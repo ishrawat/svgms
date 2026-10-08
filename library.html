@@ -110,26 +110,72 @@
         return div.innerHTML;
     }
 
-    /* Subject → badge letter + color class.
-       Used to build the small badge that replaced the emoji. */
+    /* ----------------------------------------------------------------------
+       SUBJECT BADGE — two-letter colored badge for NCERT books
+       ---------------------------------------------------------------------- */
     function getSubjectBadge(name) {
         var n = (name || '').toLowerCase();
 
-        if (n.indexOf('math') !== -1)                   return { text: 'MA', cls: 'maths' };
-        if (n.indexOf('physics') !== -1)                return { text: 'PH', cls: 'science' };
-        if (n.indexOf('chemistry') !== -1)              return { text: 'CH', cls: 'science' };
-        if (n.indexOf('biology') !== -1)                return { text: 'BI', cls: 'science' };
-        if (n.indexOf('science') !== -1)                return { text: 'SC', cls: 'science' };
-        if (n.indexOf('english') !== -1)                return { text: 'EN', cls: 'language' };
-        if (n.indexOf('hindi') !== -1)                  return { text: 'HI', cls: 'language' };
-        if (n.indexOf('social') !== -1)                 return { text: 'SS', cls: 'social' };
-        if (n.indexOf('history') !== -1)                return { text: 'HI', cls: 'social' };
-        if (n.indexOf('geography') !== -1)              return { text: 'GE', cls: 'social' };
-        if (n.indexOf('civics') !== -1)                 return { text: 'CI', cls: 'social' };
-        if (n.indexOf('politics') !== -1)               return { text: 'PO', cls: 'social' };
-        if (n.indexOf('economics') !== -1)              return { text: 'EC', cls: 'social' };
+        if (n.indexOf('math') !== -1)      return { text: 'MA', cls: 'maths' };
+        if (n.indexOf('physics') !== -1)   return { text: 'PH', cls: 'science' };
+        if (n.indexOf('chemistry') !== -1) return { text: 'CH', cls: 'science' };
+        if (n.indexOf('biology') !== -1)   return { text: 'BI', cls: 'science' };
+        if (n.indexOf('science') !== -1)   return { text: 'SC', cls: 'science' };
+        if (n.indexOf('english') !== -1)   return { text: 'EN', cls: 'language' };
+        if (n.indexOf('hindi') !== -1)     return { text: 'HI', cls: 'language' };
+        if (n.indexOf('social') !== -1)    return { text: 'SS', cls: 'social' };
+        if (n.indexOf('history') !== -1)   return { text: 'HI', cls: 'social' };
+        if (n.indexOf('geography') !== -1) return { text: 'GE', cls: 'social' };
+        if (n.indexOf('civics') !== -1)    return { text: 'CI', cls: 'social' };
+        if (n.indexOf('politics') !== -1)  return { text: 'PO', cls: 'social' };
+        if (n.indexOf('economics') !== -1) return { text: 'EC', cls: 'social' };
 
         return { text: 'BK', cls: 'other' };
+    }
+
+    /* ----------------------------------------------------------------------
+       LOGO MARKUP — 3-tier fallback: Clearbit → Google favicon → letter
+       ---------------------------------------------------------------------- */
+    function logoMarkup(domain, name) {
+        if (!domain) {
+            return '<div class="resource-logo-wrap logo-failed">' +
+                   escapeHtml((name || '?').charAt(0).toUpperCase()) +
+                   '</div>';
+        }
+
+        var initial = (name || '?').charAt(0).toUpperCase();
+        var clearbit = 'https://logo.clearbit.com/' + domain;
+        var favicon = 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=128';
+
+        return '<div class="resource-logo-wrap">' +
+            '<img class="resource-logo" ' +
+                 'src="' + escapeHtml(clearbit) + '" ' +
+                 'alt="" ' +
+                 'loading="lazy" ' +
+                 'data-fallback="' + escapeHtml(favicon) + '" ' +
+                 'data-initial="' + escapeHtml(initial) + '" ' +
+                 'data-stage="0">' +
+        '</div>';
+    }
+
+    function wireLogoFallbacks(container) {
+        container.querySelectorAll('.resource-logo').forEach(function (img) {
+            if (img.dataset.wired) return;
+            img.dataset.wired = '1';
+
+            img.addEventListener('error', function () {
+                var stage = this.dataset.stage;
+
+                if (stage === '0') {
+                    this.dataset.stage = '1';
+                    this.src = this.dataset.fallback;
+                } else {
+                    var wrap = this.parentNode;
+                    wrap.classList.add('logo-failed');
+                    wrap.textContent = this.dataset.initial;
+                }
+            });
+        });
     }
 
     /* ----------------------------------------------------------------------
@@ -227,31 +273,35 @@
        WORLD LIBRARIES
        ---------------------------------------------------------------------- */
     var worldLibraries = [
-        { name: "Harvard Free Courses", category: "Top Universities", description: "Free online courses from Harvard University across all subjects", url: "https://pll.harvard.edu/catalog/free" },
-        { name: "MIT OpenCourseWare", category: "Top Universities", description: "Free lecture notes, exams, and videos from MIT", url: "https://ocw.mit.edu/" },
-        { name: "Stanford Online", category: "Top Universities", description: "Free courses from Stanford University", url: "https://online.stanford.edu/free-courses" },
-        { name: "Oxford Free Courses", category: "Top Universities", description: "Free online courses from Oxford University", url: "https://www.oxfordhomestudy.com/free-online-courses-with-certificates" },
-        { name: "Swayam", category: "Top Universities", description: "Government of India's free online learning platform", url: "https://swayam.gov.in/" },
-        { name: "Skill India", category: "Top Universities", description: "Government of India's skill development initiative", url: "https://www.skillindiadigital.gov.in/home" },
+        // Top Universities
+        { name: "Harvard Free Courses", domain: "harvard.edu", category: "Top Universities", description: "Free online courses from Harvard University across all subjects", url: "https://pll.harvard.edu/catalog/free" },
+        { name: "MIT OpenCourseWare", domain: "mit.edu", category: "Top Universities", description: "Free lecture notes, exams, and videos from MIT", url: "https://ocw.mit.edu/" },
+        { name: "Stanford Online", domain: "stanford.edu", category: "Top Universities", description: "Free courses from Stanford University", url: "https://online.stanford.edu/free-courses" },
+        { name: "Oxford Free Courses", domain: "ox.ac.uk", category: "Top Universities", description: "Free online courses from Oxford University", url: "https://www.oxfordhomestudy.com/free-online-courses-with-certificates" },
+        { name: "Swayam", domain: "swayam.gov.in", category: "Top Universities", description: "Government of India's free online learning platform", url: "https://swayam.gov.in/" },
+        { name: "Skill India", domain: "skillindiadigital.gov.in", category: "Top Universities", description: "Government of India's skill development initiative", url: "https://www.skillindiadigital.gov.in/home" },
 
-        { name: "FreeCodeCamp", category: "Online Learning", description: "Build your skills for free — includes free certification", url: "https://www.freecodecamp.org/" },
-        { name: "MOOC.fi", category: "Online Learning", description: "Massive Open Online Courses by University of Helsinki", url: "https://www.mooc.fi/en/" },
-        { name: "Khan Academy", category: "Online Learning", description: "Free world-class education for anyone, anywhere", url: "https://www.khanacademy.org/" },
-        { name: "Coursera Free Courses", category: "Online Learning", description: "Thousands of free courses from top universities", url: "https://www.coursera.org/browse/free" },
-        { name: "NPTEL", category: "Online Learning", description: "Free courses by top IIT educators", url: "https://nptel.ac.in/" },
-        { name: "Google Digital Garage", category: "Online Learning", description: "Free digital skills training from Google", url: "https://learndigital.withgoogle.com/digitalgarage" },
-        { name: "Microsoft Learn", category: "Online Learning", description: "Free learning paths and certifications from Microsoft", url: "https://learn.microsoft.com/" },
+        // Online Learning
+        { name: "FreeCodeCamp", domain: "freecodecamp.org", category: "Online Learning", description: "Build your skills for free — includes free certification", url: "https://www.freecodecamp.org/" },
+        { name: "MOOC.fi", domain: "mooc.fi", category: "Online Learning", description: "Massive Open Online Courses by University of Helsinki", url: "https://www.mooc.fi/en/" },
+        { name: "Khan Academy", domain: "khanacademy.org", category: "Online Learning", description: "Free world-class education for anyone, anywhere", url: "https://www.khanacademy.org/" },
+        { name: "Coursera Free Courses", domain: "coursera.org", category: "Online Learning", description: "Thousands of free courses from top universities", url: "https://www.coursera.org/browse/free" },
+        { name: "NPTEL", domain: "nptel.ac.in", category: "Online Learning", description: "Free courses by top IIT educators", url: "https://nptel.ac.in/" },
+        { name: "Google Digital Garage", domain: "google.com", category: "Online Learning", description: "Free digital skills training from Google", url: "https://learndigital.withgoogle.com/digitalgarage" },
+        { name: "Microsoft Learn", domain: "microsoft.com", category: "Online Learning", description: "Free learning paths and certifications from Microsoft", url: "https://learn.microsoft.com/" },
 
-        { name: "UNESCO Digital Library", category: "Digital Libraries", description: "Access to the world's largest collection of books and documents", url: "https://unesdoc.unesco.org/" },
-        { name: "World Digital Library", category: "Digital Libraries", description: "Cultural treasures from libraries around the world", url: "https://www.wdl.org/" },
-        { name: "Project Gutenberg", category: "Digital Libraries", description: "Over 60,000 free ebooks", url: "https://www.gutenberg.org/" },
-        { name: "Internet Archive", category: "Digital Libraries", description: "Free books, movies, music, and websites", url: "https://archive.org/" },
-        { name: "Google Books", category: "Digital Libraries", description: "Search and preview millions of books", url: "https://books.google.com/" }
+        // Digital Libraries
+        { name: "UNESCO Digital Library", domain: "unesco.org", category: "Digital Libraries", description: "Access to the world's largest collection of books and documents", url: "https://unesdoc.unesco.org/" },
+        { name: "World Digital Library", domain: "wdl.org", category: "Digital Libraries", description: "Cultural treasures from libraries around the world", url: "https://www.wdl.org/" },
+        { name: "Project Gutenberg", domain: "gutenberg.org", category: "Digital Libraries", description: "Over 60,000 free ebooks", url: "https://www.gutenberg.org/" },
+        { name: "Internet Archive", domain: "archive.org", category: "Digital Libraries", description: "Free books, movies, music, and websites", url: "https://archive.org/" },
+        { name: "Google Books", domain: "books.google.com", category: "Digital Libraries", description: "Search and preview millions of books", url: "https://books.google.com/" }
     ];
 
     function loadWorldLibraries() {
         var container = document.getElementById('worldContainer');
         var categories = {};
+
         worldLibraries.forEach(function (item) {
             if (!categories[item.category]) categories[item.category] = [];
             categories[item.category].push(item);
@@ -262,15 +312,18 @@
             html += '<div class="category-heading">' + escapeHtml(cat) + '</div>';
             categories[cat].forEach(function (item) {
                 html +=
-                    '<div class="resource-card">' +
-                        '<div class="resource-name">' + escapeHtml(item.name) + '</div>' +
-                        '<div class="resource-description">' + escapeHtml(item.description) + '</div>' +
+                    '<article class="resource-card">' +
+                        logoMarkup(item.domain, item.name) +
+                        '<h3 class="resource-name">' + escapeHtml(item.name) + '</h3>' +
+                        '<p class="resource-description">' + escapeHtml(item.description) + '</p>' +
                         '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="resource-btn">Visit</a>' +
-                    '</div>';
+                    '</article>';
             });
         });
         html += '</div>';
         container.innerHTML = html;
+
+        wireLogoFallbacks(container);
     }
 
     /* ----------------------------------------------------------------------
@@ -323,16 +376,19 @@
                         }
 
                         html +=
-                            '<div class="resource-card">' +
-                                '<div class="resource-name">' + escapeHtml(item.name || '') + '</div>' +
+                            '<article class="resource-card">' +
+                                logoMarkup(null, item.name || '') +
+                                '<h3 class="resource-name">' + escapeHtml(item.name || '') + '</h3>' +
                                 '<div class="resource-category">' + escapeHtml(item.category || '') + '</div>' +
-                                '<div class="resource-description">' + escapeHtml(item.description || '') + '</div>' +
+                                '<p class="resource-description">' + escapeHtml(item.description || '') + '</p>' +
                                 platformsHtml +
-                            '</div>';
+                            '</article>';
                     });
                 });
                 html += '</div>';
                 container.innerHTML = html;
+
+                wireLogoFallbacks(container);
             })
             .catch(function (err) {
                 console.warn('Skills unavailable:', err);
