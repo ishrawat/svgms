@@ -4191,11 +4191,17 @@ footer p {
     border-radius: var(--r-sm);
     background: var(--cream-deep);
     color: var(--ink);
-    font-family: var(--font-ui);
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    line-height: 1;
+}
+
+.subject-badge svg {
+    width: 19px;
+    height: 19px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: block;
 }
 
 .subject-badge.maths     { background: var(--info-soft); color: var(--info); }

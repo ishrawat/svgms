@@ -111,26 +111,101 @@
     }
 
     /* ----------------------------------------------------------------------
-       SUBJECT BADGE — two-letter colored badge for NCERT books
+       SUBJECT ICONS — inline SVG per subject, returned as a colored badge
        ---------------------------------------------------------------------- */
+    var SUBJECT_SVGS = {
+        maths:
+            '<svg viewBox="0 0 24 24"><path d="M18 4H6l6 8-6 8h12"/></svg>',
+        physics:
+            '<svg viewBox="0 0 24 24">' +
+                '<circle cx="12" cy="12" r="1.4"/>' +
+                '<ellipse cx="12" cy="12" rx="10" ry="4"/>' +
+                '<ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/>' +
+                '<ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-60 12 12)"/>' +
+            '</svg>',
+        chemistry:
+            '<svg viewBox="0 0 24 24">' +
+                '<path d="M9 3h6"/>' +
+                '<path d="M10 3v6L4.5 18a2 2 0 001.8 3h11.4a2 2 0 001.8-3L14 9V3"/>' +
+                '<line x1="8" y1="14" x2="16" y2="14"/>' +
+            '</svg>',
+        biology:
+            '<svg viewBox="0 0 24 24">' +
+                '<path d="M4 4c4 4 4 12 8 16"/>' +
+                '<path d="M20 4c-4 4-4 12-8 16"/>' +
+                '<path d="M8 6h8"/>' +
+                '<path d="M6 10h12"/>' +
+                '<path d="M6 14h12"/>' +
+                '<path d="M8 18h8"/>' +
+            '</svg>',
+        science:
+            '<svg viewBox="0 0 24 24">' +
+                '<path d="M9 3h6"/>' +
+                '<path d="M10 3v6L4.5 18a2 2 0 001.8 3h11.4a2 2 0 001.8-3L14 9V3"/>' +
+            '</svg>',
+        english:
+            '<svg viewBox="0 0 24 24">' +
+                '<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>' +
+                '<path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>' +
+            '</svg>',
+        hindi:
+            '<svg viewBox="0 0 24 24">' +
+                '<path d="M5 8l6 6"/>' +
+                '<path d="M4 14h6"/>' +
+                '<path d="M2 5h12"/>' +
+                '<path d="M7 2h1"/>' +
+                '<path d="M22 22l-5-10-5 10"/>' +
+                '<path d="M14 18h6"/>' +
+            '</svg>',
+        history:
+            '<svg viewBox="0 0 24 24">' +
+                '<circle cx="12" cy="12" r="10"/>' +
+                '<polyline points="12 6 12 12 16 14"/>' +
+            '</svg>',
+        geography:
+            '<svg viewBox="0 0 24 24">' +
+                '<circle cx="12" cy="12" r="10"/>' +
+                '<line x1="2" y1="12" x2="22" y2="12"/>' +
+                '<path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>' +
+            '</svg>',
+        civics:
+            '<svg viewBox="0 0 24 24">' +
+                '<path d="M3 21h18"/>' +
+                '<path d="M5 21V7l7-4 7 4v14"/>' +
+                '<path d="M9 21v-6h6v6"/>' +
+            '</svg>',
+        economics:
+            '<svg viewBox="0 0 24 24">' +
+                '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>' +
+                '<polyline points="16 7 22 7 22 13"/>' +
+            '</svg>',
+        book:
+            '<svg viewBox="0 0 24 24">' +
+                '<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>' +
+                '<path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>' +
+            '</svg>'
+    };
+
+    /* Order matters — check specific subjects BEFORE general ones,
+       otherwise "Social Science (History)" would match "science". */
     function getSubjectBadge(name) {
         var n = (name || '').toLowerCase();
 
-        if (n.indexOf('math') !== -1)      return { text: 'MA', cls: 'maths' };
-        if (n.indexOf('physics') !== -1)   return { text: 'PH', cls: 'science' };
-        if (n.indexOf('chemistry') !== -1) return { text: 'CH', cls: 'science' };
-        if (n.indexOf('biology') !== -1)   return { text: 'BI', cls: 'science' };
-        if (n.indexOf('science') !== -1)   return { text: 'SC', cls: 'science' };
-        if (n.indexOf('english') !== -1)   return { text: 'EN', cls: 'language' };
-        if (n.indexOf('hindi') !== -1)     return { text: 'HI', cls: 'language' };
-        if (n.indexOf('social') !== -1)    return { text: 'SS', cls: 'social' };
-        if (n.indexOf('history') !== -1)   return { text: 'HI', cls: 'social' };
-        if (n.indexOf('geography') !== -1) return { text: 'GE', cls: 'social' };
-        if (n.indexOf('civics') !== -1)    return { text: 'CI', cls: 'social' };
-        if (n.indexOf('politics') !== -1)  return { text: 'PO', cls: 'social' };
-        if (n.indexOf('economics') !== -1) return { text: 'EC', cls: 'social' };
+        if (n.indexOf('math') !== -1)      return { svg: SUBJECT_SVGS.maths,     cls: 'maths' };
+        if (n.indexOf('physics') !== -1)   return { svg: SUBJECT_SVGS.physics,   cls: 'science' };
+        if (n.indexOf('chemistry') !== -1) return { svg: SUBJECT_SVGS.chemistry, cls: 'science' };
+        if (n.indexOf('biology') !== -1)   return { svg: SUBJECT_SVGS.biology,   cls: 'science' };
+        if (n.indexOf('history') !== -1)   return { svg: SUBJECT_SVGS.history,   cls: 'social' };
+        if (n.indexOf('geography') !== -1) return { svg: SUBJECT_SVGS.geography, cls: 'social' };
+        if (n.indexOf('civics') !== -1)    return { svg: SUBJECT_SVGS.civics,    cls: 'social' };
+        if (n.indexOf('politics') !== -1)  return { svg: SUBJECT_SVGS.civics,    cls: 'social' };
+        if (n.indexOf('economics') !== -1) return { svg: SUBJECT_SVGS.economics, cls: 'social' };
+        if (n.indexOf('english') !== -1)   return { svg: SUBJECT_SVGS.english,   cls: 'language' };
+        if (n.indexOf('hindi') !== -1)     return { svg: SUBJECT_SVGS.hindi,     cls: 'language' };
+        if (n.indexOf('social') !== -1)    return { svg: SUBJECT_SVGS.geography, cls: 'social' };
+        if (n.indexOf('science') !== -1)   return { svg: SUBJECT_SVGS.science,   cls: 'science' };
 
-        return { text: 'BK', cls: 'other' };
+        return { svg: SUBJECT_SVGS.book, cls: 'other' };
     }
 
     /* ----------------------------------------------------------------------
@@ -259,7 +334,7 @@
             var badge = getSubjectBadge(book.name);
             html += '<div class="book-item">' +
                 '<div class="book-info">' +
-                    '<span class="subject-badge ' + badge.cls + '">' + badge.text + '</span>' +
+                    '<span class="subject-badge ' + badge.cls + '" aria-hidden="true">' + badge.svg + '</span>' +
                     '<span class="book-name">' + escapeHtml(book.name) + '</span>' +
                 '</div>' +
                 '<a href="' + escapeHtml(book.url) + '" target="_blank" rel="noopener" class="btn-pdf">Open PDF</a>' +
