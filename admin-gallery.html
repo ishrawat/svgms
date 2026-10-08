@@ -1,1110 +1,1396 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery Manager</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gallery Manager — SVGMS Admin</title>
+<link rel="icon" href="imgs/logo1.png" type="image/png">
+<meta name="robots" content="noindex, nofollow">
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f0f2f5;
-            padding: 20px;
-            min-height: 100vh;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        .header {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
+<style>
+/* ==========================================================================
+   GALLERY MANAGER — standalone admin page
+   ========================================================================== */
+:root {
+    --ink:            #1a2b3c;
+    --ink-soft:       #2c3e50;
+    --ink-deep:       #0d1a26;
+    --ochre:          #c8862c;
+    --ochre-bright:   #e0a347;
+    --ochre-soft:     #f3e4c4;
+    --terracotta:     #a84b2f;
+    --sage:           #7d8f72;
 
-        .header h1 {
-            color: #1a1a2e;
-            font-size: 24px;
-        }
+    --cream:          #faf6ee;
+    --cream-deep:     #f2e9d7;
+    --paper:          #ffffff;
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+    --text:           #3a4a56;
+    --text-faint:     #738290;
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
+    --line:           rgba(26, 43, 60, 0.12);
+    --line-strong:    rgba(26, 43, 60, 0.22);
 
-        .btn-primary {
-            background: #4361ee;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #3a56d4;
-        }
+    --danger:         #a02c2c;
+    --danger-soft:    #fce4e4;
+    --success:        #1b7f4b;
+    --success-soft:   #dff5e6;
+    --warning:        #8a5a10;
+    --warning-soft:   #fbf1dc;
 
-        .btn-success {
-            background: #2ecc71;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #27ae60;
-        }
+    --shadow-sm:      0 1px 2px rgba(26, 43, 60, 0.06);
+    --shadow:         0 8px 28px rgba(26, 43, 60, 0.08);
+    --shadow-lg:      0 22px 55px rgba(26, 43, 60, 0.14);
 
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #c0392b;
-        }
+    --r-sm:           3px;
+    --r:              5px;
+    --r-lg:           10px;
 
-        .btn-warning {
-            background: #f39c12;
-            color: white;
-        }
-        .btn-warning:hover {
-            background: #d68910;
-        }
+    --ease:           cubic-bezier(0.4, 0, 0.2, 1);
+    --t:              0.25s;
 
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #7f8c8d;
-        }
+    --font-display:   'Fraunces', Georgia, serif;
+    --font-ui:        'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-        }
+body {
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    background:
+        radial-gradient(ellipse 1000px 500px at 90% -100px, rgba(200, 134, 44, 0.08), transparent 60%),
+        linear-gradient(180deg, #fafbfa, var(--cream));
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
 
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 20px;
-        }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+img, svg { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+:focus-visible { outline: 2px solid var(--ochre); outline-offset: 2px; }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #2d3436;
-            font-size: 14px;
-        }
+/* ---------- Layout ---------- */
+.admin-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: clamp(1.25rem, 3vw, 2rem);
+}
 
-        .form-control {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #dfe6e9;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
+/* ---------- Header ---------- */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    padding: 1.15rem 1.4rem;
+    background: var(--paper);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+    border-bottom: 3px solid var(--ochre);
+    margin-bottom: 1.5rem;
+}
 
-        .form-control:focus {
-            outline: none;
-            border-color: #4361ee;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
+.admin-header h1 {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 30, 'WONK' 1;
+    font-weight: 600;
+    font-size: 1.35rem;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
+.admin-header h1 i { color: var(--ochre); font-size: 1.1rem; }
 
-        .message {
-            padding: 12px 18px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: none;
-            font-size: 14px;
-        }
+.admin-header .links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
 
-        .message.success {
-            display: block;
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
+.admin-header .links a,
+.admin-header .links button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    border-radius: var(--r-sm);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    transition: all var(--t) var(--ease);
+}
 
-        .message.error {
-            display: block;
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
+.admin-header .links a:hover,
+.admin-header .links button:hover {
+    background: var(--cream);
+    border-color: var(--ochre);
+}
 
-        .message.loading {
-            display: block;
-            background: #e2e3e5;
-            color: #383d41;
-            border-left: 4px solid #6c757d;
-        }
+.admin-header .links i { font-size: 0.75rem; color: var(--ochre); }
 
-        .progress-container {
-            width: 100%;
-            height: 30px;
-            background: #e9ecef;
-            border-radius: 15px;
-            margin: 15px 0;
-            overflow: hidden;
-            display: none;
-            position: relative;
-        }
+.btn-logout {
+    background: var(--terracotta) !important;
+    color: var(--cream) !important;
+    border-color: var(--terracotta) !important;
+    font-weight: 700;
+}
 
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4361ee, #2ecc71);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 15px;
-        }
+.btn-logout:hover {
+    background: #8b3d24 !important;
+    border-color: #8b3d24 !important;
+    transform: translateY(-1px);
+}
 
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-            font-weight: 600;
-            color: #2d3436;
-        }
+.btn-logout i { color: var(--cream) !important; }
 
-        .event-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            border-left: 4px solid #4361ee;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
+/* ---------- Cards ---------- */
+.card {
+    background: var(--paper);
+    padding: clamp(1.4rem, 3vw, 2rem);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+}
 
-        .event-info {
-            flex: 1;
-            min-width: 200px;
-        }
+.card-title {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 30, 'WONK' 1;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
 
-        .event-title {
-            font-weight: 600;
-            color: #1a1a2e;
-            font-size: 16px;
-        }
+.card-title i { color: var(--ochre); font-size: 1rem; }
 
-        .event-meta {
-            font-size: 13px;
-            color: #636e72;
-            margin-top: 4px;
-        }
+.card-title .event-name {
+    color: var(--terracotta);
+    font-style: italic;
+    margin-left: 0.15rem;
+}
 
-        .event-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+/* ---------- Form ---------- */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
 
-        .event-actions .btn {
-            padding: 6px 14px;
-            font-size: 13px;
-        }
+.form-group { margin-bottom: 1rem; }
 
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
+.form-group label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.4rem;
+}
 
-        .image-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #e9ecef;
-            position: relative;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+.form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-sm);
+    background: var(--cream);
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all var(--t) var(--ease);
+}
 
-        .image-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
+.form-control:focus {
+    outline: none;
+    border-color: var(--ochre);
+    background: var(--paper);
+    box-shadow: 0 0 0 3px rgba(200, 134, 44, 0.14);
+}
 
-        .image-card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            display: block;
-        }
+.form-control[type="file"] {
+    padding: 0.65rem 0.9rem;
+    border-style: dashed;
+    cursor: pointer;
+}
 
-        .image-card .image-error {
-            width: 100%;
-            height: 150px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #f8f9fa;
-            color: #e74c3c;
-            font-size: 13px;
-        }
+.form-control[type="file"]:hover {
+    border-color: var(--ochre);
+    background: var(--paper);
+}
 
-        .image-card .image-error span {
-            font-size: 32px;
-            margin-bottom: 5px;
-        }
+.form-control[type="file"]::file-selector-button {
+    padding: 0.4rem 0.9rem;
+    margin-right: 0.75rem;
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    border-radius: var(--r-sm);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background var(--t) var(--ease);
+}
 
-        .image-card .image-caption {
-            padding: 8px 12px;
-            font-size: 13px;
-            color: #2d3436;
-            background: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: center;
-        }
+.form-control[type="file"]::file-selector-button:hover {
+    background: var(--ochre);
+    color: var(--ink);
+}
 
-        .image-card .delete-btn {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            background: rgba(231, 76, 60, 0.9);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-            z-index: 10;
-        }
+.form-hint {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    line-height: 1.5;
+}
 
-        .image-card .delete-btn:hover {
-            background: #c0392b;
-            transform: scale(1.1);
-        }
+/* ---------- Buttons ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.3rem;
+    border: none;
+    border-radius: var(--r-sm);
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    transition: all var(--t) var(--ease);
+    white-space: nowrap;
+}
 
-        .delete-cloud-btn {
-            width: calc(100% - 12px);
-            margin: 0 6px 6px;
-            padding: 6px 8px;
-            border: 1px solid #d29b35;
-            border-radius: 4px;
-            background: #fff8e8;
-            color: #7a5512;
-            cursor: pointer;
-            font-size: 11px;
-        }
+.btn i { font-size: 0.8rem; }
 
-        .delete-cloud-btn:hover:not(:disabled) {
-            background: #f6ead0;
-        }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-        .delete-cloud-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.55;
-        }
+.btn-primary {
+    background: var(--ink);
+    color: var(--cream);
+}
+.btn-primary:hover:not(:disabled) {
+    background: var(--ochre);
+    color: var(--ink);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
 
-        .hidden {
-            display: none !important;
-        }
+.btn-success {
+    background: var(--sage);
+    color: var(--cream);
+}
+.btn-success:hover:not(:disabled) {
+    background: #677a5c;
+    transform: translateY(-1px);
+}
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #636e72;
-        }
+.btn-danger {
+    background: var(--terracotta);
+    color: var(--cream);
+}
+.btn-danger:hover:not(:disabled) {
+    background: #8b3d24;
+    transform: translateY(-1px);
+}
 
-        .empty-state span {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 10px;
-        }
+.btn-warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+    border: 1px solid rgba(138, 90, 16, 0.3);
+}
+.btn-warning:hover:not(:disabled) {
+    background: var(--warning);
+    color: var(--cream);
+    border-color: var(--warning);
+}
 
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: stretch;
-                text-align: center;
-            }
+.btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+}
+.btn-secondary:hover:not(:disabled) {
+    background: var(--cream);
+    border-color: var(--ochre);
+}
 
-            .header-actions {
-                justify-content: center;
-            }
+.btn-sm {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.75rem;
+}
 
-            .form-row {
-                grid-template-columns: 1fr;
-            }
+/* ---------- Messages ---------- */
+.message {
+    display: none;
+    padding: 0.85rem 1.1rem;
+    border-radius: var(--r-sm);
+    margin-bottom: 1.25rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.5;
+    border-left: 4px solid transparent;
+}
 
-            .event-item {
-                flex-direction: column;
-                text-align: center;
-            }
+.message.success {
+    display: block;
+    background: var(--success-soft);
+    color: var(--success);
+    border-left-color: var(--success);
+}
+.message.error {
+    display: block;
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-left-color: var(--danger);
+}
+.message.loading {
+    display: block;
+    background: var(--cream-deep);
+    color: var(--text);
+    border-left-color: var(--ochre);
+}
 
-            .event-actions {
-                justify-content: center;
-            }
+/* ---------- Progress ---------- */
+.progress-container {
+    width: 100%;
+    height: 26px;
+    background: var(--cream-deep);
+    border-radius: 999px;
+    margin: 1rem 0;
+    overflow: hidden;
+    display: none;
+    position: relative;
+    border: 1px solid var(--line);
+}
 
-            .image-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            }
-        }
-    </style>
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ochre), var(--ochre-bright));
+    width: 0%;
+    transition: width 0.3s var(--ease);
+}
+
+.progress-text {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+}
+
+/* ---------- Event List ---------- */
+.event-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 0.7rem;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--ochre);
+    border-radius: var(--r);
+    transition: all var(--t) var(--ease);
+}
+
+.event-item:hover {
+    background: var(--paper);
+    box-shadow: var(--shadow-sm);
+}
+
+.event-item:last-child { margin-bottom: 0; }
+
+.event-info { flex: 1; min-width: 200px; }
+
+.event-title {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 30, 'WONK' 1;
+    font-weight: 600;
+    font-size: 1.02rem;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+    margin-bottom: 0.35rem;
+}
+
+.event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-faint);
+}
+
+.event-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.event-meta i { color: var(--ochre); font-size: 0.7rem; }
+
+.event-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+/* ---------- Image Grid ---------- */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.9rem;
+    margin-top: 1rem;
+    width: 100%;
+    grid-column: 1 / -1;
+}
+
+.image-grid-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--text-faint);
+    font-size: 0.88rem;
+    font-style: italic;
+}
+
+.image-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+.image-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+
+.image-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+    background: var(--cream-deep);
+}
+
+.image-card .image-error {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    background: var(--cream-deep);
+    color: var(--danger);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.image-card .image-error i { font-size: 1.5rem; }
+
+.image-card .image-caption {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--paper);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    border-top: 1px solid var(--line);
+}
+
+.image-card .delete-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    background: rgba(160, 44, 44, 0.9);
+    color: var(--cream);
+    border: none;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: all var(--t) var(--ease);
+}
+
+.image-card .delete-btn:hover {
+    background: var(--danger);
+    transform: scale(1.08);
+}
+
+.delete-cloud-btn {
+    width: calc(100% - 12px);
+    margin: 0 6px 6px;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid rgba(200, 134, 44, 0.5);
+    border-radius: var(--r-sm);
+    background: var(--ochre-soft);
+    color: var(--warning);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all var(--t) var(--ease);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.delete-cloud-btn:hover:not(:disabled) {
+    background: var(--ochre);
+    color: var(--ink);
+    border-color: var(--ochre);
+}
+
+.delete-cloud-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+/* ---------- Hidden + Empty ---------- */
+.hidden { display: none !important; }
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--text-faint);
+    font-size: 0.95rem;
+}
+
+.empty-state i {
+    display: block;
+    font-size: 2.2rem;
+    color: var(--line-strong);
+    margin-bottom: 0.75rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .admin-header .links { justify-content: flex-start; }
+
+    .form-row { grid-template-columns: 1fr; }
+
+    .event-item { flex-direction: column; }
+    .event-actions { width: 100%; }
+    .event-actions .btn { flex: 1; justify-content: center; }
+
+    .image-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .image-card img,
+    .image-card .image-error { height: 110px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
 </head>
 <body>
 
-<div class="container">
-    
-    <div class="header">
-        <h1>🖼️ Gallery Manager</h1>
-        <div class="header-actions">
-            <button class="btn btn-secondary" onclick="goToDashboard()">← Dashboard</button>
-            <button class="btn btn-secondary" onclick="goToSite()">View Site</button>
-            <button class="btn btn-warning" onclick="cleanupBrokenImages()">🧹 Clean Broken</button>
-            <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
-        </div>
-    </div>
+<div class="admin-wrapper">
 
-    <div class="card">
-        <div class="card-title">📅 Create New Event</div>
+    <!-- ===== HEADER ===== -->
+    <header class="admin-header">
+        <h1><i class="fas fa-images"></i> Gallery Manager</h1>
+        <div class="links">
+            <a href="admin.html"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            <a href="index.html"><i class="fas fa-globe"></i> View Site</a>
+            <button type="button" onclick="cleanupBrokenImages()">
+                <i class="fas fa-broom"></i> Clean Broken
+            </button>
+            <button type="button" class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== CREATE EVENT ===== -->
+    <section class="card">
+        <h2 class="card-title"><i class="fas fa-calendar-plus"></i> Create New Event</h2>
+
         <div id="eventMessage" class="message"></div>
+
         <div class="form-row">
             <div class="form-group">
-                <label>Event Title *</label>
-                <input type="text" id="eventTitle" class="form-control" placeholder="e.g., Sports Day 2026">
+                <label for="eventTitle">Event Title</label>
+                <input type="text" id="eventTitle" class="form-control" placeholder="e.g. Sports Day 2026">
             </div>
             <div class="form-group">
-                <label>Event Date</label>
+                <label for="eventDate">Event Date</label>
                 <input type="date" id="eventDate" class="form-control">
             </div>
         </div>
-        <div class="form-group">
-            <label>Description</label>
-            <input type="text" id="eventDescription" class="form-control" placeholder="Brief description (optional)">
-        </div>
-        <button class="btn btn-success" id="createEventBtn" onclick="createGalleryEvent()" disabled>➕ Create Event</button>
-    </div>
 
-    <div class="card hidden" id="uploadSection">
-        <div class="card-title">📤 Upload Images to <span id="selectedEventTitle"></span></div>
+        <div class="form-group">
+            <label for="eventDescription">Description (optional)</label>
+            <input type="text" id="eventDescription" class="form-control" placeholder="Brief description">
+        </div>
+
+        <button class="btn btn-success" id="createEventBtn" onclick="createGalleryEvent()" disabled>
+            <i class="fas fa-plus"></i> Create Event
+        </button>
+    </section>
+
+    <!-- ===== UPLOAD ===== -->
+    <section class="card hidden" id="uploadSection">
+        <h2 class="card-title">
+            <i class="fas fa-cloud-upload-alt"></i>
+            Upload Images to <span class="event-name" id="selectedEventTitle"></span>
+        </h2>
+
         <div id="uploadMessage" class="message"></div>
+
         <div class="progress-container" id="progressContainer">
             <div class="progress-bar" id="progressBar"></div>
             <div class="progress-text" id="progressText">0%</div>
         </div>
-        <div class="form-group">
-            <label>Choose Images</label>
-            <input type="file" id="imageFiles" class="form-control" accept="image/*" multiple>
-            <small style="color: #636e72; display: block; margin-top: 5px;">
-                Max 5MB per image. Supports JPG, PNG, GIF, WebP.
-            </small>
-        </div>
-        <div class="form-group">
-            <label>Caption (optional)</label>
-            <input type="text" id="imageCaption" class="form-control" placeholder="Caption for all images">
-        </div>
-        <input type="hidden" id="selectedEventId">
-        <button class="btn btn-primary" onclick="uploadImages()">📤 Upload Images</button>
-        <button class="btn btn-secondary" onclick="cancelUpload()">Cancel</button>
-    </div>
 
-    <div class="card">
-        <div class="card-title">📋 Events</div>
+        <div class="form-group">
+            <label for="imageFiles">Choose Images</label>
+            <input type="file" id="imageFiles" class="form-control" accept="image/*" multiple>
+            <small class="form-hint">Max 5 MB per image. Supports JPG, PNG, GIF, WebP.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="imageCaption">Caption (optional)</label>
+            <input type="text" id="imageCaption" class="form-control" placeholder="Applies to all selected images">
+        </div>
+
+        <input type="hidden" id="selectedEventId">
+
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="btn btn-primary" id="uploadImagesBtn" onclick="uploadImages()">
+                <i class="fas fa-cloud-upload-alt"></i> Upload Images
+            </button>
+            <button class="btn btn-secondary" onclick="cancelUpload()">Cancel</button>
+        </div>
+    </section>
+
+    <!-- ===== EVENTS LIST ===== -->
+    <section class="card">
+        <h2 class="card-title"><i class="fas fa-list"></i> Events</h2>
         <div id="eventsList">
             <div class="empty-state">
-                <span>⏳</span>
-                Loading events...
+                <i class="fas fa-spinner fa-spin"></i>
+                Loading events…
             </div>
         </div>
-    </div>
+    </section>
 
 </div>
 
+<!-- ===== FIREBASE SDK ===== -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script>
-// ==========================================
-// CONFIGURATION
-// ==========================================
-const CONFIG = {
-    firebase: {
-        apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
-        authDomain: "svgms-backend.firebaseapp.com",
-        projectId: "svgms-backend",
-        storageBucket: "svgms-backend.firebasestorage.app",
-        messagingSenderId: "1065359559935",
-        appId: "1:1065359559935:web:977cea73a68e05813750ca"
-    },
-    cloudinary: {
-        cloudName: "zh3vg8mi",
-        uploadPreset: "school_notices"
+(function () {
+    'use strict';
+
+    /* =========================================================
+       CONFIG
+       ========================================================= */
+    var CONFIG = {
+        firebase: {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        },
+        cloudinary: {
+            cloudName: "zh3vg8mi",
+            uploadPreset: "school_notices"
+        },
+        maxImageSizeMB: 5
+    };
+
+    /* =========================================================
+       INIT
+       ========================================================= */
+    firebase.initializeApp(CONFIG.firebase);
+    var auth = firebase.auth();
+    var db = firebase.firestore();
+
+    var currentEventId = null;
+    var imageCache = {};
+    var galleryUser = null;
+    var galleryAuthorized = false;
+
+    /* =========================================================
+       HELPERS
+       ========================================================= */
+    function escapeHtml(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
-};
 
-// ==========================================
-// INITIALIZATION
-// ==========================================
-firebase.initializeApp(CONFIG.firebase);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-let currentEventId = null;
-const imageCache = {};
-let galleryUser = null;
-let galleryAuthorized = false;
-
-// ==========================================
-// AUTH CHECK
-// ==========================================
-auth.onAuthStateChanged(async function(user) {
-    if (!user) {
-        window.location.href = 'admin.html';
-        return;
+    function formatDate(value) {
+        if (!value) return '';
+        try {
+            var d = new Date(value);
+            if (isNaN(d.getTime())) return String(value);
+            return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        } catch (e) { return String(value); }
     }
 
-    galleryUser = user;
-    try {
-        var userDoc = await db.collection('users').doc(user.uid).get();
-        var role = userDoc.exists ? userDoc.data().role : null;
-        galleryAuthorized = role === 'admin' || role === 'staff';
-        if (!galleryAuthorized) {
-            showMessage('eventMessage', 'Your account is not authorized to manage the gallery.', 'error');
+    function showMessage(elementId, text, type) {
+        var el = document.getElementById(elementId);
+        if (!el) return;
+        el.textContent = text;
+        el.className = 'message ' + type;
+
+        if (type === 'success' || type === 'error') {
+            setTimeout(function () {
+                el.className = 'message';
+                el.textContent = '';
+            }, 5000);
+        }
+    }
+
+    /* =========================================================
+       AUTH GUARD
+       ========================================================= */
+    auth.onAuthStateChanged(function (user) {
+        if (!user) {
+            window.location.href = 'admin.html';
             return;
         }
-        document.getElementById('createEventBtn').disabled = false;
-        loadEvents();
-    } catch (error) {
-        console.error('Gallery authorization error:', error);
-        showMessage('eventMessage', 'Could not verify gallery permissions. Please sign in again.', 'error');
-    }
-});
 
-// ==========================================
-// NAVIGATION
-// ==========================================
-function goToDashboard() {
-    window.location.href = 'admin.html';
-}
+        galleryUser = user;
 
-function goToSite() {
-    window.location.href = 'index.html';
-}
+        db.collection('users').doc(user.uid).get()
+            .then(function (userDoc) {
+                var role = userDoc.exists ? userDoc.data().role : null;
+                galleryAuthorized = role === 'admin' || role === 'staff';
 
-// ==========================================
-// CREATE EVENT
-// ==========================================
-function createGalleryEvent() {
-    if (!galleryUser || !galleryAuthorized) {
-        showMessage('eventMessage', 'You are not authorized to create gallery events.', 'error');
-        return;
-    }
+                if (!galleryAuthorized) {
+                    showMessage('eventMessage', 'Your account is not authorized to manage the gallery.', 'error');
+                    return;
+                }
 
-    var title = document.getElementById('eventTitle').value.trim();
-    var date = document.getElementById('eventDate').value;
-    var description = document.getElementById('eventDescription').value.trim();
-
-    if (!title) {
-        showMessage('eventMessage', 'Please enter an event title.', 'error');
-        return;
-    }
-
-    var createButton = document.getElementById('createEventBtn');
-    createButton.disabled = true;
-    showMessage('eventMessage', 'Creating event...', 'loading');
-
-    db.collection('events').add({
-        title: title,
-        date: date || null,
-        description: description || '',
-        createdBy: galleryUser.uid,
-        createdByEmail: galleryUser.email || '',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(function() {
-        showMessage('eventMessage', '✅ Event created successfully!', 'success');
-        document.getElementById('eventTitle').value = '';
-        document.getElementById('eventDate').value = '';
-        document.getElementById('eventDescription').value = '';
-        loadEvents();
-    }).catch(function(error) {
-        console.error('Error:', error);
-        var message = error.code === 'permission-denied'
-            ? '❌ Firestore denied this action. Confirm your account has the admin/staff role and the Firestore rules allow event creation.'
-            : '❌ Could not create event: ' + error.message;
-        showMessage('eventMessage', message, 'error');
-    }).finally(function() {
-        createButton.disabled = false;
+                document.getElementById('createEventBtn').disabled = false;
+                loadEvents();
+            })
+            .catch(function (err) {
+                console.error('Gallery authorization error:', err);
+                showMessage('eventMessage', 'Could not verify gallery permissions. Please sign in again.', 'error');
+            });
     });
-}
 
-window.createGalleryEvent = createGalleryEvent;
+    /* =========================================================
+       NAVIGATION
+       ========================================================= */
+    window.goToDashboard = function () { window.location.href = 'admin.html'; };
+    window.goToSite      = function () { window.location.href = 'index.html'; };
 
-// ==========================================
-// LOAD EVENTS
-// ==========================================
-function loadEvents() {
-    var container = document.getElementById('eventsList');
-    container.innerHTML = '<div class="empty-state"><span>⏳</span>Loading events...</div>';
-
-    db.collection('events').orderBy('date', 'desc').get().then(function(snapshot) {
-        if (snapshot.empty) {
-            container.innerHTML = '<div class="empty-state"><span>📭</span>No events created yet.</div>';
+    /* =========================================================
+       CREATE EVENT
+       ========================================================= */
+    window.createGalleryEvent = function () {
+        if (!galleryUser || !galleryAuthorized) {
+            showMessage('eventMessage', 'You are not authorized to create gallery events.', 'error');
             return;
         }
 
-        container.innerHTML = '';
-        var promises = [];
+        var title = document.getElementById('eventTitle').value.trim();
+        var date = document.getElementById('eventDate').value;
+        var description = document.getElementById('eventDescription').value.trim();
 
-        snapshot.forEach(function(doc) {
-            var event = doc.data();
-            var eventId = doc.id;
+        if (!title) {
+            showMessage('eventMessage', 'Please enter an event title.', 'error');
+            return;
+        }
 
-            var promise = db.collection('eventImages')
-                .where('eventId', '==', eventId)
-                .get()
-                .then(function(imgSnapshot) {
-                    var images = [];
-                    imgSnapshot.forEach(function(imgDoc) {
-                        images.push({ id: imgDoc.id, data: imgDoc.data() });
-                    });
+        var btn = document.getElementById('createEventBtn');
+        btn.disabled = true;
+        showMessage('eventMessage', 'Creating event…', 'loading');
 
-                    var div = document.createElement('div');
-                    div.className = 'event-item';
-                    
-                    var title = escapeHtml(event.title);
-                    var desc = event.description ? escapeHtml(event.description) : '';
-                    var dateStr = event.date ? formatDate(event.date) : '';
-                    
-                    div.innerHTML = 
-                        '<div class="event-info">' +
-                            '<div class="event-title">' + title + '</div>' +
-                            '<div class="event-meta">' +
-                                (dateStr ? '📅 ' + dateStr : '') +
-                                (desc ? '| ' + desc : '') +
-                                '| 🖼️ ' + images.length + ' images' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="event-actions">' +
-                            '<button class="btn btn-primary" data-eventid="' + eventId + '" data-eventtitle="' + title.replace(/"/g, '&quot;') + '" onclick="showUpload(this)">📤 Add</button>' +
-                            '<button class="btn btn-warning" data-eventid="' + eventId + '" onclick="toggleManage(this)">🖼️ Manage</button>' +
-                            '<button class="btn btn-danger" data-eventid="' + eventId + '" onclick="deleteEvent(this)">🗑️ Delete</button>' +
-                        '</div>' +
-                        '<div id="manage-' + eventId + '" style="width:100%; display:none; margin-top:15px;">' +
-                            '<div id="images-' + eventId + '" class="image-grid">' +
-                                (images.length === 0 ? '<p style="grid-column:1/-1; color:#636e72; text-align:center;">No images in this event.</p>' : '') +
-                            '</div>' +
-                        '</div>';
+        db.collection('events').add({
+            title: title,
+            date: date || null,
+            description: description || '',
+            createdBy: galleryUser.uid,
+            createdByEmail: galleryUser.email || '',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function () {
+            showMessage('eventMessage', 'Event created.', 'success');
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventDate').value = '';
+            document.getElementById('eventDescription').value = '';
+            loadEvents();
+        }).catch(function (err) {
+            console.error(err);
+            var message = err.code === 'permission-denied'
+                ? 'Firestore denied this action. Confirm your account has the admin/staff role and Firestore rules allow event creation.'
+                : 'Could not create event: ' + err.message;
+            showMessage('eventMessage', message, 'error');
+        }).finally(function () {
+            btn.disabled = false;
+        });
+    };
 
-                    container.appendChild(div);
+    /* =========================================================
+       LOAD EVENTS
+       ========================================================= */
+    function loadEvents() {
+        var container = document.getElementById('eventsList');
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i>Loading events…</div>';
 
-                    if (images.length > 0) {
-                        var grid = document.getElementById('images-' + eventId);
-                        var imgPromises = images.map(function(img) {
-                            return checkImage(img.data.imageUrl).then(function(exists) {
-                                var card = createImageCard(img.id, img.data, eventId, exists);
-                                grid.appendChild(card);
+        db.collection('events').orderBy('date', 'desc').get()
+            .then(function (snapshot) {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i>No events created yet.</div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                var promises = [];
+
+                snapshot.forEach(function (doc) {
+                    var event = doc.data();
+                    var eventId = doc.id;
+
+                    var promise = db.collection('eventImages')
+                        .where('eventId', '==', eventId)
+                        .get()
+                        .then(function (imgSnap) {
+                            var images = [];
+                            imgSnap.forEach(function (imgDoc) {
+                                images.push({ id: imgDoc.id, data: imgDoc.data() });
                             });
+                            return renderEventCard(eventId, event, images);
                         });
-                        return Promise.all(imgPromises);
-                    }
+
+                    promises.push(promise);
                 });
 
-            promises.push(promise);
-        });
-
-        return Promise.all(promises);
-    }).catch(function(error) {
-        console.error('Error:', error);
-        container.innerHTML = '<div class="empty-state"><span>❌</span>Error loading events</div>';
-    });
-}
-
-// ==========================================
-// TOGGLE MANAGE
-// ==========================================
-function toggleManage(button) {
-    var eventId = button.getAttribute('data-eventid');
-    var container = document.getElementById('manage-' + eventId);
-    if (!container) return;
-
-    if (container.style.display === 'none') {
-        container.style.display = 'block';
-        refreshImages(eventId);
-    } else {
-        container.style.display = 'none';
+                return Promise.all(promises);
+            })
+            .catch(function (err) {
+                console.error(err);
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i>Could not load events.</div>';
+            });
     }
-}
 
-// ==========================================
-// REFRESH IMAGES
-// ==========================================
-function refreshImages(eventId) {
-    var grid = document.getElementById('images-' + eventId);
-    if (!grid) return;
+    function renderEventCard(eventId, event, images) {
+        var container = document.getElementById('eventsList');
+        var title = escapeHtml(event.title);
+        var desc = event.description ? escapeHtml(event.description) : '';
+        var dateStr = event.date ? formatDate(event.date) : '';
 
-    grid.innerHTML = '<p style="grid-column:1/-1; color:#636e72; text-align:center;">Loading images...</p>';
+        var div = document.createElement('div');
+        div.className = 'event-item';
 
-    db.collection('eventImages')
-        .where('eventId', '==', eventId)
-        .get()
-        .then(function(snapshot) {
-            if (snapshot.empty) {
-                grid.innerHTML = '<p style="grid-column:1/-1; color:#636e72; text-align:center;">No images in this event.</p>';
+        var metaHtml = '';
+        if (dateStr) metaHtml += '<span><i class="fas fa-calendar"></i>' + dateStr + '</span>';
+        if (desc)    metaHtml += '<span>' + desc + '</span>';
+        metaHtml += '<span><i class="fas fa-image"></i>' + images.length + ' image' + (images.length === 1 ? '' : 's') + '</span>';
+
+        div.innerHTML =
+            '<div class="event-info">' +
+                '<div class="event-title">' + title + '</div>' +
+                '<div class="event-meta">' + metaHtml + '</div>' +
+            '</div>' +
+            '<div class="event-actions">' +
+                '<button class="btn btn-primary btn-sm" data-eventid="' + eventId + '" data-eventtitle="' + title + '" onclick="showUpload(this)"><i class="fas fa-plus"></i> Add</button>' +
+                '<button class="btn btn-warning btn-sm" data-eventid="' + eventId + '" onclick="toggleManage(this)"><i class="fas fa-images"></i> Manage</button>' +
+                '<button class="btn btn-danger btn-sm" data-eventid="' + eventId + '" onclick="deleteEvent(this)"><i class="fas fa-trash"></i> Delete</button>' +
+            '</div>' +
+            '<div id="manage-' + eventId + '" class="image-grid" style="display:none;">' +
+                (images.length === 0
+                    ? '<p class="image-grid-empty">No images in this event.</p>'
+                    : '') +
+            '</div>';
+
+        container.appendChild(div);
+
+        if (images.length > 0) {
+            var grid = document.getElementById('manage-' + eventId);
+            images.forEach(function (img) {
+                grid.appendChild(createImageCard(img.id, img.data, eventId, true));
+            });
+        }
+
+        return Promise.resolve();
+    }
+
+    /* =========================================================
+       TOGGLE MANAGE
+       ========================================================= */
+    window.toggleManage = function (button) {
+        var eventId = button.getAttribute('data-eventid');
+        var container = document.getElementById('manage-' + eventId);
+        if (!container) return;
+
+        if (container.style.display === 'none') {
+            container.style.display = 'grid';
+            refreshImages(eventId);
+        } else {
+            container.style.display = 'none';
+        }
+    };
+
+    /* =========================================================
+       REFRESH IMAGES
+       ========================================================= */
+    function refreshImages(eventId) {
+        var grid = document.getElementById('manage-' + eventId);
+        if (!grid) return;
+
+        grid.innerHTML = '<p class="image-grid-empty">Loading images…</p>';
+
+        db.collection('eventImages')
+            .where('eventId', '==', eventId)
+            .get()
+            .then(function (snapshot) {
+                if (snapshot.empty) {
+                    grid.innerHTML = '<p class="image-grid-empty">No images in this event.</p>';
+                    return;
+                }
+
+                grid.innerHTML = '';
+                snapshot.forEach(function (doc) {
+                    grid.appendChild(createImageCard(doc.id, doc.data(), eventId, true));
+                });
+            })
+            .catch(function (err) {
+                console.error(err);
+                grid.innerHTML = '<p class="image-grid-empty" style="color:var(--danger);">Could not load images.</p>';
+            });
+    }
+
+    /* =========================================================
+       CREATE IMAGE CARD
+       ========================================================= */
+    function createImageCard(id, img, eventId, exists) {
+        var card = document.createElement('div');
+        card.className = 'image-card';
+
+        var caption = img.caption || 'Untitled';
+        var url = img.imageUrl || '';
+        var publicId = img.publicId || '';
+
+        var cloudBtn = publicId
+            ? '<button class="delete-cloud-btn" data-imageid="' + escapeHtml(id) + '" data-eventid="' + escapeHtml(eventId) + '" data-publicid="' + escapeHtml(publicId) + '" onclick="deleteImageFromCloud(this)">' +
+                  '<i class="fas fa-cloud"></i> Cloud + DB' +
+              '</button>'
+            : '<button class="delete-cloud-btn" disabled title="No Cloudinary public ID on this record"><i class="fas fa-cloud-slash"></i> No Cloud ID</button>';
+
+        var dbBtn = '<button class="delete-btn" data-imageid="' + escapeHtml(id) + '" data-eventid="' + escapeHtml(eventId) + '" onclick="deleteImage(this)" aria-label="Delete DB record">' +
+                        '<i class="fas fa-times"></i>' +
+                    '</button>';
+
+        if (exists && url) {
+            card.innerHTML =
+                dbBtn +
+                '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(caption) + '" loading="lazy">' +
+                '<div class="image-caption">' + escapeHtml(caption) + '</div>' +
+                cloudBtn;
+        } else {
+            card.innerHTML =
+                dbBtn +
+                '<div class="image-error"><i class="fas fa-image"></i>Image not found</div>' +
+                '<div class="image-caption">' + escapeHtml(caption) + '</div>' +
+                cloudBtn;
+        }
+
+        return card;
+    }
+
+    /* =========================================================
+       DELETE IMAGE (DB ONLY)
+       ========================================================= */
+    window.deleteImage = function (button) {
+        var imageId = button.getAttribute('data-imageid');
+        var eventId = button.getAttribute('data-eventid');
+
+        if (!confirm('Remove this image from the database? The Cloudinary file will remain.')) return;
+
+        db.collection('eventImages').doc(imageId).delete()
+            .then(function () {
+                showMessage('eventMessage', 'Image record deleted.', 'success');
+                refreshImages(eventId);
+                loadEvents();
+            })
+            .catch(function (err) {
+                showMessage('eventMessage', 'Error: ' + err.message, 'error');
+            });
+    };
+
+    /* =========================================================
+       DELETE IMAGE FROM CLOUDINARY + DB
+       ========================================================= */
+    window.deleteImageFromCloud = async function (button) {
+        var imageId = button.getAttribute('data-imageid');
+        var eventId = button.getAttribute('data-eventid');
+        var publicId = button.getAttribute('data-publicid') || '';
+        if (!publicId) return;
+        if (!confirm('Delete this image from Cloudinary AND remove its database record?')) return;
+
+        button.disabled = true;
+
+        try {
+            var token = await auth.currentUser.getIdToken();
+
+            var response = await fetch('/api/delete-cloudinary-image', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    publicId: publicId,
+                    resourceType: 'image',
+                    type: 'upload'
+                })
+            });
+
+            var result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Cloudinary deletion failed');
+
+            await db.collection('eventImages').doc(imageId).delete();
+
+            showMessage('eventMessage', 'Image deleted from Cloudinary and database.', 'success');
+            refreshImages(eventId);
+            loadEvents();
+        } catch (err) {
+            button.disabled = false;
+            showMessage('eventMessage', err.message, 'error');
+        }
+    };
+
+    /* =========================================================
+       DELETE EVENT
+       ========================================================= */
+    window.deleteEvent = function (button) {
+        var eventId = button.getAttribute('data-eventid');
+
+        if (!confirm('Delete this event and all its image records? This cannot be undone.')) return;
+
+        db.collection('eventImages')
+            .where('eventId', '==', eventId)
+            .get()
+            .then(function (snapshot) {
+                var batch = db.batch();
+                snapshot.forEach(function (doc) { batch.delete(doc.ref); });
+                return batch.commit();
+            })
+            .then(function () {
+                return db.collection('events').doc(eventId).delete();
+            })
+            .then(function () {
+                showMessage('eventMessage', 'Event deleted.', 'success');
+                loadEvents();
+            })
+            .catch(function (err) {
+                showMessage('eventMessage', 'Error: ' + err.message, 'error');
+            });
+    };
+
+    /* =========================================================
+       SHOW UPLOAD
+       ========================================================= */
+    window.showUpload = function (button) {
+        var eventId = button.getAttribute('data-eventid');
+        var eventTitle = button.getAttribute('data-eventtitle');
+
+        currentEventId = eventId;
+        document.getElementById('selectedEventId').value = eventId;
+        document.getElementById('selectedEventTitle').textContent = eventTitle;
+        document.getElementById('uploadSection').classList.remove('hidden');
+        document.getElementById('uploadSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.cancelUpload = function () {
+        document.getElementById('uploadSection').classList.add('hidden');
+        document.getElementById('imageFiles').value = '';
+        document.getElementById('imageCaption').value = '';
+        document.getElementById('progressBar').style.width = '0%';
+        document.getElementById('progressText').textContent = '0%';
+        document.getElementById('progressContainer').style.display = 'none';
+        currentEventId = null;
+    };
+
+    /* =========================================================
+       UPLOAD IMAGES
+       ========================================================= */
+    window.uploadImages = function () {
+        var filesInput = document.getElementById('imageFiles');
+        var files = filesInput.files;
+        var caption = document.getElementById('imageCaption').value.trim();
+        var eventId = document.getElementById('selectedEventId').value;
+        var btn = document.getElementById('uploadImagesBtn');
+
+        if (!files.length) {
+            showMessage('uploadMessage', 'Please select at least one image.', 'error');
+            return;
+        }
+        if (!eventId) {
+            showMessage('uploadMessage', 'No event selected.', 'error');
+            return;
+        }
+
+        var maxSize = CONFIG.maxImageSizeMB * 1024 * 1024;
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].size > maxSize) {
+                showMessage('uploadMessage', files[i].name + ' exceeds ' + CONFIG.maxImageSizeMB + ' MB limit.', 'error');
+                return;
+            }
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
+        document.getElementById('progressContainer').style.display = 'block';
+        document.getElementById('progressBar').style.width = '0%';
+        document.getElementById('progressText').textContent = '0%';
+        showMessage('uploadMessage', 'Uploading ' + files.length + ' image' + (files.length === 1 ? '' : 's') + '…', 'loading');
+
+        var uploaded = 0;
+        var errors = 0;
+        var total = files.length;
+        var idx = 0;
+
+        function processNext() {
+            if (idx >= total) {
+                document.getElementById('progressBar').style.width = '100%';
+                document.getElementById('progressText').textContent = '100%';
+
+                if (errors === 0) {
+                    showMessage('uploadMessage', uploaded + ' image' + (uploaded === 1 ? '' : 's') + ' uploaded.', 'success');
+                } else {
+                    showMessage('uploadMessage', uploaded + ' uploaded, ' + errors + ' failed.', 'error');
+                }
+
+                filesInput.value = '';
+                document.getElementById('imageCaption').value = '';
+
+                setTimeout(function () {
+                    document.getElementById('progressContainer').style.display = 'none';
+                    document.getElementById('progressBar').style.width = '0%';
+                    document.getElementById('progressText').textContent = '0%';
+                }, 3000);
+
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Images';
+                loadEvents();
                 return;
             }
 
-            grid.innerHTML = '';
-            var promises = [];
+            var file = files[idx];
+            var progress = Math.round((idx / total) * 100);
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress + '%';
+            showMessage('uploadMessage', 'Processing ' + (idx + 1) + '/' + total + ': ' + file.name, 'loading');
 
-            snapshot.forEach(function(doc) {
-                var img = doc.data();
-                var imgId = doc.id;
-                var promise = checkImage(img.imageUrl).then(function(exists) {
-                    var card = createImageCard(imgId, img, eventId, exists);
-                    grid.appendChild(card);
-                });
-                promises.push(promise);
-            });
+            var formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CONFIG.cloudinary.uploadPreset);
 
-            return Promise.all(promises);
-        })
-        .catch(function(error) {
-            console.error('Error:', error);
-            grid.innerHTML = '<p style="grid-column:1/-1; color:#dc3545; text-align:center;">Error loading images.</p>';
-        });
-}
-
-// ==========================================
-// CHECK IMAGE
-// ==========================================
-function checkImage(url) {
-    return new Promise(function(resolve) {
-        if (!url || !url.startsWith('http')) {
-            resolve(false);
-            return;
-        }
-
-        if (imageCache[url] !== undefined) {
-            resolve(imageCache[url]);
-            return;
-        }
-
-        var img = new Image();
-        var resolved = false;
-
-        var timeout = setTimeout(function() {
-            if (!resolved) {
-                resolved = true;
-                imageCache[url] = false;
-                resolve(false);
-            }
-        }, 3000);
-
-        img.onload = function() {
-            if (!resolved) {
-                resolved = true;
-                clearTimeout(timeout);
-                imageCache[url] = true;
-                resolve(true);
-            }
-        };
-
-        img.onerror = function() {
-            if (!resolved) {
-                resolved = true;
-                clearTimeout(timeout);
-                imageCache[url] = false;
-                resolve(false);
-            }
-        };
-
-        img.src = url;
-    });
-}
-
-// ==========================================
-// CREATE IMAGE CARD
-// ==========================================
-function createImageCard(id, img, eventId, exists) {
-    var card = document.createElement('div');
-    card.className = 'image-card';
-
-    var caption = img.caption || 'Untitled';
-    var url = img.imageUrl || '';
-    var publicId = encodeURIComponent(img.publicId || '');
-    var cloudDeleteButton = publicId
-        ? '<button class="delete-cloud-btn" data-imageid="' + id + '" data-eventid="' + eventId + '" data-publicid="' + publicId + '" onclick="deleteImageFromCloud(this)">☁ Delete Cloud + DB</button>'
-        : '<button class="delete-cloud-btn" disabled title="This older upload has no Cloudinary public ID">☁ Cloud ID unavailable</button>';
-    var actions = '<button class="delete-btn" data-imageid="' + id + '" data-eventid="' + eventId + '" onclick="deleteImage(this)">× Delete DB record</button>' + cloudDeleteButton;
-
-    if (exists && url) {
-        card.innerHTML = 
-            '<img src="' + url + '" alt="' + escapeHtml(caption) + '" loading="lazy">' +
-            '<div class="image-caption">' + escapeHtml(caption) + '</div>' +
-            actions;
-    } else {
-        card.innerHTML = 
-            '<div class="image-error">' +
-                '<span>🖼️</span>' +
-                'Image not found' +
-            '</div>' +
-            '<div class="image-caption">' + escapeHtml(caption) + '</div>' +
-            actions;
-    }
-
-    return card;
-}
-
-// ==========================================
-// DELETE IMAGE
-// ==========================================
-function deleteImage(button) {
-    var imageId = button.getAttribute('data-imageid');
-    var eventId = button.getAttribute('data-eventid');
-    
-    if (!confirm('Delete this image?')) return;
-
-    db.collection('eventImages').doc(imageId).delete()
-        .then(function() {
-            showMessage('eventMessage', '✅ Image deleted!', 'success');
-            refreshImages(eventId);
-            loadEvents();
-        })
-        .catch(function(error) {
-            showMessage('eventMessage', '❌ Error: ' + error.message, 'error');
-        });
-}
-
-async function deleteImageFromCloud(button) {
-    var imageId = button.getAttribute('data-imageid');
-    var eventId = button.getAttribute('data-eventid');
-    var publicId = decodeURIComponent(button.getAttribute('data-publicid') || '');
-    if (!publicId) return;
-    if (!confirm('Delete this image from Cloudinary and remove its database record?')) return;
-
-    button.disabled = true;
-    try {
-        var token = await auth.currentUser.getIdToken();
-        var response = await fetch('/api/delete-cloudinary-image', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ publicId: publicId, resourceType: 'image', type: 'upload' })
-        });
-        var result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Cloudinary deletion failed');
-        await db.collection('eventImages').doc(imageId).delete();
-        showMessage('eventMessage', '✅ Image deleted from Cloudinary and database.', 'success');
-        refreshImages(eventId);
-        loadEvents();
-    } catch (error) {
-        button.disabled = false;
-        showMessage('eventMessage', '❌ ' + error.message, 'error');
-    }
-}
-
-// ==========================================
-// DELETE EVENT
-// ==========================================
-function deleteEvent(button) {
-    var eventId = button.getAttribute('data-eventid');
-    
-    if (!confirm('Delete this event and all its images?')) return;
-
-    db.collection('eventImages')
-        .where('eventId', '==', eventId)
-        .get()
-        .then(function(snapshot) {
-            var batch = db.batch();
-            snapshot.forEach(function(doc) {
-                batch.delete(doc.ref);
-            });
-            return batch.commit();
-        })
-        .then(function() {
-            return db.collection('events').doc(eventId).delete();
-        })
-        .then(function() {
-            showMessage('eventMessage', '✅ Event deleted!', 'success');
-            loadEvents();
-        })
-        .catch(function(error) {
-            showMessage('eventMessage', '❌ Error: ' + error.message, 'error');
-        });
-}
-
-// ==========================================
-// SHOW UPLOAD
-// ==========================================
-function showUpload(button) {
-    var eventId = button.getAttribute('data-eventid');
-    var eventTitle = button.getAttribute('data-eventtitle');
-    
-    currentEventId = eventId;
-    document.getElementById('selectedEventId').value = eventId;
-    document.getElementById('selectedEventTitle').textContent = eventTitle;
-    document.getElementById('uploadSection').classList.remove('hidden');
-    document.getElementById('uploadSection').scrollIntoView({ behavior: 'smooth' });
-}
-
-function cancelUpload() {
-    document.getElementById('uploadSection').classList.add('hidden');
-    document.getElementById('imageFiles').value = '';
-    document.getElementById('imageCaption').value = '';
-    document.getElementById('progressBar').style.width = '0%';
-    document.getElementById('progressText').textContent = '0%';
-    document.getElementById('progressContainer').style.display = 'none';
-    currentEventId = null;
-}
-
-// ==========================================
-// UPLOAD IMAGES TO CLOUDINARY
-// ==========================================
-function uploadImages() {
-    var files = document.getElementById('imageFiles').files;
-    var caption = document.getElementById('imageCaption').value.trim();
-    var eventId = document.getElementById('selectedEventId').value;
-    var btn = document.querySelector('#uploadSection .btn-primary');
-
-    if (!files.length) {
-        showMessage('uploadMessage', 'Please select at least one image.', 'error');
-        return;
-    }
-
-    if (!eventId) {
-        showMessage('uploadMessage', 'No event selected.', 'error');
-        return;
-    }
-
-    var maxSize = 5 * 1024 * 1024;
-    for (var i = 0; i < files.length; i++) {
-        if (files[i].size > maxSize) {
-            showMessage('uploadMessage', '❌ ' + files[i].name + ' exceeds 5MB limit.', 'error');
-            return;
-        }
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Uploading...';
-    document.getElementById('progressContainer').style.display = 'block';
-    document.getElementById('progressBar').style.width = '0%';
-    document.getElementById('progressText').textContent = '0%';
-    showMessage('uploadMessage', 'Uploading ' + files.length + ' images...', 'loading');
-
-    var uploaded = 0;
-    var errors = 0;
-    var total = files.length;
-    var currentIndex = 0;
-
-    function processNext() {
-        if (currentIndex >= total) {
-            document.getElementById('progressBar').style.width = '100%';
-            document.getElementById('progressText').textContent = '100%';
-
-            if (errors === 0) {
-                showMessage('uploadMessage', '✅ ' + uploaded + ' images uploaded successfully!', 'success');
-            } else {
-                showMessage('uploadMessage', '⚠️ ' + uploaded + ' uploaded, ' + errors + ' failed.', 'error');
-            }
-
-            document.getElementById('imageFiles').value = '';
-            document.getElementById('imageCaption').value = '';
-            setTimeout(function() {
-                document.getElementById('progressContainer').style.display = 'none';
-                document.getElementById('progressBar').style.width = '0%';
-                document.getElementById('progressText').textContent = '0%';
-            }, 3000);
-
-            btn.disabled = false;
-            btn.textContent = '📤 Upload Images';
-            loadEvents();
-            return;
-        }
-
-        var file = files[currentIndex];
-        var progress = Math.round((currentIndex / total) * 100);
-        document.getElementById('progressBar').style.width = progress + '%';
-        document.getElementById('progressText').textContent = progress + '%';
-        
-        showMessage('uploadMessage', 'Processing ' + (currentIndex+1) + '/' + total + ': ' + file.name, 'loading');
-
-        var formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', CONFIG.cloudinary.uploadPreset);
-
-        fetch('https://api.cloudinary.com/v1_1/' + CONFIG.cloudinary.cloudName + '/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            if (data.secure_url) {
-                return db.collection('eventImages').add({
-                    eventId: eventId,
-                    imageUrl: data.secure_url,
-                    publicId: data.public_id || '',
-                    caption: caption || '',
-                    order: Date.now() + currentIndex,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(function() {
-                    uploaded++;
-                });
-            } else {
+            fetch('https://api.cloudinary.com/v1_1/' + CONFIG.cloudinary.cloudName + '/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.secure_url) {
+                    return db.collection('eventImages').add({
+                        eventId: eventId,
+                        imageUrl: data.secure_url,
+                        publicId: data.public_id || '',
+                        caption: caption || '',
+                        order: Date.now() + idx,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(function () { uploaded++; });
+                } else {
+                    errors++;
+                    console.error('Upload failed:', data);
+                }
+            })
+            .catch(function (err) {
+                console.error('Upload error:', err);
                 errors++;
-                console.error('Upload failed:', data);
-                return Promise.resolve();
-            }
-        })
-        .catch(function(error) {
-            console.error('Upload error:', error);
-            errors++;
-            return Promise.resolve();
-        })
-        .finally(function() {
-            currentIndex++;
-            var newProgress = Math.round((currentIndex / total) * 100);
-            document.getElementById('progressBar').style.width = newProgress + '%';
-            document.getElementById('progressText').textContent = newProgress + '%';
-            processNext();
-        });
-    }
-
-    processNext();
-}
-
-// ==========================================
-// CLEANUP BROKEN IMAGES
-// ==========================================
-function cleanupBrokenImages() {
-    if (!confirm('This will check all images and delete broken ones. Continue?')) return;
-
-    showMessage('eventMessage', '🔍 Scanning images...', 'loading');
-
-    db.collection('eventImages').get().then(function(snapshot) {
-        var total = snapshot.size;
-
-        if (total === 0) {
-            showMessage('eventMessage', 'No images to check.', 'success');
-            return;
+            })
+            .finally(function () {
+                idx++;
+                var p = Math.round((idx / total) * 100);
+                document.getElementById('progressBar').style.width = p + '%';
+                document.getElementById('progressText').textContent = p + '%';
+                processNext();
+            });
         }
 
-        var deleted = 0;
-        var checked = 0;
-        var promises = [];
+        processNext();
+    };
 
-        snapshot.forEach(function(doc) {
-            var data = doc.data();
-            if (data.imageUrl) {
-                var promise = checkImage(data.imageUrl).then(function(exists) {
-                    checked++;
-                    if (!exists) {
-                        return db.collection('eventImages').doc(doc.id).delete().then(function() {
-                            deleted++;
-                        });
+    /* =========================================================
+       CLEANUP BROKEN IMAGES
+       ========================================================= */
+    window.cleanupBrokenImages = function () {
+        if (!confirm('Check every image and delete records whose file is unreachable. Continue?')) return;
+
+        showMessage('eventMessage', 'Scanning images…', 'loading');
+
+        db.collection('eventImages').get()
+            .then(function (snapshot) {
+                if (snapshot.empty) {
+                    showMessage('eventMessage', 'No images to check.', 'success');
+                    return;
+                }
+
+                var deleted = 0;
+                var checked = 0;
+                var promises = [];
+
+                snapshot.forEach(function (doc) {
+                    var data = doc.data();
+                    if (data.imageUrl) {
+                        promises.push(
+                            checkImage(data.imageUrl).then(function (exists) {
+                                checked++;
+                                if (!exists) {
+                                    return db.collection('eventImages').doc(doc.id).delete().then(function () {
+                                        deleted++;
+                                    });
+                                }
+                            })
+                        );
                     }
                 });
-                promises.push(promise);
-            }
-        });
 
-        return Promise.all(promises).then(function() {
-            Object.keys(imageCache).forEach(function(key) {
-                delete imageCache[key];
+                return Promise.all(promises).then(function () {
+                    imageCache = {};
+                    showMessage('eventMessage', 'Checked ' + checked + ' images. Deleted ' + deleted + ' broken.', 'success');
+                    loadEvents();
+                });
+            })
+            .catch(function (err) {
+                console.error(err);
+                showMessage('eventMessage', 'Error: ' + err.message, 'error');
             });
-            showMessage('eventMessage', '✅ Checked ' + checked + ' images, deleted ' + deleted + ' broken.', 'success');
-            loadEvents();
+    };
+
+    /* =========================================================
+       CHECK IMAGE
+       ========================================================= */
+    function checkImage(url) {
+        return new Promise(function (resolve) {
+            if (!url || url.indexOf('http') !== 0) { resolve(false); return; }
+            if (imageCache[url] !== undefined) { resolve(imageCache[url]); return; }
+
+            var img = new Image();
+            var resolved = false;
+
+            var timeout = setTimeout(function () {
+                if (!resolved) {
+                    resolved = true;
+                    imageCache[url] = false;
+                    resolve(false);
+                }
+            }, 3000);
+
+            img.onload = function () {
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timeout);
+                    imageCache[url] = true;
+                    resolve(true);
+                }
+            };
+
+            img.onerror = function () {
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timeout);
+                    imageCache[url] = false;
+                    resolve(false);
+                }
+            };
+
+            img.src = url;
         });
-    }).catch(function(error) {
-        console.error('Error:', error);
-        showMessage('eventMessage', '❌ Error: ' + error.message, 'error');
-    });
-}
-
-// ==========================================
-// HELPERS
-// ==========================================
-function showMessage(elementId, text, type) {
-    var el = document.getElementById(elementId);
-    if (!el) return;
-    el.textContent = text;
-    el.className = 'message ' + type;
-    
-    if (type === 'success' || type === 'error') {
-        setTimeout(function() {
-            el.className = 'message';
-        }, 5000);
     }
-}
 
-function escapeHtml(text) {
-    if (!text) return '';
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function formatDate(dateStr) {
-    try {
-        return new Date(dateStr).toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
+    /* =========================================================
+       LOGOUT
+       ========================================================= */
+    window.logout = function () {
+        auth.signOut().then(function () {
+            window.location.href = 'admin.html';
         });
-    } catch {
-        return dateStr;
-    }
-}
+    };
 
-function logout() {
-    auth.signOut();
-    window.location.href = 'admin.html';
-}
+    /* Expose helpers used by inline handlers that reference window scope */
+    window.escapeHtml = escapeHtml;
+    window.formatDate = formatDate;
+})();
 </script>
 
 </body>
