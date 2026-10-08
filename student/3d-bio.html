@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biology Simulations - Student Zone</title>
+    <link rel="stylesheet" href="assets/student-style.css">
+    <style>
+        /* ===== TWINKLING STARS BACKGROUND ===== */
+        body {
+            background: #0a0e1a;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Starfield container */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.2;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Shooting star animation */
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.3);
+            animation: shoot 4s linear infinite;
+        }
+
+        .shooting-star::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+            transform: translateY(-50%);
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translate(0, 0) rotate(-35deg);
+                opacity: 0;
+            }
+            5% {
+                opacity: 1;
+            }
+            20% {
+                transform: translate(400px, -200px) rotate(-35deg);
+                opacity: 1;
+            }
+            25% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* ===== SIM PAGE STYLES ===== */
+        .sim-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sim-header {
+            margin-bottom: 2rem;
+        }
+
+        .sim-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+
+        .sim-header p {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        /* ===== SIMULATION GRID ===== */
+        .sim-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .sim-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .sim-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .sim-card .sim-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sim-card .sim-desc {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .sim-card .sim-embed {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #0a0e1a;
+            pointer-events: none;
+        }
+
+        .sim-card .sim-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none;
+        }
+
+        .sim-card .sim-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            transition: var(--transition);
+        }
+
+        .sim-card:hover .sim-hint {
+            opacity: 1;
+        }
+
+        /* ===== FULLSCREEN MODAL ===== */
+        .sim-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-dark);
+            z-index: 9999;
+            padding: 1.5rem;
+            overflow: hidden;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .sim-modal.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .sim-modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .sim-modal .modal-header .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .sim-modal .modal-header .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0 0.5rem;
+        }
+
+        .sim-modal .modal-header .modal-close:hover {
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .sim-modal .modal-body {
+            width: 100%;
+            height: calc(100% - 70px);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0a0e1a;
+        }
+
+        .sim-modal .modal-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .sim-modal .modal-hint {
+            text-align: center;
+            margin-top: 0.8rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        /* ===== BACK LINK ===== */
+        .back-link {
+            display: inline-block;
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .sim-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sim-wrapper {
+                padding: 1rem 0.8rem;
+            }
+            .sim-header h1 {
+                font-size: 1.5rem;
+            }
+            .sim-card {
+                padding: 1rem;
+            }
+            .sim-modal {
+                padding: 0.8rem;
+            }
+            .sim-modal .modal-header .modal-title {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sim-card .sim-title {
+                font-size: 1rem;
+            }
+            .sim-card .sim-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="student-body">
+
+    <!-- ===== STARFIELD BACKGROUND ===== -->
+    <div id="starfield">
+        <!-- Stars will be generated by JavaScript -->
+    </div>
+
+    <div class="sim-wrapper">
+
+        <!-- ===== HEADER ===== -->
+        <div id="student-header"></div>
+
+        <!-- ===== BACK LINK ===== -->
+        <a href="https://svgms.vercel.app/student/sim-biology.html" class="back-link">← Back to Bio Dashboard</a>
+
+        <!-- ===== PAGE HEADER ===== -->
+        <div class="sim-header">
+            <h1>🔬 Virtual Biology Lab</h1>
+            <p>Double-click any 3D model to explore it in fullscreen — rotate, zoom, and discover!</p>
+        </div>
+
+       <!-- ===== SIMULATIONS GRID ===== -->
+<div class="sim-grid">
+
+    <!-- Animal Cell -->
+    <div class="sim-card" data-title="Animal Cell" data-url="https://sketchfab.com/models/0d9f7f4257224975b2ef83a283709b2f/embed">
+        <div class="sim-title">🔬 Animal Cell</div>
+        <div class="sim-desc">Explore the intricate world of eukaryotic cells — nucleus, mitochondria, and more!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/0d9f7f4257224975b2ef83a283709b2f/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Plant Cell -->
+    <div class="sim-card" data-title="Plant Cell" data-url="https://sketchfab.com/models/e61e7bdf8c8449a583b364f05e70289b/embed">
+        <div class="sim-title">🌱 Plant Cell</div>
+        <div class="sim-desc">Discover what makes plants unique — chloroplasts, cell walls, and central vacuoles!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/e61e7bdf8c8449a583b364f05e70289b/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Mitochondria -->
+    <div class="sim-card" data-title="Mitochondria" data-url="https://sketchfab.com/models/397631a85faa487ba1f1cc4fe5e1b7e3/embed">
+        <div class="sim-title">⚡ Mitochondria</div>
+        <div class="sim-desc">The powerhouse of the cell — see how energy is produced at the cellular level!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/397631a85faa487ba1f1cc4fe5e1b7e3/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Plasma Membrane -->
+    <div class="sim-card" data-title="Plasma Membrane" data-url="https://sketchfab.com/models/75dc8ba645c64dde8a466396058ffc06/embed">
+        <div class="sim-title">🧫 Plasma Membrane</div>
+        <div class="sim-desc">Explore the Fluid Mosaic Model — the gatekeeper of every living cell!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/75dc8ba645c64dde8a466396058ffc06/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Chloroplast -->
+    <div class="sim-card" data-title="Chloroplast" data-url="https://sketchfab.com/models/30bc55b2f763415f9222f876c564be97/embed">
+        <div class="sim-title">☀️ Chloroplast</div>
+        <div class="sim-desc">Where photosynthesis happens — turning sunlight into life-giving energy!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/30bc55b2f763415f9222f876c564be97/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Prokaryotic Cell -->
+    <div class="sim-card" data-title="Prokaryotic Cell" data-url="https://sketchfab.com/models/048bc9f9a03c4e9e84937a8c76984d63/embed">
+        <div class="sim-title">🦠 Prokaryotic Cell</div>
+        <div class="sim-desc">The simplest and oldest life forms — bacteria and archaea unveiled!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/048bc9f9a03c4e9e84937a8c76984d63/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Protein Structure -->
+    <div class="sim-card" data-title="Protein Structure" data-url="https://sketchfab.com/models/cc33bb1ebe6141b08d0d06f1bbebc2b7/embed">
+        <div class="sim-title">🧩 Protein Structure</div>
+        <div class="sim-desc">See the building blocks of life — from amino acids to complex 3D structures!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/cc33bb1ebe6141b08d0d06f1bbebc2b7/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Mitosis -->
+    <div class="sim-card" data-title="Mitosis" data-url="https://sketchfab.com/models/eda0bbce41f3438f88dfac3b0d6d9265/embed">
+        <div class="sim-title">🔄 Mitosis</div>
+        <div class="sim-desc">Watch cells divide! The fascinating process of cell replication in action.</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/eda0bbce41f3438f88dfac3b0d6d9265/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Meiosis -->
+    <div class="sim-card" data-title="Meiosis" data-url="https://sketchfab.com/models/1772cb63102b4f1c9ff5e607643cde83/embed">
+        <div class="sim-title">🧬 Meiosis</div>
+        <div class="sim-desc">The dance of chromosomes — how gametes are formed for reproduction!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/1772cb63102b4f1c9ff5e607643cde83/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Human Heart -->
+    <div class="sim-card" data-title="Human Heart" data-url="https://sketchfab.com/models/168b474fba564f688048212e99b4159d/embed">
+        <div class="sim-title">❤️ Human Heart</div>
+        <div class="sim-desc">The engine of life — explore the anatomy of the human heart in 3D!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/168b474fba564f688048212e99b4159d/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Human Respiratory System -->
+    <div class="sim-card" data-title="Human Respiratory System" data-url="https://sketchfab.com/models/250911151757489da1cf5501b791f363/embed">
+        <div class="sim-title">🫁 Respiratory System</div>
+        <div class="sim-desc">Breathe in! Explore the lungs and airways that keep us alive.</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/250911151757489da1cf5501b791f363/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Bronchi Alveoli -->
+    <div class="sim-card" data-title="Bronchi Alveoli" data-url="https://sketchfab.com/models/c0ca6af6c6a1449084341a96eea515ea/embed">
+        <div class="sim-title">🫧 Bronchi & Alveoli</div>
+        <div class="sim-desc">The tiny air sacs where oxygen meets the bloodstream — gas exchange unveiled!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/c0ca6af6c6a1449084341a96eea515ea/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Nephron -->
+    <div class="sim-card" data-title="Nephron" data-url="https://sketchfab.com/models/30319ce9c5a441bdb6feeb9926c15284/embed">
+        <div class="sim-title">🧫 Nephron</div>
+        <div class="sim-desc">The filtration unit of the kidney — where your blood gets cleaned!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/30319ce9c5a441bdb6feeb9926c15284/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Urinary System -->
+    <div class="sim-card" data-title="Urinary System" data-url="https://sketchfab.com/models/d5d3b4e21c9040f8b004c2102913a5d2/embed">
+        <div class="sim-title">🚽 Urinary System</div>
+        <div class="sim-desc">Follow the journey of waste removal — kidneys, ureters, bladder, and urethra!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/d5d3b4e21c9040f8b004c2102913a5d2/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Digestive System -->
+    <div class="sim-card" data-title="Digestive System" data-url="https://sketchfab.com/models/0031f9c064d44c42a251543dc500f525/embed">
+        <div class="sim-title">🍽️ Digestive System</div>
+        <div class="sim-desc">From bite to energy — the incredible journey of food through your body!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/0031f9c064d44c42a251543dc500f525/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Human Brain -->
+    <div class="sim-card" data-title="Human Brain" data-url="https://sketchfab.com/models/95b4e19bb32c4edeb46fcb3db048037c/embed">
+        <div class="sim-title">🧠 Human Brain</div>
+        <div class="sim-desc">The command center — explore the most complex organ in the known universe!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/95b4e19bb32c4edeb46fcb3db048037c/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Neuron -->
+    <div class="sim-card" data-title="Neuron" data-url="https://sketchfab.com/models/6ef85cb9061a4ef2abb9e87258c7d0fb/embed">
+        <div class="sim-title">⚡ Neuron</div>
+        <div class="sim-desc">The building block of your nervous system — how signals travel through your body!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/6ef85cb9061a4ef2abb9e87258c7d0fb/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Flower Cross Section -->
+    <div class="sim-card" data-title="Flower Cross Section" data-url="https://sketchfab.com/models/7e3186fec9b941aa97fde7ecb080828a/embed">
+        <div class="sim-title">🌸 Flower Anatomy</div>
+        <div class="sim-desc">The beauty of reproduction — explore the parts that make flowers bloom!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/7e3186fec9b941aa97fde7ecb080828a/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Xylem and Phloem -->
+    <div class="sim-card" data-title="Xylem and Phloem Anatomy" data-url="https://sketchfab.com/models/a8e93a28252c4717b50ff068a79f7c87/embed">
+        <div class="sim-title">🌿 Xylem & Phloem</div>
+        <div class="sim-desc">The plant's plumbing system — how water and nutrients travel through plants!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/a8e93a28252c4717b50ff068a79f7c87/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+    <!-- Sarcomere -->
+    <div class="sim-card" data-title="Sarcomere" data-url="https://sketchfab.com/models/a0f57ca1a44f4658b515fca5bf2131e5/embed">
+        <div class="sim-title">💪 Sarcomere</div>
+        <div class="sim-desc">The smallest unit of muscle contraction — see how your muscles work!</div>
+        <div class="sim-embed">
+            <iframe src="https://sketchfab.com/models/a0f57ca1a44f4658b515fca5bf2131e5/embed" allowfullscreen></iframe>
+        </div>
+        <div class="sim-hint">🔍 Double click to expand</div>
+    </div>
+
+</div>
+
+        <!-- ===== FOOTER ===== -->
+        <div id="student-footer"></div>
+
+    </div>
+
+    <!-- ===== FULLSCREEN MODAL ===== -->
+    <div class="sim-modal" id="simModal">
+        <div class="modal-header">
+            <span class="modal-title" id="modalTitle">Simulation</span>
+            <button class="modal-close" id="modalClose">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <iframe id="modalIframe" src="" allowfullscreen></iframe>
+        </div>
+        <div class="modal-hint">💡 Double click / tap again or press ESC to close</div>
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // ===== LOAD HEADER =====
+        fetch('components/header.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-header').innerHTML = data);
+
+        // ===== LOAD FOOTER =====
+        fetch('components/footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-footer').innerHTML = data);
+
+        // ===== CHECK AUTH =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // ===== LOGOUT =====
+        function studentLogout() {
+            if (confirm('Exit Student Zone?')) {
+                auth.signOut().then(() => {
+                    window.location.href = 'login.html';
+                });
+            }
+        }
+
+        // ============================================================
+        // TWINKLING STARS BACKGROUND
+        // ============================================================
+
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const numStars = 200;
+            const numShootingStars = 3;
+
+            // Create regular stars
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 3 + 1;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const duration = Math.random() * 3 + 2;
+                const delay = Math.random() * 5;
+
+                star.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}%;
+                    top: ${y}%;
+                    --duration: ${duration}s;
+                    animation-delay: ${delay}s;
+                `;
+
+                starfield.appendChild(star);
+            }
+
+            // Create shooting stars
+            for (let i = 0; i < numShootingStars; i++) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                const x = Math.random() * 80 + 10;
+                const y = Math.random() * 40;
+                const delay = Math.random() * 8 + 4;
+
+                shootingStar.style.cssText = `
+                    left: ${x}%;
+                    top: ${y}%;
+                    animation-delay: ${delay}s;
+                    animation-duration: ${Math.random() * 3 + 3}s;
+                `;
+
+                starfield.appendChild(shootingStar);
+            }
+        }
+
+        // Initialize starfield when page loads
+        document.addEventListener('DOMContentLoaded', createStarfield);
+
+        // ============================================================
+        // FULLSCREEN MODAL
+        // ============================================================
+
+        const modal = document.getElementById('simModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalIframe = document.getElementById('modalIframe');
+        const modalClose = document.getElementById('modalClose');
+
+        function openModal(title, url) {
+            modalTitle.textContent = title;
+            modalIframe.src = url;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            modalIframe.src = '';
+            document.body.style.overflow = '';
+        }
+
+        modalClose.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // ===== DOUBLE CLICK / DOUBLE TAP ON CARDS =====
+        document.querySelectorAll('.sim-card').forEach(function(card) {
+            let clickTimer = null;
+
+            card.addEventListener('click', function(e) {
+                if (e.target.closest('.sim-embed')) return;
+
+                const title = this.dataset.title;
+                const url = this.dataset.url;
+
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                    openModal(title, url);
+                } else {
+                    clickTimer = setTimeout(() => {
+                        clickTimer = null;
+                    }, 300);
+                }
+            });
+
+            let lastTap = 0;
+            card.addEventListener('touchend', function(e) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+
+                if (tapLength < 300 && tapLength > 0) {
+                    e.preventDefault();
+                    const title = this.dataset.title;
+                    const url = this.dataset.url;
+                    openModal(title, url);
+                }
+
+                lastTap = currentTime;
+            });
+        });
+    </script>
+
+</body>
+</html>

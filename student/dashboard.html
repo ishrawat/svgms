@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Student Zone</title>
+    <style>
+        /* ============================================================
+        GLOBAL RESET & BASE
+        ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3e 50%, #2a1a4e 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+        MAIN CONTAINER
+        ============================================================ */
+        .dashboard-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+        }
+
+        /* ============================================================
+        HEADER
+        ============================================================ */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .header-left .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #fff;
+        }
+        .header-left .logo span {
+            color: #667eea;
+        }
+
+        .header-left .user-greeting {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 2px;
+        }
+        .header-left .user-greeting strong {
+            color: #fff;
+        }
+        .header-left .user-greeting .class-info {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .sow-badge {
+            display: none;
+            background: linear-gradient(135deg, #ffd700, #ff6b00);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: glow 2s ease-in-out infinite;
+            color: #fff;
+        }
+        .sow-badge.visible {
+            display: inline-block;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.6); }
+        }
+
+        .logout-btn {
+            background: rgba(244, 67, 54, 0.15);
+            color: #ef5350;
+            border: 1px solid rgba(244, 67, 54, 0.2);
+            padding: 0.4rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .logout-btn:hover {
+            background: rgba(244, 67, 54, 0.25);
+            transform: scale(1.05);
+        }
+
+        /* ============================================================
+        MAIN LAYOUT: 80/20 SPLIT
+        ============================================================ */
+        .dashboard-main {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        /* ===== LEFT CONTENT (80%) ===== */
+        .main-content {
+            flex: 0 0 80%;
+            max-width: 80%;
+        }
+
+        /* ===== RIGHT SIDEBAR (20%) ===== */
+        .sidebar {
+            flex: 0 0 20%;
+            max-width: 20%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            position: sticky;
+            top: 1rem;
+        }
+
+        /* ============================================================
+        STATS ROW (Top of Main Content)
+        ============================================================ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .stat-box:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+        .stat-box .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-box .label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
+        .stat-box .sub-text {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
+        }
+        .stat-box .streak-icon { font-size: 1.2rem; }
+
+        /* ============================================================
+        QUICK ACTIONS GRID
+        ============================================================ */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1.2rem 0.8rem;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .action-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+        .action-card .icon { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
+        .action-card .title { font-size: 0.85rem; font-weight: 500; }
+        .action-card .desc { font-size: 0.65rem; color: rgba(255, 255, 255, 0.3); margin-top: 2px; }
+
+        /* ============================================================
+        WEEKLY PROGRESS
+        ============================================================ */
+        .weekly-progress {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .weekly-progress .title {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.5rem;
+        }
+        .weekly-progress .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .weekly-progress .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+        .weekly-progress .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ============================================================
+        RECENT ACTIVITY
+        ============================================================ */
+        .recent-activity {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+        }
+        .recent-activity .title {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.8rem;
+        }
+
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .recent-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .recent-item .subject { color: #fff; }
+        .recent-item .score { color: #ffd54f; font-weight: 600; }
+        .recent-item .mode-tag {
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+        .recent-item .date {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .no-activity {
+            color: rgba(255, 255, 255, 0.25);
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* ============================================================
+        SIDEBAR COMPONENTS (20%)
+        ============================================================ */
+
+        /* Stats Sidebar */
+        .sidebar-stats {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .sidebar-stats .title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 0.6rem;
+        }
+        .sidebar-stats .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+        }
+        .sidebar-stats .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 0.4rem 0.5rem;
+            text-align: center;
+        }
+        .sidebar-stats .stat-item .num {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .sidebar-stats .stat-item .lbl {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.5px;
+        }
+        .sidebar-stats .stat-item.purple .num { color: #667eea; }
+        .sidebar-stats .stat-item.green .num { color: #66bb6a; }
+        .sidebar-stats .stat-item.gold .num { color: #ffd700; }
+        .sidebar-stats .stat-item.orange .num { color: #ffa726; }
+        .sidebar-stats .stat-item.pink .num { color: #f06292; }
+        .sidebar-stats .stat-item.cyan .num { color: #4dd0e1; }
+
+        /* Duel Stats Sidebar */
+        .sidebar-duel {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .sidebar-duel .title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 0.5rem;
+        }
+        .sidebar-duel .duel-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.2rem 0;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .sidebar-duel .duel-row .value {
+            font-weight: 600;
+            color: #fff;
+        }
+        .sidebar-duel .duel-row .value.win { color: #66bb6a; }
+        .sidebar-duel .duel-row .value.loss { color: #ef5350; }
+        .sidebar-duel .duel-row .value.tie { color: #ffa726; }
+        .sidebar-duel .duel-row .value.gold { color: #ffd700; }
+
+        /* Achievements Sidebar */
+        .sidebar-achievements {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .sidebar-achievements .title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 0.5rem;
+        }
+        .sidebar-achievements .badges {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .sidebar-achievements .badge {
+            font-size: 1.2rem;
+            opacity: 0.3;
+            transition: all 0.3s;
+        }
+        .sidebar-achievements .badge.unlocked {
+            opacity: 1;
+        }
+        .sidebar-achievements .badge:hover {
+            transform: scale(1.3);
+        }
+        .sidebar-achievements .count {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.25);
+            margin-top: 4px;
+        }
+
+        /* Win Rate Sidebar */
+        .sidebar-winrate {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .sidebar-winrate .title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 0.4rem;
+        }
+        .sidebar-winrate .bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .sidebar-winrate .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+            transition: width 0.6s ease;
+        }
+        .sidebar-winrate .info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Last Active Sidebar */
+        .sidebar-lastactive {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            text-align: center;
+        }
+        .sidebar-lastactive .label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .sidebar-lastactive .time {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 2px;
+        }
+
+        /* Student of Week Sidebar */
+        .sidebar-sow {
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            text-align: center;
+            display: none;
+        }
+        .sidebar-sow.visible {
+            display: block;
+        }
+        .sidebar-sow .icon { font-size: 1.5rem; }
+        .sidebar-sow .text {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #ffd700;
+            margin-top: 2px;
+        }
+
+        /* ============================================================
+        FOOTER
+        ============================================================ */
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 0.7rem;
+            line-height: 1.6;
+        }
+        .footer .brand { color: rgba(255, 255, 255, 0.2); font-weight: 500; }
+
+        /* ============================================================
+        RESPONSIVE
+        ============================================================ */
+        @media (max-width: 992px) {
+            .dashboard-main {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            .main-content {
+                flex: 1 1 100% !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                flex-basis: 100% !important;
+                min-width: 0 !important;
+            }
+            .sidebar {
+                flex: 1 1 100% !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                flex-basis: 100% !important;
+                min-width: 0 !important;
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                gap: 0.8rem;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-wrapper { padding: 0.8rem; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .header-right { width: 100%; justify-content: space-between; }
+            .stats-row { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .quick-actions { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .action-card { padding: 1rem 0.5rem; }
+            .action-card .icon { font-size: 1.5rem; }
+            .action-card .title { font-size: 0.75rem; }
+            .sidebar {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        /* ============================================================
+        FIX: Mobile - Main Content Takes Full Width
+        ============================================================ */
+        @media (max-width: 992px) {
+            .main-content {
+                flex: 1 1 100% !important;    /* Take full width */
+                max-width: 100% !important;    /* No width limit */
+                width: 100% !important;        /* Ensure full width */
+            }
+            
+            .sidebar {
+                flex: 1 1 100% !important;
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .sidebar {
+                grid-template-columns: 1fr;
+            }
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* ============================================================
+        SHARED STYLES (for components loaded via fetch)
+        ============================================================ */
+        #student-header,
+        #student-footer {
+            width: 100%;
+        }
+
+        /* ============================================================
+        MOBILE FULL WIDTH FIX - FOR ALL USERS
+        ============================================================ */
+        @media (max-width: 992px) {
+            .main-content,
+            .sidebar {
+                max-width: 100% !important;
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                flex-basis: 100% !important;
+                min-width: 0 !important;
+            }
+        }
+
+
+        
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+
+        <!-- ===== HEADER ===== -->
+        <div id="student-header"></div>
+
+        <!-- ===== DASHBOARD HEADER ===== -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">🏠 STUDENT <span>ZONE</span></div>
+                <div class="user-greeting">
+                    👋 Welcome, <strong id="studentNameDisplay">Explorer</strong>!
+                    <span class="class-info" id="classInfo">📍 Class <span id="studentClass">--</span> | Roll No: <span id="studentRollNo">--</span></span>
+                    <span id="sowBadge" class="sow-badge">🏆 Student of the Week</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <span id="weeklyRankDisplay" style="font-size:0.75rem; color:rgba(255,255,255,0.3); display:none;">
+                    Weekly Rank: #<span id="weeklyRankNum">--</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- ===== MAIN LAYOUT: 80/20 ===== -->
+        <div class="dashboard-main">
+
+            <!-- ===== LEFT: MAIN CONTENT (80%) ===== -->
+            <div class="main-content">
+
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="number" id="totalPoints">0</div>
+                        <div class="label">⭐ Points</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">
+                            <span class="streak-icon" id="streakIcon">📅</span>
+                            <span id="streakNumber">0</span>
+                        </div>
+                        <div class="label">🔥 Streak</div>
+                        <div class="sub-text" id="nextMilestone"></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="rankNumber">-</div>
+                        <div class="label">🏆 Rank</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="quizCount">0</div>
+                        <div class="label">📝 Quizzes</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="quiz.html" class="action-card">
+                        <span class="icon">📝</span>
+                        <div class="title">Quiz</div>
+                        <div class="desc">Test knowledge</div>
+                    </a>
+                    <a href="games/game-index.html" class="action-card">
+                        <span class="icon">🎮</span>
+                        <div class="title">Games</div>
+                        <div class="desc">Play & learn</div>
+                    </a>
+                    <a href="sim-physics.html" class="action-card">
+                        <span class="icon">⚛️</span>
+                        <div class="title">Physics</div>
+                        <div class="desc">Simulations</div>
+                    </a>
+                    <a href="sim-chemistry.html" class="action-card">
+                        <span class="icon">🧪</span>
+                        <div class="title">Chemistry</div>
+                        <div class="desc">Simulations</div>
+                    </a>
+                    <a href="sim-math.html" class="action-card">
+                        <span class="icon">📐</span>
+                        <div class="title">Math</div>
+                        <div class="desc">Simulations</div>
+                    </a>
+                    <a href="sim-biology.html" class="action-card">
+                        <span class="icon">🧬</span>
+                        <div class="title">Biology</div>
+                        <div class="desc">Simulations</div>
+                    </a>
+                    <a href="profile.html" class="action-card">
+                        <span class="icon">👤</span>
+                        <div class="title">Profile</div>
+                        <div class="desc">View & Edit</div>
+                    </a>
+                </div>
+
+                <!-- Weekly Progress -->
+                <div class="weekly-progress">
+                    <div class="title">📈 Weekly Progress</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="weeklyProgressFill" style="width:0%"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <span id="weeklyStats">0 activities this week</span>
+                        <span id="weeklyPercent">0%</span>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity">
+                    <div class="title">📊 Recent Activity</div>
+                    <div id="recentActivity">
+                        <div class="no-activity">Loading...</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== RIGHT: SIDEBAR (20%) ===== -->
+            <div class="sidebar">
+
+                <!-- Stats -->
+                <div class="sidebar-stats">
+                    <div class="title">📊 Stats</div>
+                    <div class="stat-grid">
+                        <div class="stat-item purple">
+                            <div class="num" id="sidePoints">0</div>
+                            <div class="lbl">Points</div>
+                        </div>
+                        <div class="stat-item gold">
+                            <div class="num" id="sideStreak">0</div>
+                            <div class="lbl">Streak</div>
+                        </div>
+                        <div class="stat-item cyan">
+                            <div class="num" id="sideRank">-</div>
+                            <div class="lbl">Rank</div>
+                        </div>
+                        <div class="stat-item pink">
+                            <div class="num" id="sideQuizzes">0</div>
+                            <div class="lbl">Quizzes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duel Stats -->
+                <div class="sidebar-duel">
+                    <div class="title">⚔️ Duel</div>
+                    <div class="duel-row"><span>🏆 Wins</span><span class="value win" id="sideWins">0</span></div>
+                    <div class="duel-row"><span>💪 Losses</span><span class="value loss" id="sideLosses">0</span></div>
+                    <div class="duel-row"><span>🤝 Ties</span><span class="value tie" id="sideTies">0</span></div>
+                    <div class="duel-row"><span>⚔️ Total</span><span class="value" id="sideTotal">0</span></div>
+                    <div class="duel-row"><span>⭐ Duel Pts</span><span class="value gold" id="sideDuelPoints">0</span></div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="sidebar-achievements">
+                    <div class="title">🏅 Achievements</div>
+                    <div class="badges" id="sideAchievements">
+                        <span class="badge">🎯</span>
+                        <span class="badge">💯</span>
+                        <span class="badge">⚔️</span>
+                        <span class="badge">🏆</span>
+                        <span class="badge">🔥</span>
+                        <span class="badge">🌟</span>
+                    </div>
+                    <div class="count" id="sideAchievementCount">0 unlocked</div>
+                </div>
+
+                <!-- Win Rate -->
+                <div class="sidebar-winrate">
+                    <div class="title">📈 Win Rate</div>
+                    <div class="bar"><div class="fill" id="winRateFill" style="width:0%"></div></div>
+                    <div class="info">
+                        <span id="winRateText">0%</span>
+                        <span id="winRateDetail">0/0</span>
+                    </div>
+                </div>
+
+                <!-- Last Active -->
+                <div class="sidebar-lastactive">
+                    <div class="label">⏱️ Last Active</div>
+                    <div class="time" id="lastActiveTime">Just now</div>
+                </div>
+
+                <!-- Student of Week -->
+                <div class="sidebar-sow" id="sideSow">
+                    <div class="icon">🏆</div>
+                    <div class="text">⭐ Student of the Week!</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer">
+            <span class="brand">SVGMS • BHIM • RAJASTHAN</span><br>
+            © 2026 SVGMS — A learning initiative brought to life through the vision of Mr. Hazari Singh Ravali
+        </div>
+
+        <div id="student-footer"></div>
+    </div>
+
+    <!-- ============================================================
+    FIREBASE SDK
+    ============================================================ -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ============================================================
+        // FIREBASE CONFIG
+        // ============================================================
+        var firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        var auth = firebase.auth();
+        var db = firebase.firestore();
+
+        // ============================================================
+        // LOAD HEADER & FOOTER
+        // ============================================================
+        fetch('components/header.html')
+            .then(function(res) { return res.text(); })
+            .then(function(data) { document.getElementById('student-header').innerHTML = data; })
+            .catch(function() { console.error('Failed to load header'); });
+
+        fetch('components/footer.html')
+            .then(function(res) { return res.text(); })
+            .then(function(data) { document.getElementById('student-footer').innerHTML = data; })
+            .catch(function() { console.error('Failed to load footer'); });
+
+        // ============================================================
+        // DASHBOARD FUNCTIONS
+        // ============================================================
+
+        var allAchievements = [
+            { id: 'first_quiz', icon: '🎯', name: 'First Quiz' },
+            { id: 'perfect_score', icon: '💯', name: 'Perfect Score' },
+            { id: 'quiz_warrior', icon: '⚔️', name: 'Quiz Warrior' },
+            { id: 'quiz_master', icon: '🏆', name: 'Quiz Master' },
+            { id: 'streak_7', icon: '🔥', name: '7-Day Streak' },
+            { id: 'streak_30', icon: '🌟', name: '30-Day Streak' }
+        ];
+
+        function updateSidebarStats(points, streak, rank, quizzes) {
+            document.getElementById('sidePoints').textContent = points || 0;
+            document.getElementById('sideStreak').textContent = streak || 0;
+            document.getElementById('sideRank').textContent = rank || '-';
+            document.getElementById('sideQuizzes').textContent = quizzes || 0;
+        }
+
+        function updateSidebarDuel(stats) {
+            document.getElementById('sideWins').textContent = stats.wins || 0;
+            document.getElementById('sideLosses').textContent = stats.losses || 0;
+            document.getElementById('sideTies').textContent = stats.ties || 0;
+            document.getElementById('sideTotal').textContent = stats.totalDuels || 0;
+            document.getElementById('sideDuelPoints').textContent = stats.totalDuelPoints || 0;
+        }
+
+        function updateSidebarAchievements(achievements) {
+            var container = document.getElementById('sideAchievements');
+            var countEl = document.getElementById('sideAchievementCount');
+            var unlocked = achievements || [];
+            var unlockedIds = new Set(unlocked);
+
+            var badges = container.querySelectorAll('.badge');
+            badges.forEach(function(badge, index) {
+                if (index < allAchievements.length) {
+                    var ach = allAchievements[index];
+                    if (unlockedIds.has(ach.id)) {
+                        badge.classList.add('unlocked');
+                        badge.title = ach.name + ' ✅ Unlocked';
+                    } else {
+                        badge.classList.remove('unlocked');
+                        badge.title = ach.name + ' 🔒 Locked';
+                    }
+                }
+            });
+
+            var count = allAchievements.filter(function(a) { return unlockedIds.has(a.id); }).length;
+            countEl.textContent = count + '/' + allAchievements.length + ' unlocked';
+        }
+
+        function updateSidebarWinRate(wins, total) {
+            var rate = total > 0 ? Math.round((wins / total) * 100) : 0;
+            document.getElementById('winRateFill').style.width = rate + '%';
+            document.getElementById('winRateText').textContent = rate + '%';
+            document.getElementById('winRateDetail').textContent = wins + '/' + total;
+        }
+
+        function updateLastActive(timestamp) {
+            var el = document.getElementById('lastActiveTime');
+            if (!timestamp) { el.textContent = 'Just now'; return; }
+            var now = new Date();
+            var diff = Math.floor((now - timestamp) / 1000);
+            if (diff < 60) el.textContent = 'Just now';
+            else if (diff < 3600) el.textContent = Math.floor(diff / 60) + ' min ago';
+            else if (diff < 86400) el.textContent = Math.floor(diff / 3600) + ' hours ago';
+            else el.textContent = Math.floor(diff / 86400) + ' days ago';
+        }
+
+        function updateStreakDisplay(streak) {
+            var streakNum = document.getElementById('streakNumber');
+            var streakIcon = document.getElementById('streakIcon');
+            
+            if (streakNum) streakNum.textContent = streak || 0;
+            
+            if (streakIcon) {
+                if (streak >= 100) streakIcon.textContent = '💎';
+                else if (streak >= 60) streakIcon.textContent = '👑';
+                else if (streak >= 30) streakIcon.textContent = '🏆';
+                else if (streak >= 14) streakIcon.textContent = '🌟';
+                else if (streak >= 7) streakIcon.textContent = '⚡';
+                else if (streak >= 3) streakIcon.textContent = '🔥';
+                else streakIcon.textContent = '📅';
+            }
+
+            var nextEl = document.getElementById('nextMilestone');
+            if (nextEl && streak > 0) {
+                var milestones = [3, 7, 14, 30, 60, 100];
+                var next = null;
+                for (var i = 0; i < milestones.length; i++) {
+                    if (streak < milestones[i]) {
+                        next = milestones[i];
+                        break;
+                    }
+                }
+                if (next) {
+                    var remaining = next - streak;
+                    nextEl.textContent = remaining + ' days to ' + next + '-day 🎯';
+                } else {
+                    nextEl.textContent = '🏆 Max streak!';
+                }
+            }
+        }
+
+        function updateRecentActivity(activities) {
+            var container = document.getElementById('recentActivity');
+            
+            if (!activities || activities.length === 0) {
+                container.innerHTML = '<div class="no-activity">No quizzes taken yet. Start your first quiz! 🚀</div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < activities.length && i < 5; i++) {
+                var act = activities[i];
+                var modeTag = act.mode === 'dual' ? '⚔️ Duel' : '📝 Quiz';
+                html += '<div class="recent-item">' +
+                    '<span class="subject">' + (act.subject || 'Quiz') + '</span>' +
+                    '<span class="score">' + (act.percentage || 0) + '%</span>' +
+                    '<span class="mode-tag">' + modeTag + '</span>' +
+                    '<span class="date">' + (act.date ? act.date.toLocaleDateString() : 'Recent') + '</span>' +
+                    '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function updateWeeklyProgress(activities) {
+            var fill = document.getElementById('weeklyProgressFill');
+            var stats = document.getElementById('weeklyStats');
+            var percent = document.getElementById('weeklyPercent');
+
+            var count = activities ? activities.length : 0;
+            var maxActivities = 10;
+            var progress = Math.min((count / maxActivities) * 100, 100);
+
+            fill.style.width = progress + '%';
+            stats.textContent = count + ' activities this week';
+            percent.textContent = Math.round(progress) + '%';
+        }
+
+        // ============================================================
+        // CALCULATE AND UPDATE RANK
+        // ============================================================
+        async function calculateAndUpdateRank(userId, currentPoints) {
+            try {
+                console.log('📊 Calculating rank for user:', userId);
+                
+                // Get all students sorted by totalPoints
+                var snapshot = await db.collection('students')
+                    .orderBy('totalPoints', 'desc')
+                    .get();
+                
+                var rank = 1;
+                var found = false;
+                var totalStudents = 0;
+                
+                snapshot.forEach(function(doc) {
+                    totalStudents++;
+                    if (doc.id === userId) {
+                        found = true;
+                        return;
+                    }
+                    if (!found) rank++;
+                });
+                
+                if (!found) {
+                    console.warn('⚠️ User not found in ranking');
+                    return null;
+                }
+                
+                console.log('✅ Rank calculated: #' + rank + ' out of ' + totalStudents + ' students');
+                
+                // Save rank to Firestore
+                await db.collection('students').doc(userId).update({
+                    rank: rank
+                });
+                
+                return rank;
+                
+            } catch (error) {
+                console.error('❌ Error calculating rank:', error);
+                return null;
+            }
+        }
+
+        // ============================================================
+        // LOAD DASHBOARD
+        // ============================================================
+        async function loadDashboard() {
+            var user = auth.currentUser;
+            if (!user) return;
+        
+            try {
+                var doc = await db.collection('students').doc(user.uid).get();
+                var data = doc.data();
+        
+                if (!data) {
+                    console.error('No student data found');
+                    return;
+                }
+        
+                // ============================================================
+                // SET UP REAL-TIME LISTENER FOR AUTO-UPDATES
+                // ============================================================
+                if (window.dashboardListener) {
+                    window.dashboardListener();
+                    window.dashboardListener = null;
+                }
+        
+                window.dashboardListener = db.collection('students').doc(user.uid)
+                    .onSnapshot(function(snapshot) {
+                        if (snapshot.exists) {
+                            var updatedData = snapshot.data();
+                            console.log('🔄 Dashboard updated in real-time:', updatedData);
+                            
+                            // Update main stats
+                            document.getElementById('totalPoints').textContent = updatedData.totalPoints || 0;
+                            document.getElementById('streakNumber').textContent = updatedData.streak || 0;
+                            
+                            // Update streak icon
+                            updateStreakDisplay(updatedData.streak || 0);
+                            
+                            // Get current quiz count
+                            var quizCount = document.getElementById('quizCount').textContent || 0;
+                            
+                            // Update rank - recalculate if missing
+                            if (updatedData.rank) {
+                                document.getElementById('rankNumber').textContent = '#' + updatedData.rank;
+                                document.getElementById('sideRank').textContent = '#' + updatedData.rank;
+                                updateSidebarStats(
+                                    updatedData.totalPoints || 0,
+                                    updatedData.streak || 0,
+                                    '#' + updatedData.rank,
+                                    quizCount
+                                );
+                            } else {
+                                // If rank is missing, show placeholder and recalculate
+                                document.getElementById('rankNumber').textContent = '#--';
+                                document.getElementById('sideRank').textContent = '#--';
+                                updateSidebarStats(
+                                    updatedData.totalPoints || 0,
+                                    updatedData.streak || 0,
+                                    '#--',
+                                    quizCount
+                                );
+                                // Recalculate rank
+                                calculateAndUpdateRank(user.uid, updatedData.totalPoints || 0)
+                                    .then(function(rank) {
+                                        if (rank) {
+                                            document.getElementById('rankNumber').textContent = '#' + rank;
+                                            document.getElementById('sideRank').textContent = '#' + rank;
+                                            updateSidebarStats(
+                                                updatedData.totalPoints || 0,
+                                                updatedData.streak || 0,
+                                                '#' + rank,
+                                                quizCount
+                                            );
+                                        }
+                                    })
+                                    .catch(function(err) {
+                                        console.warn('Could not update rank:', err);
+                                    });
+                            }
+                            
+                            // Update Student of Week badge
+                            if (updatedData.studentOfWeek) {
+                                document.getElementById('sowBadge').classList.add('visible');
+                                document.getElementById('sideSow').classList.add('visible');
+                            } else {
+                                document.getElementById('sowBadge').classList.remove('visible');
+                                document.getElementById('sideSow').classList.remove('visible');
+                            }
+                            
+                            // Update last active
+                            if (updatedData.lastActive) {
+                                updateLastActive(updatedData.lastActive.toDate());
+                            }
+                            
+                            // Update duel stats in sidebar
+                            if (updatedData.duelStats) {
+                                updateSidebarDuel(updatedData.duelStats);
+                                updateSidebarWinRate(
+                                    updatedData.duelStats.wins || 0, 
+                                    updatedData.duelStats.totalDuels || 0
+                                );
+                            }
+                        }
+                    }, function(error) {
+                        console.error('❌ Dashboard listener error:', error);
+                    });
+        
+                // ============================================================
+                // LOAD INITIAL DATA
+                // ============================================================
+                
+                // Header
+                document.getElementById('studentNameDisplay').textContent = data.name || 'Explorer';
+                document.getElementById('studentClass').textContent = data.class || '--';
+                document.getElementById('studentRollNo').textContent = data.rollNo || '--';
+        
+                // Stats
+                var points = data.totalPoints || 0;
+                var streak = data.streak || 0;
+                document.getElementById('totalPoints').textContent = points;
+                updateStreakDisplay(streak);
+        
+                // Quiz count
+                var quizSnapshot = await db.collection('quiz_scores')
+                    .where('studentId', '==', user.uid)
+                    .get();
+                var quizCount = quizSnapshot.size || 0;
+                document.getElementById('quizCount').textContent = quizCount;
+        
+                // Calculate and update rank
+                var rank = await calculateAndUpdateRank(user.uid, points);
+                if (rank) {
+                    document.getElementById('rankNumber').textContent = '#' + rank;
+                    document.getElementById('sideRank').textContent = '#' + rank;
+                } else {
+                    document.getElementById('rankNumber').textContent = '#--';
+                    document.getElementById('sideRank').textContent = '#--';
+                }
+        
+                // Student of Week
+                if (data.studentOfWeek) {
+                    document.getElementById('sowBadge').classList.add('visible');
+                    document.getElementById('sideSow').classList.add('visible');
+                }
+        
+                // Achievements
+                var achievements = data.achievements || [];
+                updateSidebarAchievements(achievements);
+        
+                // Duel Stats
+                var duelStats = data.duelStats || { 
+                    totalDuels: 0, 
+                    wins: 0, 
+                    losses: 0, 
+                    ties: 0, 
+                    totalDuelPoints: 0 
+                };
+                updateSidebarDuel(duelStats);
+                updateSidebarWinRate(duelStats.wins || 0, duelStats.totalDuels || 0);
+        
+                // Sidebar Stats with actual rank
+                updateSidebarStats(points, streak, rank ? '#' + rank : '#--', quizCount);
+        
+                // Last Active
+                var lastActive = data.lastActive ? data.lastActive.toDate() : null;
+                updateLastActive(lastActive);
+        
+                // Recent Activity
+                var activities = [];
+                quizSnapshot.forEach(function(doc) {
+                    var act = doc.data();
+                    var date = act.attemptedAt ? act.attemptedAt.toDate() : new Date();
+                    activities.push({
+                        subject: act.subject || 'Quiz',
+                        percentage: act.percentage || 0,
+                        score: act.score || 0,
+                        total: act.total || 0,
+                        mode: act.mode || 'solo',
+                        date: date
+                    });
+                });
+                activities.sort(function(a, b) { return b.date - a.date; });
+                updateRecentActivity(activities);
+        
+                // Weekly Progress
+                var thisWeek = activities.filter(function(a) {
+                    var now = new Date();
+                    var weekAgo = new Date(now);
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    return a.date >= weekAgo;
+                });
+                updateWeeklyProgress(thisWeek);
+        
+                console.log('✅ Dashboard loaded with real-time updates');
+        
+            } catch (error) {
+                console.error('❌ Error loading dashboard:', error);
+            }
+        }
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        function studentLogout() {
+            if (confirm('Exit Student Zone?')) {
+                auth.signOut().then(function() {
+                    window.location.href = 'login.html';
+                }).catch(function(error) {
+                    console.error('❌ Logout error:', error);
+                });
+            }
+        }
+
+        // ============================================================
+        // AUTH STATE
+        // ============================================================
+        auth.onAuthStateChanged(async function(user) {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                await user.reload();
+            } catch (e) {
+                console.warn('Token refresh failed:', e);
+            }
+
+            if (!user.emailVerified) {
+                await auth.signOut();
+                window.location.href = 'login.html?error=not-verified';
+                return;
+            }
+
+            await loadDashboard();
+        });
+
+        // ============================================================
+        // CLEANUP ON PAGE UNLOAD
+        // ============================================================
+        window.addEventListener('beforeunload', function() {
+            if (window.dashboardListener) {
+                window.dashboardListener();
+                window.dashboardListener = null;
+                console.log('🧹 Dashboard listener cleaned up');
+            }
+        });
+
+        console.log('✅ Dashboard with 20% right sidebar loaded!');
+    </script>
+
+    <script src="chat-widget.js"></script>
+
+</body>
+</html>

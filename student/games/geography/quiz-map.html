@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embeddable Continent Quiz Game</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+        }
+        .game-container {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0,1);
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 { margin-top: 0; }
+        .prompt-box {
+            background-color: #eff6ff;
+            border: 2px solid var(--primary-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        svg {
+            width: 100%;
+            height: auto;
+            background: #e0f2fe;
+            border-radius: 8px;
+            border: 1px solid #bae6fd;
+        }
+        .continent {
+            fill: #ffffff;
+            stroke: #94a3b8;
+            stroke-width: 1.5;
+            cursor: pointer;
+            transition: fill 0.2s ease;
+        }
+        .continent:hover {
+            fill: #e2e8f0;
+        }
+        .correct { fill: var(--success-color) !important; cursor: default; }
+        .wrong { fill: var(--error-color) !important; }
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            display: none;
+        }
+        .btn:hover { background-color: #2563eb; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h2>World Continent Quiz</h2>
+    <div class="score-board">
+        <div>Target: <span id="score-correct">0</span>/7</div>
+        <div>Attempts: <span id="score-attempts">0</span></div>
+    </div>
+    <div id="prompt" class="prompt-box">Loading game...</div>
+
+    <!-- Simplified SVG World Map Outline -->
+    <svg viewBox="0 0 1000 500" xmlns="http://w3.org">
+        <!-- North America -->
+        <path class="continent" data-name="North America" d="M100,50 L280,50 L350,180 L250,280 L180,250 L100,150 Z" />
+        <!-- South America -->
+        <path class="continent" data-name="South America" d="M250,290 L330,300 L380,360 L320,480 L270,420 Z" />
+        <!-- Europe -->
+        <path class="continent" data-name="Europe" d="M420,60 L580,60 L560,180 L440,180 L400,120 Z" />
+        <!-- Africa -->
+        <path class="continent" data-name="Africa" d="M430,195 L560,195 L600,280 L550,420 L480,300 L410,240 Z" />
+        <!-- Asia -->
+        <path class="continent" data-name="Asia" d="M585,60 L900,60 L920,280 L750,320 L570,185 Z" />
+        <!-- Australia -->
+        <path class="continent" data-name="Australia" d="M780,340 L880,350 L900,420 L800,430 Z" />
+        <!-- Antarctica -->
+        <path class="continent" data-name="Antarctica" d="M100,470 L900,470 L850,500 L150,500 Z" />
+    </svg>
+
+    <button id="reset-btn" class="btn" onclick="startGame()">Play Again</button>
+</div>
+
+<script>
+    const continents = ["North America", "South America", "Europe", "Africa", "Asia", "Australia", "Antarctica"];
+    let remainingContinents = [];
+    let currentTarget = "";
+    let attempts = 0;
+    let correctCount = 0;
+
+    const promptEl = document.getElementById("prompt");
+    const correctEl = document.getElementById("score-correct");
+    const attemptsEl = document.getElementById("score-attempts");
+    const resetBtn = document.getElementById("reset-btn");
+
+    function startGame() {
+        remainingContinents = [...continents];
+        attempts = 0;
+        correctCount = 0;
+        resetBtn.style.display = "none";
+        
+        document.querySelectorAll('.continent').forEach(el => {
+            el.className.baseVal = "continent";
+        });
+        
+        updateScores();
+        nextTurn();
+    }
+
+    function nextTurn() {
+        if (remainingContinents.length === 0) {
+            promptEl.textContent = "🎉 Congratulations! You found all continents!";
+            resetBtn.style.display = "inline-block";
+            currentTarget = "";
+            return;
+        }
+        const randomIndex = Math.floor(Math.random() * remainingContinents.length);
+        currentTarget = remainingContinents[randomIndex];
+        promptEl.textContent = `Click on: ${currentTarget}`;
+    }
+
+    function updateScores() {
+        correctEl.textContent = correctCount;
+        attemptsEl.textContent = attempts;
+    }
+
+    document.querySelectorAll('.continent').forEach(element => {
+        element.addEventListener('click', function() {
+            if (!currentTarget) return; // Game over or not started
+
+            const clickedContinent = this.getAttribute('data-name');
+            
+            // Prevent clicking already solved continents
+            if (this.classList.contains('correct')) return;
+
+            attempts++;
+
+            if (clickedContinent === currentTarget) {
+                this.classList.remove('wrong');
+                this.classList.add('correct');
+                correctCount++;
+                
+                // Remove from remaining list
+                remainingContinents = remainingContinents.filter(c => c !== currentTarget);
+                updateScores();
+                nextTurn();
+            } else {
+                // Flash red temporary penalty feedback
+                this.classList.add('wrong');
+                setTimeout(() => this.classList.remove('wrong'), 500);
+                updateScores();
+            }
+        });
+    });
+
+    // Initialize Game on Load
+    startGame();
+</script>
+
+</body>
+</html>

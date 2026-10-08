@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer - Student Zone</title>
+    <style>
+        /* ============================================================
+        GLOBAL RESET & BASE STYLES
+        ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3e 50%, #2a1a4e 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+        MULTIPLAYER CONTAINER
+        ============================================================ */
+        .multiplayer-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .multiplayer-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .multiplayer-container h2 {
+            color: #fff;
+            font-weight: 400;
+            letter-spacing: 1px;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .multiplayer-container p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+        }
+
+        /* ============================================================
+        TABS
+        ============================================================ */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.6rem 1.8rem;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: -0.8rem;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: rgba(255, 255, 255, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            animation: tabGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes tabGlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .tab-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ============================================================
+        TAB CONTENT
+        ============================================================ */
+        .tab-content {
+            display: none;
+            padding: 1.5rem 0;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+        FORM SECTIONS
+        ============================================================ */
+        .form-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-section:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-section h4 {
+            color: #fff;
+            font-weight: 400;
+            margin: 0 0 1.2rem 0;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================================
+        FORM ROW
+        ============================================================ */
+        .form-row {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .form-group label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            display: block;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.05);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .form-group select option {
+            background: #1a1a3e;
+            color: #fff;
+        }
+
+        /* ============================================================
+        CHECKBOX
+        ============================================================ */
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            padding-top: 0.8rem;
+        }
+
+        .form-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+            cursor: pointer;
+        }
+
+        .form-checkbox input[type="checkbox"]:hover {
+            transform: scale(1.1);
+        }
+
+        /* ============================================================
+        BUTTONS
+        ============================================================ */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary.btn-block {
+            width: 100%;
+        }
+
+        .btn-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #66bb6a;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .btn-success:hover {
+            background: rgba(76, 175, 80, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .btn-danger {
+            background: rgba(244, 67, 54, 0.2);
+            color: #ef5350;
+            border: 1px solid rgba(244, 67, 54, 0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .btn-danger:hover {
+            background: rgba(244, 67, 54, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.2);
+        }
+
+        .btn-warning {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffa726;
+            border: 1px solid rgba(255, 152, 0, 0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .btn-warning:hover {
+            background: rgba(255, 152, 0, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.8rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+        }
+
+        /* ============================================================
+        CHALLENGE CARDS
+        ============================================================ */
+        .challenge-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .challenge-card .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .challenge-card .title {
+            color: #fff;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .challenge-card .meta {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+        }
+
+        .challenge-card .actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* ============================================================
+        STATUS BADGES
+        ============================================================ */
+        .status {
+            padding: 0.15rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .status-waiting {
+            background: rgba(255, 152, 0, 0.15);
+            color: #ffa726;
+            border: 1px solid rgba(255, 152, 0, 0.1);
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.15);
+            color: #66bb6a;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+
+        .status-completed {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status-rejected {
+            background: rgba(244, 67, 54, 0.15);
+            color: #ef5350;
+            border: 1px solid rgba(244, 67, 54, 0.1);
+        }
+
+        /* ============================================================
+        CHALLENGE ID DISPLAY
+        ============================================================ */
+        .challenge-id-display {
+            background: rgba(102, 126, 234, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            border-radius: 8px;
+            padding: 0.4rem 1rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: #667eea;
+            font-weight: 500;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ============================================================
+        COPY BUTTON
+        ============================================================ */
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.4);
+            padding: 0.15rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* ============================================================
+        EMPTY STATE
+        ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            margin: 0;
+        }
+
+        /* ============================================================
+        CREATED CHALLENGE BOX
+        ============================================================ */
+        .created-challenge-box {
+            background: rgba(76, 175, 80, 0.06);
+            border: 1px solid rgba(76, 175, 80, 0.12);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .created-challenge-box .icon {
+            font-size: 2.5rem;
+        }
+
+        .created-challenge-box .message {
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0.5rem 0;
+        }
+
+        /* ============================================================
+        OPEN CHALLENGES SECTION
+        ============================================================ */
+        .open-challenges-section {
+            margin-top: 2rem;
+        }
+
+        .open-challenges-section h4 {
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 400;
+            margin: 0 0 1rem 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #openChallengesList,
+        #myChallengesList {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        #openChallengesList::-webkit-scrollbar,
+        #myChallengesList::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #openChallengesList::-webkit-scrollbar-track,
+        #myChallengesList::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        #openChallengesList::-webkit-scrollbar-thumb,
+        #myChallengesList::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        #openChallengesList::-webkit-scrollbar-thumb:hover,
+        #myChallengesList::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ============================================================
+        TOAST NOTIFICATIONS
+        ============================================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9rem;
+            z-index: 9999;
+            animation: toastSlideIn 0.5s ease;
+            max-width: 350px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            font-weight: 500;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #e53935, #b71c1c);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, #1e88e5, #0d47a1);
+        }
+
+        .toast.warning {
+            background: linear-gradient(135deg, #ff6f00, #e65100);
+        }
+
+        .toast.hide {
+            animation: toastSlideOut 0.5s ease forwards;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toastSlideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* ============================================================
+        LOADING SPINNER
+        ============================================================ */
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================================================
+        LOBBY MODAL
+        ============================================================ */
+        .lobby-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInOverlay 0.3s ease;
+        }
+
+        .lobby-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .lobby-modal {
+            background: linear-gradient(135deg, #1a1a3e 0%, #2a1a4e 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            animation: slideUpModal 0.4s ease;
+            position: relative;
+        }
+
+        @keyframes slideUpModal {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .lobby-modal .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+        }
+
+        .lobby-modal .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.1);
+        }
+
+        .lobby-modal .lobby-title {
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: 0.3rem;
+            color: #fff;
+        }
+
+        .lobby-modal .lobby-subtitle {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lobby-modal .challenge-id-box {
+            background: rgba(102, 126, 234, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .lobby-modal .challenge-id-box .id-label {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .lobby-modal .challenge-id-box .id-value {
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .lobby-modal .players-list {
+            margin: 1.5rem 0;
+        }
+
+        .lobby-modal .players-list .player-count {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .lobby-modal .players-list .player-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .lobby-modal .players-list .player-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .lobby-modal .players-list .player-item .player-name {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .lobby-modal .players-list .player-item .player-status {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.7rem;
+            border-radius: 20px;
+        }
+
+        .lobby-modal .players-list .player-item .player-status.ready {
+            background: rgba(76, 175, 80, 0.15);
+            color: #66bb6a;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+
+        .lobby-modal .players-list .player-item .player-status.waiting {
+            background: rgba(255, 152, 0, 0.15);
+            color: #ffa726;
+            border: 1px solid rgba(255, 152, 0, 0.1);
+        }
+
+        .lobby-modal .players-list .player-item .player-status.creator {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .lobby-modal .players-list .player-item .ready-btn {
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+        }
+
+        .lobby-modal .players-list .player-item .ready-btn:hover {
+            background: rgba(102, 126, 234, 0.25);
+            transform: scale(1.05);
+        }
+
+        .lobby-modal .players-list .player-item .ready-btn.ready {
+            background: rgba(76, 175, 80, 0.15);
+            color: #66bb6a;
+        }
+
+        .lobby-modal .players-list .player-item .ready-btn.ready:hover {
+            background: rgba(76, 175, 80, 0.25);
+        }
+
+        .lobby-modal .start-btn-container {
+            margin-top: 1.5rem;
+        }
+
+        .lobby-modal .start-btn-container .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .lobby-modal .lobby-footer {
+            margin-top: 1rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.75rem;
+        }
+
+        /* Loading animation for lobby */
+        .lobby-modal .pulse-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            margin-left: 5px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.8); }
+        }
+
+        /* ============================================================
+        DUEL GAMEPLAY AREA - NEW
+        ============================================================ */
+        .duel-gameplay-area {
+            display: none;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .duel-gameplay-area.active {
+            display: block;
+        }
+
+        .duel-gameplay-area .duel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .duel-gameplay-area .duel-header h2 {
+            color: #fff;
+            font-weight: 400;
+            letter-spacing: 1px;
+            font-size: 1.5rem;
+        }
+
+        .duel-gameplay-area .duel-header .duel-scores {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .duel-gameplay-area .duel-header .duel-scores span {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .duel-gameplay-area .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            color: #fff;
+            border-left: 3px solid #667eea;
+        }
+
+        .duel-gameplay-area .options-grid {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .duel-gameplay-area .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-align: left;
+            width: 100%;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .duel-gameplay-area .option-btn:hover:not(.disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .duel-gameplay-area .option-btn .label {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 25px;
+        }
+
+        .duel-gameplay-area .option-btn.correct {
+            border-color: #66bb6a;
+            background: rgba(76, 175, 80, 0.15);
+        }
+
+        .duel-gameplay-area .option-btn.correct .label {
+            color: #66bb6a;
+        }
+
+        .duel-gameplay-area .option-btn.wrong {
+            border-color: #ef5350;
+            background: rgba(244, 67, 54, 0.15);
+        }
+
+        .duel-gameplay-area .option-btn.wrong .label {
+            color: #ef5350;
+        }
+
+        .duel-gameplay-area .option-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .duel-gameplay-area .feedback-area {
+            margin: 1.5rem 0;
+            padding: 1rem 1.2rem;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .duel-gameplay-area .feedback-area.show {
+            display: block;
+        }
+
+        .duel-gameplay-area .feedback-area.correct {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #81c784;
+        }
+
+        .duel-gameplay-area .feedback-area.wrong {
+            background: rgba(244, 67, 54, 0.15);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: #ef9a9a;
+        }
+
+        .duel-gameplay-area .progress-container {
+            margin: 1.5rem 0;
+        }
+
+        .duel-gameplay-area .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .duel-gameplay-area .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .duel-gameplay-area .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .duel-gameplay-area .duel-results {
+            display: none;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .duel-gameplay-area .duel-results.show {
+            display: block;
+        }
+
+        .duel-gameplay-area .duel-results .results-score {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0.5rem 0;
+        }
+
+        .duel-gameplay-area .duel-results .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .duel-gameplay-area .duel-results .results-stat {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .duel-gameplay-area .duel-results .results-stat .number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .duel-gameplay-area .duel-results .results-stat .label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .duel-gameplay-area .duel-results .result-message {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+        }
+
+        /* ============================================================
+        RESPONSIVE DESIGN
+        ============================================================ */
+        @media (max-width: 768px) {
+            .multiplayer-container {
+                padding: 1.5rem;
+                margin: 1rem;
+                border-radius: 15px;
+            }
+
+            .multiplayer-container h2 {
+                font-size: 1.5rem;
+            }
+
+            .tabs {
+                gap: 0.3rem;
+            }
+
+            .tab-btn {
+                padding: 0.4rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .form-group {
+                min-width: 100%;
+            }
+
+            .form-section {
+                padding: 1rem;
+            }
+
+            .challenge-card {
+                padding: 1rem;
+            }
+
+            .challenge-card .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .challenge-card .actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            #openChallengesList,
+            #myChallengesList {
+                max-height: 300px;
+            }
+
+            .toast {
+                bottom: 15px;
+                right: 15px;
+                left: 15px;
+                max-width: unset;
+                font-size: 0.85rem;
+                padding: 12px 18px;
+            }
+
+            .lobby-modal {
+                padding: 1.5rem;
+                max-width: 95%;
+            }
+
+            .lobby-modal .lobby-title {
+                font-size: 1.4rem;
+            }
+
+            .duel-gameplay-area {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .duel-gameplay-area .duel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .multiplayer-container {
+                padding: 1rem;
+                margin: 0.5rem;
+                border-radius: 10px;
+            }
+
+            .tab-btn {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.7rem;
+            }
+
+            .btn-primary {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .challenge-card .title {
+                font-size: 0.9rem;
+            }
+
+            .lobby-modal {
+                padding: 1rem;
+            }
+
+            .duel-gameplay-area {
+                padding: 1rem;
+            }
+        }
+
+        /* ============================================================
+        UTILITY CLASSES
+        ============================================================ */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 {
+            margin-top: 1rem;
+        }
+
+        .mt-2 {
+            margin-top: 2rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 1rem;
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gap-1 {
+            gap: 1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MAIN MULTIPLAYER PAGE -->
+    <div class="multiplayer-container" id="mainMultiplayerPage">
+        <div id="student-header"></div>
+
+        <h2>🎮 Multiplayer</h2>
+        <p>Challenge friends or create open challenges for anyone to join!</p>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="dual" onclick="switchTab('dual')">⚔️ Dual</button>
+            <button class="tab-btn" data-tab="multi" onclick="switchTab('multi')">👥 Multiplayer Lobbies</button>
+        </div>
+
+        <!-- DUAL TAB -->
+        <div id="tab-dual" class="tab-content active">
+
+            <!-- CREATE CHALLENGE -->
+            <div class="form-section">
+                <h4>📝 Create Challenge</h4>
+                <form onsubmit="createChallenge(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>📚 Subject</label>
+                            <select id="challengeSubject">
+                                <option value="all">All Subjects</option>
+                                <option value="ancient">Ancient History</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>📝 Questions</label>
+                            <select id="challengeCount">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>⏱️ Time Limit</label>
+                            <select id="challengeTime">
+                                <option value="60">1 min</option>
+                                <option value="120">2 min</option>
+                                <option value="180" selected>3 min</option>
+                                <option value="300">5 min</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="isOpenChallenge" checked>
+                        <label for="isOpenChallenge">🌐 Open Challenge (anyone can join)</label>
+                    </div>
+                    <div id="specificOpponentField" style="display:none; margin-top:0.5rem;">
+                        <div class="form-group">
+                            <label>👤 Opponent Email</label>
+                            <input type="email" id="opponentEmail" placeholder="friend@email.com">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" style="margin-top:1rem; width:100%;">🚀 Create Challenge</button>
+                </form>
+                <div id="createdChallengeDisplay"></div>
+            </div>
+
+            <!-- JOIN CHALLENGE -->
+            <div class="form-section">
+                <h4>🔗 Join Challenge</h4>
+                <div class="form-row">
+                    <div class="form-group" style="flex:3;">
+                        <label>Challenge ID</label>
+                        <input type="text" id="joinChallengeId" placeholder="Enter challenge ID">
+                    </div>
+                    <div class="form-group" style="flex:1; display:flex; align-items:flex-end;">
+                        <button onclick="joinChallengeById()" class="btn-primary" style="width:100%;">🔗 Join</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPEN CHALLENGES -->
+            <div class="open-challenges-section">
+                <h4>🌐 Open Challenges</h4>
+                <div id="openChallengesList">
+                    <div class="empty-state">
+                        <span class="icon">⚔️</span>
+                        <p>No open challenges available. Create one!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MY CHALLENGES -->
+            <div class="open-challenges-section">
+                <h4>📋 My Challenges</h4>
+                <div id="myChallengesList">
+                    <div class="empty-state">
+                        <span class="icon">📭</span>
+                        <p>No challenges yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MULTI TAB (Coming Soon) -->
+        <div id="tab-multi" class="tab-content">
+            <div class="empty-state">
+                <span class="icon">👥</span>
+                <p>Multiplayer Lobbies coming soon!</p>
+            </div>
+        </div>
+
+        <div id="student-footer"></div>
+    </div>
+
+    <!-- ============================================================
+    DUEL GAMEPLAY AREA - NEW
+    ============================================================ -->
+    <div class="duel-gameplay-area" id="duelGameplayArea">
+        <!-- Duel content will be dynamically inserted here -->
+    </div>
+
+    <!-- ============================================================
+    LOBBY MODAL
+    ============================================================ -->
+    <div class="lobby-overlay" id="lobbyOverlay">
+        <div class="lobby-modal">
+            <button class="close-btn" onclick="closeLobby()">✕</button>
+            
+            <div class="lobby-title">🎮 Challenge Lobby</div>
+            <div class="lobby-subtitle">Waiting for players to join...</div>
+
+            <div class="challenge-id-box">
+                <span class="id-label">🆔 Challenge ID</span>
+                <span class="id-value" id="lobbyChallengeId">---</span>
+                <button onclick="copyLobbyId()" class="copy-btn">📋 Copy</button>
+            </div>
+
+            <div class="players-list">
+                <div class="player-count" id="playerCountDisplay">👥 Players: <span id="playerCountNum">0</span>/2</div>
+                <div id="playersContainer">
+                    <div class="empty-state" style="padding:1rem;">
+                        <span class="icon">⏳</span>
+                        <p>Waiting for players...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="start-btn-container">
+                <button class="btn-primary" id="startGameBtn" disabled onclick="startGameFromLobby()">
+                    ⏳ Waiting for players...
+                </button>
+            </div>
+
+            <div class="lobby-footer">
+                <span>Share the Challenge ID with a friend to play!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+    // ============================================================
+    // FIREBASE CONFIG
+    // ============================================================
+    var firebaseConfig = {
+        apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+        authDomain: "svgms-backend.firebaseapp.com",
+        projectId: "svgms-backend",
+        storageBucket: "svgms-backend.firebasestorage.app",
+        messagingSenderId: "1065359559935",
+        appId: "1:1065359559935:web:977cea73a68e05813750ca"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    var auth = firebase.auth();
+    var db = firebase.firestore();
+
+    // ============================================================
+    // GLOBAL VARIABLES
+    // ============================================================
+    var currentUser = null;
+    var currentUserData = null;
+    var openChallengesListener = null;
+    var myChallengesListener = null;
+    var lobbyUnsubscribe = null;
+    var currentLobbyChallengeId = null;
+    var lobbyData = null;
+
+    // Duel state
+    var duelState = {
+        isActive: false,
+        challengeId: null,
+        isCreator: false,
+        opponentName: '',
+        questions: [],
+        currentQuestionIndex: 0,
+        correct: 0,
+        wrong: 0,
+        score: 0,
+        answers: [],
+        timer: null,
+        timeLeft: 0,
+        startTime: null,
+        isComplete: false,
+        challengeListener: null,
+        myScore: 0,
+        opponentScore: 0,
+        myAnswers: [],
+        opponentAnswers: []
+    };
+
+    // Sheet config for questions
+    var SHEET_CONFIG = {
+        sheetId: '1ApjcYT5Srnd1NkGkjIhuirSWQkSvsnLdZiiEl_wnREY',
+        apiKey: 'AIzaSyCnt4iYKeO-Y1b-OlY3jdZUntwHuWQBQls',
+        range: 'A2:K'
+    };
+
+    var questionCache = null;
+    var isQuestionsLoaded = false;
+
+    // ============================================================
+    // TOAST NOTIFICATION
+    // ============================================================
+    function showToast(message, type) {
+        type = type || 'info';
+        var existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+
+        var toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(function() {
+            toast.classList.add('hide');
+            setTimeout(function() { toast.remove(); }, 500);
+        }, 4000);
+    }
+
+    // ============================================================
+    // TAB SWITCHING
+    // ============================================================
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(function(el) {
+            el.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-btn').forEach(function(el) {
+            el.classList.remove('active');
+        });
+
+        var target = document.getElementById('tab-' + tab);
+        if (target) target.classList.add('active');
+        
+        var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
+        if (btn) btn.classList.add('active');
+
+        if (tab === 'dual') {
+            loadOpenChallenges();
+            loadMyChallenges();
+        }
+    }
+
+    // ============================================================
+    // TOGGLE OPPONENT FIELD
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        var checkbox = document.getElementById('isOpenChallenge');
+        var field = document.getElementById('specificOpponentField');
+        
+        if (checkbox && field) {
+            checkbox.addEventListener('change', function() {
+                field.style.display = this.checked ? 'none' : 'block';
+            });
+        }
+    });
+
+    // ============================================================
+    // CREATE CHALLENGE
+    // ============================================================
+    async function createChallenge(event) {
+        event.preventDefault();
+
+        if (!currentUser) {
+            showToast('Please login first', 'error');
+            return;
+        }
+
+        var subject = document.getElementById('challengeSubject').value;
+        var count = parseInt(document.getElementById('challengeCount').value);
+        var timeLimit = parseInt(document.getElementById('challengeTime').value);
+        var isOpen = document.getElementById('isOpenChallenge').checked;
+        var opponentEmail = document.getElementById('opponentEmail').value.trim();
+
+        if (!isOpen && !opponentEmail) {
+            showToast('Please enter opponent email', 'error');
+            return;
+        }
+
+        try {
+            var challengeData = {
+                creator: currentUser.uid,
+                creatorName: currentUserData?.name || currentUser.displayName || 'Student',
+                subject: subject,
+                count: count,
+                timeLimit: timeLimit,
+                status: 'waiting',
+                isOpen: isOpen,
+                creatorScore: 0,
+                opponentScore: 0,
+                creatorAnswers: [],
+                opponentAnswers: [],
+                winner: null,
+                questionIds: null,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                players: {},
+                playerCount: 0,
+                creatorFinished: false,
+                opponentFinished: false
+            };
+
+            // Add creator to players
+            challengeData.players[currentUser.uid] = {
+                name: currentUserData?.name || currentUser.displayName || 'Student',
+                ready: false,
+                isCreator: true
+            };
+            challengeData.playerCount = 1;
+
+            if (!isOpen && opponentEmail) {
+                var students = await db.collection('students')
+                    .where('email', '==', opponentEmail)
+                    .get();
+
+                if (students.empty) {
+                    showToast('User not found with this email', 'error');
+                    return;
+                }
+
+                var opponentDoc = students.docs[0];
+                var opponentData = opponentDoc.data();
+
+                if (opponentDoc.id === currentUser.uid) {
+                    showToast('You cannot challenge yourself!', 'error');
+                    return;
+                }
+
+                challengeData.opponent = opponentDoc.id;
+                challengeData.opponentName = opponentData.name || 'Student';
+                challengeData.isOpen = false;
+            }
+
+            var docRef = await db.collection('challenges').add(challengeData);
+            var challengeId = docRef.id;
+
+            openLobby(challengeId);
+            loadOpenChallenges();
+            loadMyChallenges();
+
+        } catch (error) {
+            console.error('Error creating challenge:', error);
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // ============================================================
+    // JOIN CHALLENGE BY ID
+    // ============================================================
+    async function joinChallengeById() {
+        var challengeId = document.getElementById('joinChallengeId').value.trim();
+        
+        if (!challengeId) {
+            showToast('Please enter a challenge ID', 'error');
+            return;
+        }
+
+        if (!currentUser) {
+            showToast('Please login first', 'error');
+            return;
+        }
+
+        await joinChallenge(challengeId);
+    }
+
+    // ============================================================
+    // JOIN CHALLENGE
+    // ============================================================
+    async function joinChallenge(challengeId) {
+        try {
+            var doc = await db.collection('challenges').doc(challengeId).get();
+            
+            if (!doc.exists) {
+                showToast('Challenge not found', 'error');
+                return;
+            }
+
+            var data = doc.data();
+
+            if (data.status === 'completed') {
+                showToast('This challenge has already been completed', 'error');
+                return;
+            }
+
+            if (data.status === 'rejected') {
+                showToast('This challenge was rejected', 'error');
+                return;
+            }
+
+            if (data.status === 'active') {
+                showToast('This challenge is already active', 'error');
+                return;
+            }
+
+            if (data.creator === currentUser.uid) {
+                showToast('You created this challenge! Opening lobby...', 'info');
+                openLobby(challengeId);
+                return;
+            }
+
+            if (!data.isOpen && data.opponent !== currentUser.uid) {
+                showToast('This challenge is not for you', 'error');
+                return;
+            }
+
+            if (data.players && data.players[currentUser.uid]) {
+                showToast('You already joined this challenge!', 'info');
+                openLobby(challengeId);
+                return;
+            }
+
+            var updateData = {
+                [`players.${currentUser.uid}`]: {
+                    name: currentUserData?.name || currentUser.displayName || 'Student',
+                    ready: false,
+                    isCreator: false
+                },
+                playerCount: firebase.firestore.FieldValue.increment(1),
+                opponent: currentUser.uid,
+                opponentName: currentUserData?.name || currentUser.displayName || 'Student'
+            };
+
+            if (!data.isOpen) {
+                updateData.status = 'active';
+            }
+
+            await db.collection('challenges').doc(challengeId).update(updateData);
+
+            showToast('✅ You joined the challenge!', 'success');
+            openLobby(challengeId);
+
+        } catch (error) {
+            console.error('Error joining challenge:', error);
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // ============================================================
+    // LOBBY SYSTEM
+    // ============================================================
+    function openLobby(challengeId) {
+        closeLobby();
+        
+        currentLobbyChallengeId = challengeId;
+        document.getElementById('lobbyOverlay').classList.add('active');
+        document.getElementById('lobbyChallengeId').textContent = challengeId;
+        
+        listenToLobby(challengeId);
+    }
+
+    function closeLobby() {
+        document.getElementById('lobbyOverlay').classList.remove('active');
+        if (lobbyUnsubscribe) {
+            lobbyUnsubscribe();
+            lobbyUnsubscribe = null;
+        }
+        currentLobbyChallengeId = null;
+        lobbyData = null;
+    }
+
+    function listenToLobby(challengeId) {
+        if (lobbyUnsubscribe) {
+            lobbyUnsubscribe();
+            lobbyUnsubscribe = null;
+        }
+
+        lobbyUnsubscribe = db.collection('challenges')
+            .doc(challengeId)
+            .onSnapshot(function(doc) {
+                if (!doc.exists) {
+                    showToast('Challenge no longer exists', 'error');
+                    closeLobby();
+                    return;
+                }
+
+                lobbyData = doc.data();
+                updateLobbyUI(lobbyData);
+            }, function(error) {
+                console.error('Lobby listener error:', error);
+                showToast('Error updating lobby: ' + error.message, 'error');
+            });
+    }
+
+    function updateLobbyUI(data) {
+        if (!data) return;
+
+        var playerCount = data.playerCount || 0;
+        document.getElementById('playerCountNum').textContent = playerCount;
+
+        var container = document.getElementById('playersContainer');
+        var playersHtml = '';
+
+        if (data.players && Object.keys(data.players).length > 0) {
+            Object.keys(data.players).forEach(function(uid) {
+                var player = data.players[uid];
+                var isCurrentUser = uid === currentUser.uid;
+                var isCreator = player.isCreator || false;
+                
+                var statusClass = 'waiting';
+                var statusText = '⏳ Waiting...';
+                if (isCreator) {
+                    statusClass = 'creator';
+                    statusText = '👑 Creator';
+                } else if (player.ready) {
+                    statusClass = 'ready';
+                    statusText = '✅ Ready';
+                }
+
+                playersHtml += `
+                    <div class="player-item">
+                        <span class="player-name">
+                            ${player.name}
+                            ${isCreator ? ' 👑' : ''}
+                            ${isCurrentUser ? ' (You)' : ''}
+                        </span>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span class="player-status ${statusClass}">${statusText}</span>
+                            ${isCurrentUser ? `
+                                <button class="ready-btn ${player.ready ? 'ready' : ''}" 
+                                        onclick="toggleReady()">
+                                    ${player.ready ? '✅ Ready' : '⏳ Ready'}
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            playersHtml = `
+                <div class="empty-state" style="padding:1rem;">
+                    <span class="icon">⏳</span>
+                    <p>Waiting for players...</p>
+                </div>
+            `;
+        }
+
+        container.innerHTML = playersHtml;
+
+        var startBtn = document.getElementById('startGameBtn');
+        var allReady = true;
+        var playerCount2 = data.playerCount || 0;
+
+        if (data.players) {
+            Object.keys(data.players).forEach(function(uid) {
+                if (!data.players[uid].ready) {
+                    allReady = false;
+                }
+            });
+        }
+
+        if (playerCount2 < 2) {
+            startBtn.disabled = true;
+            startBtn.textContent = `⏳ Waiting for players... (${playerCount2}/2)`;
+        } else if (!allReady) {
+            startBtn.disabled = true;
+            startBtn.textContent = '⏳ Waiting for all players to be ready...';
+        } else {
+            startBtn.disabled = false;
+            startBtn.textContent = '🚀 Start Game!';
+        }
+
+        var subtitle = document.querySelector('.lobby-subtitle');
+        if (playerCount2 < 2) {
+            subtitle.textContent = `⏳ Waiting for players to join... (${playerCount2}/2)`;
+        } else if (!allReady) {
+            subtitle.textContent = '⏳ Waiting for all players to be ready...';
+        } else {
+            subtitle.textContent = '✅ All players ready! Click Start Game!';
+        }
+    }
+
+    function toggleReady() {
+        if (!currentLobbyChallengeId || !currentUser) return;
+
+        var playerData = lobbyData?.players?.[currentUser.uid];
+        if (!playerData) return;
+
+        var newReadyState = !playerData.ready;
+
+        var updateData = {};
+        updateData[`players.${currentUser.uid}.ready`] = newReadyState;
+
+        db.collection('challenges').doc(currentLobbyChallengeId)
+            .update(updateData)
+            .then(function() {
+                showToast(newReadyState ? '✅ You are ready!' : '⏳ You are not ready', 'info');
+            })
+            .catch(function(error) {
+                console.error('Error updating ready status:', error);
+                showToast('Error: ' + error.message, 'error');
+            });
+    }
+
+    // ============================================================
+    // START GAME FROM LOBBY - NOW STARTS DUEL ON SAME PAGE
+    // ============================================================
+    function startGameFromLobby() {
+            if (!currentLobbyChallengeId) {
+                showToast('No challenge ID found!', 'error');
+                return;
+            }
+
+            var allReady = true;
+            if (lobbyData?.players) {
+                Object.keys(lobbyData.players).forEach(function(uid) {
+                    if (!lobbyData.players[uid].ready) {
+                        allReady = false;
+                    }
+                });
+            }
+
+            if (!allReady || lobbyData?.playerCount < 2) {
+                showToast('Not all players are ready!', 'warning');
+                return;
+            }
+
+            var startBtn = document.getElementById('startGameBtn');
+            startBtn.disabled = true;
+            startBtn.textContent = '⏳ Starting game...';
+
+            var challengeId = currentLobbyChallengeId;
+            console.log('Starting game with challenge ID:', challengeId);
+
+            db.collection('challenges').doc(challengeId)
+                .update({
+                    status: 'active'
+                })
+                .then(function() {
+                    closeLobby();
+                    startDuelOnPage(challengeId);
+                })
+                .catch(function(error) {
+                    console.error('Error starting game:', error);
+                    showToast('Error: ' + error.message, 'error');
+                    startBtn.disabled = false;
+                    startBtn.textContent = '🚀 Start Game!';
+                });
+        }
+
+
+
+
+    // ============================================================
+    // DUEL GAMEPLAY - ON THE SAME PAGE
+    // ============================================================
+    async function startDuelOnPage(challengeId) {
+        if (!challengeId) {
+            showToast('Invalid challenge ID!', 'error');
+            return;
+        }
+
+        console.log('Starting duel with challenge ID:', challengeId);
+
+        try {
+            // Hide main multiplayer page
+            document.getElementById('mainMultiplayerPage').style.display = 'none';
+
+            // Show duel area
+            var duelArea = document.getElementById('duelGameplayArea');
+            duelArea.classList.add('active');
+            duelArea.innerHTML = `
+                <div class="duel-header">
+                    <h2>⚔️ Duel</h2>
+                    <div class="duel-scores">
+                        <span>⭐ Your Score: <span id="duelMyScore">0</span></span>
+                        <span>⭐ Opponent: <span id="duelOpponentScore">0</span></span>
+                        <span>⏱️ <span id="duelTimer">0</span>s</span>
+                    </div>
+                </div>
+                <div id="duelQuestionArea">
+                    <div class="text-center" style="padding:2rem;">
+                        <div class="loading-spinner"></div>
+                        <p style="margin-top:1rem; color:rgba(255,255,255,0.4);">Loading questions...</p>
+                    </div>
+                </div>
+            `;
+
+            // Load challenge data
+            var doc = await db.collection('challenges').doc(challengeId).get();
+            if (!doc.exists) {
+                showToast('Challenge not found!', 'error');
+                return;
+            }
+            var data = doc.data();
+
+            // Setup duel state
+            duelState.challengeId = challengeId;
+            duelState.isCreator = (data.creator === currentUser.uid);
+            duelState.opponentName = duelState.isCreator ? data.opponentName : data.creatorName;
+            duelState.timeLeft = data.timeLimit || 180;
+            duelState.isComplete = false;
+
+            // Fetch questions
+            if (!isQuestionsLoaded || !questionCache) await fetchQuestions();
+            if (!questionCache || questionCache.length === 0) {
+                showToast('No questions available!', 'error');
+                return;
+            }
+
+            // Load or generate questions
+            var selectedQuestions;
+            if (data.questionIds && data.questionIds.length > 0) {
+                selectedQuestions = questionCache.filter(function(q) {
+                    return data.questionIds.indexOf(q.id) !== -1;
+                });
+            } else {
+                // Select questions based on subject and count
+                var available = data.subject && data.subject !== 'all' 
+                    ? questionCache.filter(function(q) { return q.subject === data.subject; })
+                    : questionCache;
+                
+                // Shuffle and select
+                var shuffled = shuffleArray([...available]);
+                selectedQuestions = shuffled.slice(0, Math.min(data.count || 10, shuffled.length));
+                
+                // Save question IDs to challenge
+                var questionIds = selectedQuestions.map(function(q) { return q.id; });
+                await db.collection('challenges').doc(challengeId).update({
+                    questionIds: questionIds
+                });
+            }
+
+            if (selectedQuestions.length === 0) {
+                showToast('No questions available for this subject!', 'error');
+                return;
+            }
+
+            duelState.questions = shuffleArray([...selectedQuestions]);
+            duelState.currentQuestionIndex = 0;
+            duelState.correct = 0;
+            duelState.wrong = 0;
+            duelState.score = 0;
+            duelState.answers = [];
+            duelState.myAnswers = [];
+            duelState.opponentAnswers = [];
+            duelState.myScore = 0;
+            duelState.opponentScore = 0;
+
+            // Update UI with opponent name
+            var headerElement = document.querySelector('.duel-gameplay-area .duel-header h2');
+            if (headerElement) {
+                headerElement.textContent = '⚔️ Duel vs ' + duelState.opponentName;
+            }
+
+            // Start duel listener for real-time updates
+            startDuelListener(challengeId);
+
+            // Show first question
+            showDuelQuestion();
+
+            // Start timer
+            if (duelState.timeLeft > 0) {
+                if (duelState.timer) clearInterval(duelState.timer);
+                duelState.timer = setInterval(updateDuelTimer, 1000);
+            }
+
+        } catch (error) {
+            console.error('Error starting duel:', error);
+            showToast('Error starting duel: ' + error.message, 'error');
+        }
+    }
+
+
+
+
+
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+        return array;
+    }
+
+    function showDuelQuestion() {
+        if (duelState.isComplete) return;
+        if (duelState.currentQuestionIndex >= duelState.questions.length) {
+            completeDuel();
+            return;
+        }
+
+        var q = duelState.questions[duelState.currentQuestionIndex];
+        var total = duelState.questions.length;
+        var progress = ((duelState.currentQuestionIndex) / total) * 100;
+
+        var questionArea = document.getElementById('duelQuestionArea');
+        var labels = ['A', 'B', 'C', 'D'];
+        var optionsWithLabels = q.options.map(function(opt, idx) { 
+            return { text: opt, label: labels[idx] }; 
+        });
+        var shuffledOptions = shuffleArray([...optionsWithLabels]);
+
+        questionArea.innerHTML = `
+            <div class="question-text">${q.question}</div>
+            <div class="options-grid">
+                ${shuffledOptions.map(function(opt) {
+                    return `<button class="option-btn" data-label="${opt.label}" onclick="selectDuelAnswer('${opt.label}')">
+                        <span class="label">${opt.label}.</span>
+                        <span>${opt.text}</span>
+                    </button>`;
+                }).join('')}
+            </div>
+            <div class="feedback-area" id="duelFeedback"><div id="duelFeedbackText"></div></div>
+            <div class="progress-container">
+                <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+                <div class="progress-text">
+                    <span>${duelState.currentQuestionIndex + 1}/${total}</span>
+                    <span>⭐ ${duelState.score}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    async function selectDuelAnswer(selectedLabel) {
+        if (duelState.isComplete) return;
+
+        var q = duelState.questions[duelState.currentQuestionIndex];
+        var isCorrect = selectedLabel === q.correct;
+
+        document.querySelectorAll('.option-btn').forEach(function(btn) { 
+            btn.classList.add('disabled'); 
+        });
+
+        var btns = document.querySelectorAll('.option-btn');
+        btns.forEach(function(btn) {
+            var label = btn.dataset.label;
+            if (label === q.correct) btn.classList.add('correct');
+            if (label === selectedLabel && !isCorrect) btn.classList.add('wrong');
+        });
+
+        var feedback = document.getElementById('duelFeedback');
+        var feedbackText = document.getElementById('duelFeedbackText');
+
+        if (isCorrect) {
+            duelState.correct++;
+            duelState.score++;
+            feedback.className = 'feedback-area show correct';
+            feedbackText.textContent = '✅ Correct! ' + (q.explanation || '');
+        } else {
+            duelState.wrong++;
+            feedback.className = 'feedback-area show wrong';
+            feedbackText.textContent = '❌ Wrong! ' + (q.explanation || '');
+        }
+
+        // Update score display
+        document.getElementById('duelMyScore').textContent = duelState.score;
+
+        // Save answer to Firestore
+        var answerData = {
+            questionIndex: duelState.currentQuestionIndex,
+            selected: selectedLabel,
+            correct: isCorrect
+        };
+
+        var updateData = {};
+        if (duelState.isCreator) {
+            updateData.creatorAnswers = firebase.firestore.FieldValue.arrayUnion(answerData);
+            updateData.creatorScore = duelState.score;
+        } else {
+            updateData.opponentAnswers = firebase.firestore.FieldValue.arrayUnion(answerData);
+            updateData.opponentScore = duelState.score;
+        }
+
+        try {
+            await db.collection('challenges').doc(duelState.challengeId).update(updateData);
+        } catch (error) {
+            console.error('Error saving answer:', error);
+        }
+
+        duelState.answers.push({ question: q.id, selected: selectedLabel, correct: isCorrect });
+        duelState.currentQuestionIndex++;
+
+        setTimeout(function() { 
+            showDuelQuestion(); 
+        }, 2000);
+    }
+
+    function updateDuelTimer() {
+        duelState.timeLeft--;
+        document.getElementById('duelTimer').textContent = duelState.timeLeft;
+        if (duelState.timeLeft <= 0) {
+            clearInterval(duelState.timer);
+            completeDuel();
+        }
+    }
+
+    function startDuelListener(challengeId) {
+        if (duelState.challengeListener) {
+            duelState.challengeListener();
+            duelState.challengeListener = null;
+        }
+
+        duelState.challengeListener = db.collection('challenges').doc(challengeId)
+            .onSnapshot(function(doc) {
+                if (!doc.exists) return;
+                var data = doc.data();
+
+                // Update opponent score
+                var isCreator = data.creator === currentUser.uid;
+                var opponentScore = isCreator ? data.opponentScore : data.creatorScore;
+                var opponentAnswers = isCreator ? data.opponentAnswers : data.creatorAnswers;
+
+                document.getElementById('duelOpponentScore').textContent = opponentScore;
+                duelState.opponentScore = opponentScore;
+                duelState.opponentAnswers = opponentAnswers;
+
+                // Check if challenge completed
+                if (data.status === 'completed') {
+                    showDuelResults(data);
+                }
+            }, function(error) {
+                console.error('Duel listener error:', error);
+            });
+    }
+
+    async function completeDuel() {
+        if (duelState.isComplete) return;
+        duelState.isComplete = true;
+        if (duelState.timer) clearInterval(duelState.timer);
+
+        var user = auth.currentUser;
+        var isCreator = duelState.isCreator;
+
+        var updateData = {};
+        if (isCreator) {
+            updateData.creatorFinished = true;
+        } else {
+            updateData.opponentFinished = true;
+        }
+
+        try {
+            await db.collection('challenges').doc(duelState.challengeId).update(updateData);
+
+            // Check if both finished
+            var doc = await db.collection('challenges').doc(duelState.challengeId).get();
+            var data = doc.data();
+
+            if (data.creatorFinished && data.opponentFinished) {
+                var winner = null;
+                if (data.creatorScore > data.opponentScore) {
+                    winner = data.creator;
+                } else if (data.opponentScore > data.creatorScore) {
+                    winner = data.opponent;
+                }
+
+                await db.collection('challenges').doc(duelState.challengeId).update({
+                    status: 'completed',
+                    winner: winner,
+                    completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                if (winner === user.uid) {
+                    await db.collection('students').doc(user.uid).update({
+                        totalPoints: firebase.firestore.FieldValue.increment(50)
+                    });
+                    showToast('🏆 You won the duel! +50 bonus points!', 'success');
+                } else if (winner) {
+                    showToast('👏 ' + (data.creator === winner ? data.creatorName : data.opponentName) + ' won the duel!', 'info');
+                } else {
+                    showToast('🤝 It\'s a tie!', 'info');
+                }
+
+                showDuelResults(data);
+            } else {
+                var waitingMsg = document.getElementById('duelQuestionArea');
+                if (waitingMsg) {
+                    waitingMsg.innerHTML = `
+                        <div class="text-center" style="padding:3rem;">
+                            <span class="icon" style="font-size:3rem;">⏳</span>
+                            <p style="margin-top:1rem; color:rgba(255,255,255,0.6);">Waiting for opponent to finish...</p>
+                            <p style="color:rgba(255,255,255,0.3); font-size:0.9rem;">Your score: ${duelState.score}</p>
+                        </div>
+                    `;
+                }
+            }
+        } catch (error) {
+            console.error('Error completing duel:', error);
+        }
+    }
+
+        // ============================================================
+// SHOW DUEL RESULTS - UPDATED WITH SCORE SAVING
+// ============================================================
+async function showDuelResults(data) {
+    var currentUserObj = auth.currentUser;
+    if (!currentUserObj) return;
+    
+    var isCreator = data.creator === currentUserObj.uid;
+    var myScore = isCreator ? data.creatorScore : data.opponentScore;
+    var oppScore = isCreator ? data.opponentScore : data.creatorScore;
+    var oppName = isCreator ? data.opponentName : data.creatorName;
+    var winner = data.winner;
+    
+    var msg = '';
+    var emoji = '';
+    var isWin = false;
+    var isTie = false;
+    
+    // Determine winner
+    if (myScore > oppScore) {
+        msg = '🎉 Vaah re hushiyar jeet giyo! Congratulations!';
+        emoji = '🏆';
+        isWin = true;
+    } else if (oppScore > myScore) {
+        msg = '😅 Sorry! Har gi pakar gi! Better luck next time!';
+        emoji = '💪';
+        isWin = false;
+    } else {
+        msg = '🤝 Naa thari naa mhari! It\'s a tie!';
+        emoji = '🤝';
+        isTie = true;
+    }
+    
+    // ✅ SAVE DUEL STATS AND POINTS TO FIRESTORE
+    try {
+        var totalQuestions = data.count || 10;
+        var pointsEarned = Math.min(myScore * 10, 100); // 10 points per correct answer, max 100
+        var participationPoints = 5; // Participation bonus
+        var bonusPoints = isWin ? 50 : 0;
+        var totalPointsToAdd = pointsEarned + participationPoints + bonusPoints;
+        
+        console.log(`📊 Duel stats: Score=${myScore}, Points=${pointsEarned}, Bonus=${bonusPoints}, Total=${totalPointsToAdd}`);
+        
+        // Get current student data
+        var studentRef = db.collection('students').doc(currentUserObj.uid);
+        var studentDoc = await studentRef.get();
+        var studentData = studentDoc.data() || {};
+        
+        // Current duel stats
+        var currentStats = studentData.duelStats || { 
+            totalDuels: 0, 
+            wins: 0, 
+            losses: 0, 
+            ties: 0, 
+            totalDuelPoints: 0 
+        };
+        
+        // Update duel stats
+        currentStats.totalDuels += 1;
+        if (isWin) {
+            currentStats.wins += 1;
+            currentStats.totalDuelPoints += pointsEarned + bonusPoints;
+        } else if (isTie) {
+            currentStats.ties += 1;
+            currentStats.totalDuelPoints += pointsEarned;
+        } else {
+            currentStats.losses += 1;
+            currentStats.totalDuelPoints += pointsEarned;
+        }
+        
+        // Update student document
+        await studentRef.update({
+            totalPoints: firebase.firestore.FieldValue.increment(totalPointsToAdd),
+            streak: firebase.firestore.FieldValue.increment(1), // Streak increases on any duel
+            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+            duelStats: currentStats,
+            quizCount: firebase.firestore.FieldValue.increment(1)
+        });
+        
+        console.log('✅ Student stats updated with +' + totalPointsToAdd + ' points');
+        
+        // ✅ SAVE TO QUIZ_SCORES FOR ACTIVITY FEED
+        await db.collection('quiz_scores').add({
+            studentId: currentUserObj.uid,
+            subject: data.subject || 'Duel',
+            score: myScore,
+            total: totalQuestions,
+            percentage: Math.round((myScore / totalQuestions) * 100),
+            mode: 'dual',
+            opponent: oppName,
+            result: isWin ? 'win' : (isTie ? 'tie' : 'loss'),
+            pointsEarned: totalPointsToAdd,
+            attemptedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        console.log('✅ Duel saved to quiz_scores for activity feed');
+        
+        // Also update opponent's stats (they don't get bonus for losing)
+        var opponentId = isCreator ? data.opponent : data.creator;
+        if (opponentId) {
+            var oppRef = db.collection('students').doc(opponentId);
+            var oppDoc = await oppRef.get();
+            var oppData = oppDoc.data() || {};
+            var oppStats = oppData.duelStats || { totalDuels: 0, wins: 0, losses: 0, ties: 0, totalDuelPoints: 0 };
+            
+            var oppScoreValue = isCreator ? data.opponentScore : data.creatorScore;
+            var oppPoints = Math.min(oppScoreValue * 10, 100);
+            var oppParticipation = 5;
+            var oppBonus = 0;
+            var oppResult = '';
+            
+            oppStats.totalDuels += 1;
+            if (isWin) {
+                // Opponent lost
+                oppStats.losses += 1;
+                oppStats.totalDuelPoints += oppPoints + oppParticipation;
+                oppResult = 'loss';
+            } else if (isTie) {
+                oppStats.ties += 1;
+                oppStats.totalDuelPoints += oppPoints + oppParticipation;
+                oppResult = 'tie';
+            } else {
+                // Opponent won
+                oppStats.wins += 1;
+                oppBonus = 50;
+                oppStats.totalDuelPoints += oppPoints + oppParticipation + oppBonus;
+                oppResult = 'win';
+            }
+            
+            var oppTotalPoints = oppPoints + oppParticipation + oppBonus;
+            
+            await oppRef.update({
+                totalPoints: firebase.firestore.FieldValue.increment(oppTotalPoints),
+                lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+                duelStats: oppStats,
+                quizCount: firebase.firestore.FieldValue.increment(1)
+            });
+            
+            // Save opponent's duel to quiz_scores
+            await db.collection('quiz_scores').add({
+                studentId: opponentId,
+                subject: data.subject || 'Duel',
+                score: oppScoreValue,
+                total: totalQuestions,
+                percentage: Math.round((oppScoreValue / totalQuestions) * 100),
+                mode: 'dual',
+                opponent: isCreator ? data.creatorName : data.opponentName,
+                result: oppResult,
+                pointsEarned: oppTotalPoints,
+                attemptedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            console.log('✅ Opponent stats updated with +' + oppTotalPoints + ' points');
+        }
+        
+        // ✅ CHECK ACHIEVEMENTS
+        await checkDuelAchievements(currentUserObj.uid, currentStats);
+        
+    } catch (error) {
+        console.error('❌ Error saving duel stats:', error);
+        showToast('Error saving stats: ' + error.message, 'error');
+    }
+    
+    // ✅ SHOW RESULTS UI
+    var duelArea = document.getElementById('duelGameplayArea');
+    var resultMsg = isWin ? '🏆 You won!' : (isTie ? '🤝 It\'s a tie!' : '💪 Better luck next time!');
+    
+    duelArea.innerHTML = `
+        <div class="duel-results show">
+            <h2 style="color:#fff;">🎉 Duel Complete!</h2>
+            <div class="results-score">${myScore} - ${oppScore}</div>
+            <p class="result-message" style="font-size:1.3rem;">${emoji} ${msg}</p>
+            <p style="color:rgba(255,255,255,0.5); font-size:0.9rem; margin-top:0.5rem;">⭐ +${totalPointsToAdd} points earned!</p>
+            <div class="results-stats">
+                <div class="results-stat">
+                    <div class="number">${myScore}/${totalQuestions}</div>
+                    <div class="label">⭐ Your Score</div>
+                </div>
+                <div class="results-stat">
+                    <div class="number">${Math.round((myScore/totalQuestions)*100)}%</div>
+                    <div class="label">📊 Accuracy</div>
+                </div>
+                <div class="results-stat">
+                    <div class="number">+${totalPointsToAdd}</div>
+                    <div class="label">⭐ Points Earned</div>
+                </div>
+            </div>
+            <div class="btn-group" style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2rem;">
+                <button class="btn-primary" onclick="resetDuel()">🔄 Play Again</button>
+                <button class="btn-primary" onclick="goBackToMultiplayer()" style="background:rgba(255,255,255,0.1);">🏠 Back to Lobby</button>
+            </div>
+        </div>
+    `;
+}
+
+    // ============================================================
+    // CHECK DUEL ACHIEVEMENTS
+    // ============================================================
+    async function checkDuelAchievements(userId, duelStats) {
+        try {
+            var achievements = [];
+            var studentRef = db.collection('students').doc(userId);
+            var doc = await studentRef.get();
+            var currentAchievements = doc.data()?.achievements || [];
+            
+            // Check various achievements
+            if (duelStats.totalDuels >= 1 && !currentAchievements.includes('first_duel')) {
+                achievements.push('first_duel');
+            }
+            if (duelStats.totalDuels >= 10 && !currentAchievements.includes('duel_warrior')) {
+                achievements.push('duel_warrior');
+            }
+            if (duelStats.wins >= 1 && !currentAchievements.includes('first_win')) {
+                achievements.push('first_win');
+            }
+            if (duelStats.wins >= 10 && !currentAchievements.includes('duel_champion')) {
+                achievements.push('duel_champion');
+            }
+            if (duelStats.totalDuelPoints >= 100 && !currentAchievements.includes('duel_master')) {
+                achievements.push('duel_master');
+            }
+            
+            if (achievements.length > 0) {
+                await studentRef.update({
+                    achievements: firebase.firestore.FieldValue.arrayUnion(...achievements)
+                });
+                
+                achievements.forEach(function(ach) {
+                    var names = {
+                        'first_duel': '🎯 First Duel!',
+                        'duel_warrior': '⚔️ Duel Warrior (10 duels)',
+                        'first_win': '🏆 First Win!',
+                        'duel_champion': '👑 Duel Champion (10 wins)',
+                        'duel_master': '⭐ Duel Master (100 points)'
+                    };
+                    showToast('🏅 Achievement Unlocked: ' + (names[ach] || ach), 'success');
+                });
+            }
+        } catch (error) {
+            console.error('Error checking achievements:', error);
+        }
+    }
+
+//reset
+    function resetDuel() {
+        // Reset duel state
+        if (duelState.challengeListener) {
+            duelState.challengeListener();
+            duelState.challengeListener = null;
+        }
+        if (duelState.timer) {
+            clearInterval(duelState.timer);
+            duelState.timer = null;
+        }
+
+        duelState.isActive = false;
+        duelState.isComplete = false;
+        duelState.currentQuestionIndex = 0;
+        duelState.correct = 0;
+        duelState.wrong = 0;
+        duelState.score = 0;
+        duelState.answers = [];
+        duelState.myAnswers = [];
+        duelState.opponentAnswers = [];
+        duelState.myScore = 0;
+        duelState.opponentScore = 0;
+
+        // Hide duel area
+        document.getElementById('duelGameplayArea').classList.remove('active');
+        document.getElementById('duelGameplayArea').innerHTML = '';
+
+        // Show main page
+        document.getElementById('mainMultiplayerPage').style.display = 'block';
+
+        // Reload challenges
+        loadOpenChallenges();
+        loadMyChallenges();
+
+        showToast('🔄 Duel reset!', 'info');
+    }
+
+    function goBackToMultiplayer() {
+        resetDuel();
+    }
+
+    // ============================================================
+    // FETCH QUESTIONS
+    // ============================================================
+    async function fetchQuestions() {
+        if (questionCache && questionCache.length > 0) return questionCache;
+        try {
+            console.log('📡 Fetching questions...');
+            var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + SHEET_CONFIG.sheetId + '/values/' + SHEET_CONFIG.range + '?key=' + SHEET_CONFIG.apiKey;
+            var response = await fetch(url);
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            var data = await response.json();
+            if (!data.values || data.values.length === 0) throw new Error('No questions found');
+            var questions = data.values.map(function(row, i) {
+                var id = row[0];
+                return {
+                    id: (id !== undefined && id !== '') ? parseInt(id) : i + 1,
+                    question: row[1] || '',
+                    options: [row[2] || '', row[3] || '', row[4] || '', row[5] || ''],
+                    correct: row[6] || 'A',
+                    type: row[7] || 'MCQ',
+                    explanation: row[8] || '',
+                    pageRef: row[9] || '',
+                    subject: row[10] || 'ancient'
+                };
+            }).filter(function(q) { return q.question && q.question.trim() !== ''; });
+            questionCache = questions;
+            isQuestionsLoaded = true;
+            console.log('✅ Loaded ' + questions.length + ' questions');
+            return questions;
+        } catch (error) {
+            console.error('❌ Error fetching questions:', error);
+            throw error;
+        }
+    }
+
+    // ============================================================
+    // CANCEL CHALLENGE
+    // ============================================================
+    async function cancelChallenge(challengeId) {
+        if (!confirm('Cancel this challenge?')) return;
+
+        try {
+            await db.collection('challenges').doc(challengeId).update({
+                status: 'rejected'
+            });
+            showToast('✅ Challenge cancelled', 'success');
+            loadMyChallenges();
+            loadOpenChallenges();
+            if (currentLobbyChallengeId === challengeId) {
+                closeLobby();
+            }
+        } catch (error) {
+            console.error('Error cancelling challenge:', error);
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // ============================================================
+    // DELETE CHALLENGE (Available for ALL challenges)
+    // ============================================================
+    async function deleteChallenge(challengeId) {
+        if (!confirm('Delete this challenge permanently? This cannot be undone!')) return;
+
+        try {
+            await db.collection('challenges').doc(challengeId).delete();
+            showToast('✅ Challenge deleted', 'success');
+            loadMyChallenges();
+            loadOpenChallenges();
+            if (currentLobbyChallengeId === challengeId) {
+                closeLobby();
+            }
+        } catch (error) {
+            console.error('Error deleting challenge:', error);
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // ============================================================
+    // START DUEL (From My Challenges - Direct)
+    // ============================================================
+    function startDuel(challengeId) {
+        startDuelOnPage(challengeId);
+    }
+
+    // ============================================================
+    // COPY TEXT
+    // ============================================================
+    function copyText(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+                showToast('✅ Copied: ' + text, 'success');
+            }).catch(function() {
+                fallbackCopy(text);
+            });
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        var input = document.createElement('input');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+        showToast('✅ Copied: ' + text, 'success');
+    }
+
+    function copyLobbyId() {
+        var id = document.getElementById('lobbyChallengeId').textContent;
+        copyText(id);
+    }
+
+
+        //LOAD OPEN CHALLANAGES//
+        function loadOpenChallenges() {
+        if (openChallengesListener) {
+            openChallengesListener();
+            openChallengesListener = null;
+        }
+    
+        if (!currentUser) {
+            document.getElementById('openChallengesList').innerHTML = `
+                <div class="empty-state">
+                    <span class="icon">🔒</span>
+                    <p>Please login to see challenges</p>
+                </div>
+            `;
+            return;
+        }
+    
+        var container = document.getElementById('openChallengesList');
+    
+        // ✅ REMOVED: .where('creator', '!=', currentUser.uid)
+        openChallengesListener = db.collection('challenges')
+            .where('isOpen', '==', true)
+            .where('status', '==', 'waiting')
+            .onSnapshot(function(snapshot) {
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <span class="icon">⚔️</span>
+                            <p>No open challenges available. Create one!</p>
+                        </div>
+                    `;
+                    return;
+                }
+    
+                var html = '';
+                snapshot.forEach(function(doc) {
+                    var data = doc.data();
+                    
+                    // ✅ ADDED: Skip challenges created by current user
+                    if (data.creator === currentUser.uid) return;
+                    
+                    var playerCount = data.playerCount || 1;
+                    
+                    html += `
+                        <div class="challenge-card">
+                            <div class="header">
+                                <div>
+                                    <div class="title">${data.creatorName} vs Open</div>
+                                    <div class="meta">${data.subject} • ${data.count} questions • ${data.timeLimit}s • 👥 ${playerCount}/2</div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap;">
+                                    <span class="status status-waiting">WAITING</span>
+                                    <button onclick="joinChallenge('${doc.id}')" class="btn-success btn-sm">⚔️ Join</button>
+                                    <button onclick="copyText('${doc.id}')" class="copy-btn">📋 Copy ID</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+    
+                container.innerHTML = html;
+            }, function(error) {
+                console.error('Error loading open challenges:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">⚠️</span>
+                        <p>Error loading challenges</p>
+                    </div>
+                `;
+            });
+    }
+
+
+
+
+    // ============================================================
+    // LOAD MY CHALLENGES (Real-time - With Delete for ALL)
+    // ============================================================
+    function loadMyChallenges() {
+        if (myChallengesListener) {
+            myChallengesListener();
+            myChallengesListener = null;
+        }
+
+        if (!currentUser) {
+            document.getElementById('myChallengesList').innerHTML = `
+                <div class="empty-state">
+                    <span class="icon">🔒</span>
+                    <p>Please login to see your challenges</p>
+                </div>
+            `;
+            return;
+        }
+
+        var container = document.getElementById('myChallengesList');
+
+        myChallengesListener = db.collection('challenges')
+            .where('creator', '==', currentUser.uid)
+            .onSnapshot(function(snapshot) {
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <span class="icon">📭</span>
+                            <p>No challenges yet. Create one!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                var html = '';
+                snapshot.forEach(function(doc) {
+                    var data = doc.data();
+                    var statusClass = 'status-' + data.status;
+                    var statusLabel = data.status.toUpperCase();
+                    
+                    var isOpen = data.isOpen ? '🌐 Open' : '🎯 Specific';
+                    var opponentName = data.opponentName || 'Waiting...';
+                    var isActive = data.status === 'active';
+                    var isCompleted = data.status === 'completed';
+                    var isWaiting = data.status === 'waiting';
+                    var playerCount = data.playerCount || 1;
+
+                    html += `
+                        <div class="challenge-card">
+                            <div class="header">
+                                <div>
+                                    <div class="title">${isOpen} • ${data.creatorName} vs ${opponentName}</div>
+                                    <div class="meta">${data.subject} • ${data.count} questions • ${data.timeLimit}s • 👥 ${playerCount}/2</div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap;">
+                                    <span class="status ${statusClass}">${statusLabel}</span>
+                                    ${isWaiting ? `
+                                        <button onclick="openLobby('${doc.id}')" class="btn-success btn-sm">👥 Lobby</button>
+                                        <button onclick="cancelChallenge('${doc.id}')" class="btn-danger btn-sm">❌ Cancel</button>
+                                    ` : ''}
+                                    ${isActive ? `
+                                        <button onclick="startDuel('${doc.id}')" class="btn-warning btn-sm">👁️ View</button>
+                                    ` : ''}
+                                    ${isCompleted ? `
+                                        <span style="color:rgba(255,255,255,0.4); font-size:0.85rem;">
+                                            🏆 Winner: ${data.winner === currentUser.uid ? 'You!' : data.winner === data.creator ? data.creatorName : data.opponentName}
+                                        </span>
+                                    ` : ''}
+                                    <button onclick="copyText('${doc.id}')" class="copy-btn">📋 Copy ID</button>
+                                    <button onclick="deleteChallenge('${doc.id}')" class="btn-danger btn-sm">🗑️ Delete</button>
+                                </div>
+                            </div>
+                            ${isActive ? `<div style="margin-top:0.5rem; color:rgba(255,255,255,0.3); font-size:0.8rem;">Score: You ${data.creatorScore} - ${data.opponentScore} Opponent</div>` : ''}
+                            ${isCompleted && data.winner ? `<div style="margin-top:0.5rem; color:rgba(255,255,255,0.3); font-size:0.8rem;">Final Score: ${data.creatorScore} - ${data.opponentScore}</div>` : ''}
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            }, function(error) {
+                console.error('Error loading my challenges:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">⚠️</span>
+                        <p>Error loading your challenges</p>
+                    </div>
+                `;
+            });
+    }
+
+    // ============================================================
+    // LOAD HEADER & FOOTER
+    // ============================================================
+    fetch('components/header.html')
+        .then(function(res) { return res.text(); })
+        .then(function(data) { document.getElementById('student-header').innerHTML = data; })
+        .catch(function() { console.error('Failed to load header'); });
+
+    fetch('components/footer.html')
+        .then(function(res) { return res.text(); })
+        .then(function(data) { document.getElementById('student-footer').innerHTML = data; })
+        .catch(function() { console.error('Failed to load footer'); });
+
+    // ============================================================
+    // AUTH STATE
+    // ============================================================
+    auth.onAuthStateChanged(async function(user) {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        await user.reload();
+        if (!user.emailVerified) {
+            await auth.signOut();
+            window.location.href = 'login.html?error=not-verified';
+            return;
+        }
+
+        currentUser = user;
+
+        try {
+            var doc = await db.collection('students').doc(user.uid).get();
+            if (doc.exists) {
+                currentUserData = doc.data();
+                currentUser.displayName = currentUserData.name || 'Student';
+            }
+        } catch (e) {
+            console.warn('Could not load user data:', e);
+        }
+
+        // Pre-fetch questions
+        try {
+            await fetchQuestions();
+        } catch (e) {
+            console.warn('Could not fetch questions:', e);
+        }
+
+        loadOpenChallenges();
+        loadMyChallenges();
+
+        console.log('✅ Multiplayer page loaded with integrated Duel system');
+    });
+
+    // Clean up listeners on page unload
+    window.addEventListener('beforeunload', function() {
+        if (openChallengesListener) {
+            openChallengesListener();
+            openChallengesListener = null;
+        }
+        if (myChallengesListener) {
+            myChallengesListener();
+            myChallengesListener = null;
+        }
+        if (lobbyUnsubscribe) {
+            lobbyUnsubscribe();
+            lobbyUnsubscribe = null;
+        }
+        if (duelState.challengeListener) {
+            duelState.challengeListener();
+            duelState.challengeListener = null;
+        }
+        if (duelState.timer) {
+            clearInterval(duelState.timer);
+            duelState.timer = null;
+        }
+    });
+    </script>
+
+</body>
+</html>

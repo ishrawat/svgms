@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Simulations - Student Zone</title>
+    <link rel="stylesheet" href="assets/student-style.css">
+    <style>
+        /* ===== SIM PAGE STYLES ===== */
+        .sim-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .sim-header {
+            margin-bottom: 2rem;
+        }
+
+        .sim-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+
+        .sim-header p {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        /* ===== SIMULATION GRID ===== */
+        .sim-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .sim-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .sim-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .sim-card .sim-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sim-card .sim-desc {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .sim-card .sim-embed {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #0a0e1a;
+            pointer-events: none;
+        }
+
+        .sim-card .sim-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none;
+        }
+
+        /* ===== DOUBLE CLICK HINT ===== */
+        .sim-card .sim-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            transition: var(--transition);
+        }
+
+        .sim-card:hover .sim-hint {
+            opacity: 1;
+        }
+
+        /* ===== FULLSCREEN MODAL ===== */
+        .sim-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-dark);
+            z-index: 9999;
+            padding: 1.5rem;
+            overflow: hidden;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .sim-modal.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .sim-modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .sim-modal .modal-header .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .sim-modal .modal-header .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0 0.5rem;
+        }
+
+        .sim-modal .modal-header .modal-close:hover {
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .sim-modal .modal-body {
+            width: 100%;
+            height: calc(100% - 70px);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0a0e1a;
+        }
+
+        .sim-modal .modal-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .sim-modal .modal-hint {
+            text-align: center;
+            margin-top: 0.8rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        /* ===== BACK LINK ===== */
+        .back-link {
+            display: inline-block;
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .sim-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sim-wrapper {
+                padding: 1rem 0.8rem;
+            }
+            .sim-header h1 {
+                font-size: 1.5rem;
+            }
+            .sim-card {
+                padding: 1rem;
+            }
+            .sim-modal {
+                padding: 0.8rem;
+            }
+            .sim-modal .modal-header .modal-title {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sim-card .sim-title {
+                font-size: 1rem;
+            }
+            .sim-card .sim-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="student-body">
+
+    <div class="sim-wrapper">
+
+        <!-- ===== HEADER ===== -->
+        <div id="student-header"></div>
+
+        <!-- ===== BACK LINK ===== -->
+        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+
+        <!-- ===== PAGE HEADER ===== -->
+        <div class="sim-header">
+            <h1>⚛️ Physics Simulations</h1>
+            <p>Double-click or double-tap any simulation to expand it fullscreen</p>
+        </div>
+
+        <!-- ===== SIMULATIONS GRID ===== -->
+        <div class="sim-grid" id="simGrid">
+
+            <!-- Sim 1: Forces and Motion -->
+            <div class="sim-card" data-title="Forces and Motion" data-url="https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/forces-and-motion-basics_en.html">
+                <div class="sim-title">🏃 Forces and Motion</div>
+                <div class="sim-desc">Explore forces, motion, friction, and acceleration.</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/forces-and-motion-basics_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 2: Circuit Construction Kit -->
+            <div class="sim-card" data-title="Circuit Construction Kit" data-url="https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_en.html">
+                <div class="sim-title">⚡ Circuit Construction Kit</div>
+                <div class="sim-desc">Build and test electrical circuits.</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 3: Gravity and Orbits -->
+            <div class="sim-card" data-title="Gravity and Orbits" data-url="https://phet.colorado.edu/sims/html/gravity-and-orbits/latest/gravity-and-orbits_en.html">
+                <div class="sim-title">🪐 Gravity and Orbits</div>
+                <div class="sim-desc">Explore gravitational attraction between planets and stars.</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/gravity-and-orbits/latest/gravity-and-orbits_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 4: Wave on a String -->
+            <div class="sim-card" data-title="Wave on a String" data-url="https://phet.colorado.edu/sims/html/wave-on-a-string/latest/wave-on-a-string_en.html">
+                <div class="sim-title">🌊 Wave on a String</div>
+                <div class="sim-desc">Visualize wave properties like frequency, amplitude, and speed.</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/wave-on-a-string/latest/wave-on-a-string_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 5: Energy Skate Park -->
+            <div class="sim-card" data-title="Energy Skate Park" data-url="https://phet.colorado.edu/sims/html/energy-skate-park-basics/latest/energy-skate-park-basics_en.html">
+                <div class="sim-title">🛹 Energy Skate Park</div>
+                <div class="sim-desc">Learn about conservation of energy with a skateboarder.</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/energy-skate-park-basics/latest/energy-skate-park-basics_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 6: Bending Light -->
+            <div class="sim-card" data-title="Bending Light" data-url="https://phet.colorado.edu/sims/html/bending-light/latest/bending-light_en.html">
+                <div class="sim-title">💡 Bending Light</div>
+                <div class="sim-desc">Explore refraction and reflection of light.</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/bending-light/latest/bending-light_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 7: NASA Eyes on the Solar System -->
+            <div class="sim-card" data-title="Eyes on the Solar System" data-url="https://eyes.nasa.gov/apps/solar-system/#/home">
+                <div class="sim-title">🚀 Eyes on the Solar System</div>
+                <div class="sim-desc">Explore the solar system in real-time with NASA's interactive 3D visualization.</div>
+                <div class="sim-embed">
+                    <iframe src="https://eyes.nasa.gov/apps/solar-system/#/home" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div id="student-footer"></div>
+
+    </div>
+
+    <!-- ===== FULLSCREEN MODAL ===== -->
+    <div class="sim-modal" id="simModal">
+        <div class="modal-header">
+            <span class="modal-title" id="modalTitle">Simulation</span>
+            <button class="modal-close" id="modalClose">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <iframe id="modalIframe" src="" allowfullscreen></iframe>
+        </div>
+        <div class="modal-hint">💡 Double click / tap again or press ESC to close</div>
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // ===== LOAD HEADER =====
+        fetch('components/header.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-header').innerHTML = data);
+
+        // ===== LOAD FOOTER =====
+        fetch('components/footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-footer').innerHTML = data);
+
+        // ===== CHECK AUTH =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // ===== LOGOUT =====
+        function studentLogout() {
+            if (confirm('Exit Student Zone?')) {
+                auth.signOut().then(() => {
+                    window.location.href = 'login.html';
+                });
+            }
+        }
+
+        // ============================================================
+        // FULLSCREEN MODAL
+        // ============================================================
+
+        const modal = document.getElementById('simModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalIframe = document.getElementById('modalIframe');
+        const modalClose = document.getElementById('modalClose');
+        let currentCard = null;
+
+        function openModal(title, url) {
+            modalTitle.textContent = title;
+            modalIframe.src = url;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            currentCard = title;
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            modalIframe.src = '';
+            document.body.style.overflow = '';
+            currentCard = null;
+        }
+
+        // Close button
+        modalClose.addEventListener('click', closeModal);
+
+        // ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Close on background click
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // ===== DOUBLE CLICK / DOUBLE TAP ON CARDS =====
+        document.querySelectorAll('.sim-card').forEach(function(card) {
+            let clickTimer = null;
+
+            card.addEventListener('click', function(e) {
+                // Prevent if clicking on iframe (which has pointer-events: none)
+                if (e.target.closest('.sim-embed')) return;
+
+                const title = this.dataset.title;
+                const url = this.dataset.url;
+
+                if (clickTimer) {
+                    // Double click detected
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                    openModal(title, url);
+                } else {
+                    clickTimer = setTimeout(() => {
+                        clickTimer = null;
+                    }, 300);
+                }
+            });
+
+            // Touch support for mobile (double tap)
+            let lastTap = 0;
+            card.addEventListener('touchend', function(e) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+
+                if (tapLength < 300 && tapLength > 0) {
+                    // Double tap detected
+                    e.preventDefault();
+                    const title = this.dataset.title;
+                    const url = this.dataset.url;
+                    openModal(title, url);
+                }
+
+                lastTap = currentTime;
+            });
+        });
+    </script>
+
+</body>
+</html>

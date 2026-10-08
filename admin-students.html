@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imgs/logo1.png" type="image/png" />
+
+    <style>
+        .admin-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .admin-header .links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .admin-header .links a:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        /* ===== TOOLS BAR ===== */
+        .tools-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tools-bar .search-box {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            min-width: 200px;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .tools-bar .btn-create {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .tools-bar .btn-create:hover {
+            background: var(--primary-light);
+        }
+
+        /* ===== TABLE ===== */
+        .table-wrapper {
+            overflow-x: auto;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 1rem;
+        }
+
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .student-table th {
+            background: var(--bg-light);
+            color: var(--primary);
+            padding: 0.8rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .student-table td {
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid #eee;
+            color: var(--text-dark);
+            vertical-align: middle;
+        }
+
+        .student-table tr:hover td {
+            background: var(--bg-light);
+        }
+
+        .student-table .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .student-table .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .student-table .status-badge.banned {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .student-table .actions {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .student-table .actions button {
+            padding: 0.2rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .student-table .btn-view {
+            background: var(--primary);
+            color: white;
+        }
+
+        .student-table .btn-view:hover {
+            background: var(--primary-light);
+        }
+
+        .student-table .btn-ban {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .student-table .btn-ban:hover {
+            background: #e0a800;
+        }
+
+        .student-table .btn-unban {
+            background: #28a745;
+            color: white;
+        }
+
+        .student-table .btn-unban:hover {
+            background: #218838;
+        }
+
+        .student-table .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .student-table .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .no-students {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-box h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-box label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .modal-box input,
+        .modal-box select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--bg-light);
+        }
+
+        .modal-box input:focus,
+        .modal-box select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .modal-box .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .modal-box .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .modal-box .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .modal-box .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .modal-box .btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        .modal-box .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-box .close-btn:hover {
+            color: #333;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .toast.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .toast.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .toast.loading {
+            display: block;
+            background: #e2e3e5;
+            color: #383d41;
+            border-left: 4px solid #6c757d;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .admin-wrapper {
+                padding: 1rem;
+            }
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .tools-bar {
+                flex-direction: column;
+            }
+            .tools-bar .search-box {
+                max-width: 100%;
+                width: 100%;
+            }
+            .student-table {
+                font-size: 0.8rem;
+            }
+            .student-table th,
+            .student-table td {
+                padding: 0.4rem 0.5rem;
+            }
+            .modal-box {
+                padding: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <header class="admin-header">
+            <h1>👥 Student Management</h1>
+            <div class="links">
+                <a href="admin.html">← Dashboard</a>
+                <a href="index.html">Website</a>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- ===== TOAST ===== -->
+        <div id="toast" class="toast"></div>
+
+        <!-- ===== TOOLS BAR ===== -->
+        <div class="tools-bar">
+            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search by name, class, email..." oninput="filterStudents()">
+            <button class="btn-create" onclick="openCreateModal()">➕ Create Student</button>
+        </div>
+
+        <!-- ===== STUDENT TABLE ===== -->
+        <div class="table-wrapper">
+            <table class="student-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Roll</th>
+                        <th>Points</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsBody">
+                    <tr>
+                        <td colspan="7" class="no-students">Loading students...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== CREATE STUDENT MODAL ===== -->
+        <!-- ============================================================ -->
+        <div class="modal-overlay" id="createModal">
+            <div class="modal-box">
+                <button class="close-btn" onclick="closeCreateModal()">✕</button>
+                <h2>➕ Create Student Account</h2>
+                <div id="createMessage" class="toast"></div>
+                <form id="createForm" onsubmit="createStudent(event)">
+                    <label for="createName">Full Name *</label>
+                    <input type="text" id="createName" placeholder="e.g., Priya Singh" required>
+
+                    <label for="createClass">Class *</label>
+                    <select id="createClass" required>
+                        <option value="8-A">8-A</option>
+                        <option value="8-B">8-B</option>
+                        <option value="9-A">9-A</option>
+                        <option value="9-B">9-B</option>
+                        <option value="10-A">10-A</option>
+                        <option value="10-B">10-B</option>
+                        <option value="11-A">11-A</option>
+                        <option value="11-B">11-B</option>
+                        <option value="12-A">12-A</option>
+                        <option value="12-B">12-B</option>
+                    </select>
+
+                    <label for="createRoll">Roll Number *</label>
+                    <input type="number" id="createRoll" placeholder="e.g., 15" min="1" max="50" required>
+
+                    <label for="createEmail">Email *</label>
+                    <input type="email" id="createEmail" placeholder="student@email.com" required>
+
+                    <label for="createPassword">Password *</label>
+                    <input type="text" id="createPassword" placeholder="Min 6 characters" minlength="6" required>
+
+                    <div class="btn-row">
+                        <button type="submit" class="btn-primary" id="createBtn">➕ Create Account</button>
+                        <button type="button" class="btn-cancel" onclick="closeCreateModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ===== DOM REFS =====
+        const studentsBody = document.getElementById('studentsBody');
+        const toast = document.getElementById('toast');
+        const searchInput = document.getElementById('searchInput');
+
+        let allStudents = [];
+
+        // ===== CHECK ADMIN =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'admin.html';
+                return;
+            }
+            // Check if user is admin (optional)
+            loadStudents();
+        });
+
+        // ============================================================
+        // LOAD STUDENTS
+        // ============================================================
+        async function loadStudents() {
+            studentsBody.innerHTML = '<tr><td colspan="7" class="no-students">Loading students...</td></tr>';
+
+            try {
+                const snapshot = await db.collection('students')
+                    .orderBy('name')
+                    .get();
+
+                allStudents = [];
+                snapshot.forEach(doc => {
+                    allStudents.push({ id: doc.id, ...doc.data() });
+                });
+
+                renderStudents(allStudents);
+
+            } catch (error) {
+                console.error('Error loading students:', error);
+                studentsBody.innerHTML = '<tr><td colspan="7" class="no-students">❌ Error loading students</td></tr>';
+            }
+        }
+
+        // ============================================================
+        // RENDER STUDENTS
+        // ============================================================
+        function renderStudents(students) {
+            if (students.length === 0) {
+                studentsBody.innerHTML = '<tr><td colspan="7" class="no-students">No students found.</td></tr>';
+                return;
+            }
+
+            studentsBody.innerHTML = '';
+            students.forEach((student, index) => {
+                const isBanned = student.isBanned === true;
+                const statusHtml = isBanned
+                    ? '<span class="status-badge banned">🔴 Banned</span>'
+                    : '<span class="status-badge active">🟢 Active</span>';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${student.name || 'N/A'}</strong></td>
+                    <td>${student.class || '--'}</td>
+                    <td>${student.rollNo || '--'}</td>
+                    <td>${student.totalPoints || 0}</td>
+                    <td>${statusHtml}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn-view" onclick="viewActivity('${student.id}')">📊</button>
+                            ${isBanned
+                                ? `<button class="btn-unban" onclick="toggleBan('${student.id}', false)">✅ Unban</button>`
+                                : `<button class="btn-ban" onclick="toggleBan('${student.id}', true)">⛔ Ban</button>`
+                            }
+                            <button class="btn-delete" onclick="deleteStudent('${student.id}')">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                studentsBody.appendChild(row);
+            });
+        }
+
+        // ============================================================
+        // FILTER STUDENTS
+        // ============================================================
+        function filterStudents() {
+            const query = searchInput.value.toLowerCase().trim();
+            if (!query) {
+                renderStudents(allStudents);
+                return;
+            }
+
+            const filtered = allStudents.filter(s =>
+                (s.name && s.name.toLowerCase().includes(query)) ||
+                (s.class && s.class.toLowerCase().includes(query)) ||
+                (s.email && s.email.toLowerCase().includes(query))
+            );
+            renderStudents(filtered);
+        }
+
+        // ============================================================
+        // CREATE STUDENT
+        // ============================================================
+        async function createStudent(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('createName').value.trim();
+            const classValue = document.getElementById('createClass').value;
+            const rollNo = parseInt(document.getElementById('createRoll').value);
+            const email = document.getElementById('createEmail').value.trim();
+            const password = document.getElementById('createPassword').value;
+            const message = document.getElementById('createMessage');
+            const btn = document.getElementById('createBtn');
+
+            if (!name || !email || !password) {
+                showToast('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+            message.className = 'toast loading';
+            message.textContent = 'Creating account...';
+
+            try {
+                // 1. Create Auth Account
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // 2. Save to Firestore
+                await db.collection('students').doc(user.uid).set({
+                    uid: user.uid,
+                    name: name,
+                    class: classValue,
+                    rollNo: rollNo,
+                    email: email,
+                    totalPoints: 0,
+                    streak: 0,
+                    isBanned: false,
+                    joinedDate: new Date().toISOString(),
+                    achievements: []
+                });
+
+                message.className = 'toast success';
+                message.textContent = '✅ Student created successfully!';
+                btn.textContent = '✅ Done!';
+
+                setTimeout(() => {
+                    closeCreateModal();
+                    loadStudents();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Create student error:', error);
+                message.className = 'toast error';
+                message.textContent = '❌ ' + error.message;
+                btn.disabled = false;
+                btn.textContent = '➕ Create Account';
+            }
+        }
+
+        // ============================================================
+        // TOGGLE BAN
+        // ============================================================
+                // ============================================================
+        // TOGGLE BAN
+        // ============================================================
+        async function toggleBan(studentId, ban) {
+            const action = ban ? 'ban' : 'unban';
+            if (!confirm(`Are you sure you want to ${action} this student?`)) return;
+
+            try {
+                await db.collection('students').doc(studentId).update({
+                    isBanned: ban,
+                    bannedReason: ban ? 'Banned by admin' : '',
+                    bannedAt: ban ? new Date().toISOString() : null
+                });
+
+                showToast(`✅ Student ${ban ? 'banned' : 'unbanned'} successfully!`, 'success');
+                loadStudents();
+
+            } catch (error) {
+                console.error('Toggle ban error:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // DELETE STUDENT
+        // ============================================================
+        async function deleteStudent(studentId) {
+            if (!confirm('⚠️ Delete this student permanently? This cannot be undone!')) return;
+
+            try {
+                // Delete from Firestore
+                await db.collection('students').doc(studentId).delete();
+
+                showToast('🗑️ Student deleted successfully!', 'success');
+                loadStudents();
+
+            } catch (error) {
+                console.error('Delete student error:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // VIEW ACTIVITY
+        // ============================================================
+        function viewActivity(studentId) {
+            window.location.href = 'admin-activity-log.html?student=' + studentId;
+        }
+
+        // ============================================================
+        // MODAL CONTROLS
+        // ============================================================
+        function openCreateModal() {
+            const modal = document.getElementById('createModal');
+            if (modal) modal.classList.add('active');
+            
+            const form = document.getElementById('createForm');
+            if (form) form.reset();
+            
+            const message = document.getElementById('createMessage');
+            if (message) {
+                message.className = 'toast';
+                message.textContent = '';
+            }
+            
+            const btn = document.getElementById('createBtn');
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '➕ Create Account';
+            }
+        }
+
+        function closeCreateModal() {
+            const modal = document.getElementById('createModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        // ============================================================
+        // TOAST (FIXED VISIBILITY BUG)
+        // ============================================================
+        function showToast(message, type) {
+            if (!toast) return;
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.style.display = 'block'; // Ensure toast is visible when called
+            
+            setTimeout(() => { 
+                toast.style.display = 'none'; 
+            }, 4000);
+        }
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'admin.html';
+            }).catch(err => {
+                console.error('Logout error:', err);
+            });
+        }
+
+        // ============================================================
+        // CLOSE MODAL ON CLICK OUTSIDE
+        // ============================================================
+        const createModalEl = document.getElementById('createModal');
+        if (createModalEl) {
+            createModalEl.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCreateModal();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

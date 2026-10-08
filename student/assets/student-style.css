@@ -1,0 +1,525 @@
+/* ========================================
+   🚀 STUDENT ZONE - SCI-FI THEME
+   ======================================== */
+
+/* ===== CSS VARIABLES ===== */
+:root {
+    --primary-dark: #0a0e1a;
+    --primary-mid: #0d1b2a;
+    --primary-light: #1b2d45;
+    --neon-cyan: #00d4ff;
+    --neon-purple: #7b2ffc;
+    --neon-pink: #ff2d75;
+    --neon-green: #00ff88;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-white: #ffffff;
+    --text-gray: #a0b4c8;
+    --text-muted: #6a7f9a;
+    --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.3);
+    --glow-purple: 0 0 20px rgba(123, 47, 252, 0.3);
+    --transition: all 0.3s ease;
+}
+
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== BODY ===== */
+.student-body {
+    background: var(--primary-dark);
+    background-image: 
+        radial-gradient(ellipse at 20% 50%, rgba(123, 47, 252, 0.1) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(0, 212, 255, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 100%, rgba(0, 255, 136, 0.05) 0%, transparent 40%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* ===== ANIMATED BACKGROUND PARTICLES ===== */
+.student-body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+        radial-gradient(2px 2px at 50px 160px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 90px 40px, rgba(255,255,255,0.2), transparent),
+        radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.2), transparent);
+    background-size: 200px 200px;
+    background-repeat: repeat;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ===== CONTAINER ===== */
+.student-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 450px;
+}
+
+/* ===== GLASS CARD ===== */
+.student-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    box-shadow: 
+        var(--glow-cyan),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* ===== GLOW BORDER (Animated) ===== */
+.student-card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple), var(--neon-cyan));
+    background-size: 400% 400%;
+    border-radius: 24px;
+    z-index: -1;
+    opacity: 0.3;
+    animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0% { background-position: 0% 50%; opacity: 0.3; }
+    50% { background-position: 100% 50%; opacity: 0.6; }
+    100% { background-position: 0% 50%; opacity: 0.3; }
+}
+
+/* ===== HEADER ===== */
+.student-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.student-header .icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.student-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1px;
+}
+
+.student-header .subtitle {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+    letter-spacing: 2px;
+}
+
+/* ===== LOGO / MISSION BADGE ===== */
+.mission-badge {
+    display: inline-block;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    padding: 0.2rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--neon-cyan);
+    margin-bottom: 0.5rem;
+}
+
+/* ===== FORM ===== */
+.student-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.student-form label {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-top: 0.3rem;
+}
+
+.student-form input,
+.student-form select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--text-white);
+    font-size: 0.95rem;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.student-form input:focus,
+.student-form select:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.student-form input::placeholder {
+    color: var(--text-muted);
+}
+
+.student-form select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%236a7f9a'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    cursor: pointer;
+}
+
+.student-form select option {
+    background: var(--primary-dark);
+    color: var(--text-white);
+}
+
+/* ===== BUTTON ===== */
+.student-btn {
+    width: 100%;
+    padding: 0.9rem;
+    margin-top: 0.8rem;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.student-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 40px rgba(0, 212, 255, 0.2);
+}
+
+.student-btn:active {
+    transform: scale(0.98);
+}
+
+.student-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ===== LINKS ===== */
+.student-links {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.student-links a {
+    color: var(--neon-cyan);
+    text-decoration: none;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.student-links a:hover {
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+/* ===== BACK LINK ===== */
+.student-back {
+    display: inline-block;
+    margin-top: 0.8rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: var(--transition);
+}
+
+.student-back:hover {
+    color: var(--neon-cyan);
+}
+
+/* ===== MESSAGES ===== */
+.student-message {
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.student-message.success {
+    display: block;
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    color: var(--neon-green);
+}
+
+.student-message.error {
+    display: block;
+    background: rgba(255, 45, 117, 0.1);
+    border: 1px solid rgba(255, 45, 117, 0.2);
+    color: var(--neon-pink);
+}
+
+.student-message.loading {
+    display: block;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    color: var(--neon-cyan);
+}
+
+/* ========================================
+   🎮 DASHBOARD SPECIFIC STYLES
+   ======================================== */
+
+/* ===== DASHBOARD CONTAINER ===== */
+.dashboard-container {
+    max-width: 1100px;
+    width: 100%;
+}
+
+/* ===== DASHBOARD HEADER ===== */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.dash-header .greeting {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.dash-header .greeting span {
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dash-header .logout-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-gray);
+    padding: 0.5rem 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.85rem;
+}
+
+.dash-header .logout-btn:hover {
+    background: rgba(255, 45, 117, 0.15);
+    border-color: var(--neon-pink);
+    color: var(--neon-pink);
+}
+
+/* ===== STATS ROW ===== */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-box {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.stat-box .number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-box .label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.1rem;
+}
+
+/* ===== DASHBOARD GRID ===== */
+.dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.dash-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    color: var(--text-white);
+}
+
+.dash-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--neon-cyan);
+    box-shadow: var(--glow-cyan);
+}
+
+.dash-card .icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.dash-card .title {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.dash-card .desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+/* ========================================
+   🔧 RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .student-container {
+        max-width: 100%;
+    }
+    .student-card {
+        padding: 1.8rem 1.2rem;
+    }
+    .student-header h1 {
+        font-size: 1.4rem;
+    }
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .dash-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .dash-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .student-body {
+        padding: 1rem;
+    }
+    .student-card {
+        padding: 1.2rem 0.8rem;
+        border-radius: 16px;
+    }
+    .dash-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+    }
+    .dash-card {
+        padding: 1rem 0.5rem;
+    }
+    .dash-card .icon {
+        font-size: 1.6rem;
+    }
+    .stats-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+}
+
+/* Verification success card styles */
+.verification-success-card {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 10px 0;
+    border-left: 5px solid #4CAF50;
+}
+
+.verification-success-card ul {
+    padding-left: 0;
+}
+
+.verification-success-card li {
+    background: white;
+    margin: 8px 0;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.verification-success-card li:hover {
+    transform: translateX(5px);
+}
+
+.resend-btn {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.resend-btn:hover {
+    background: #1976D2;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Student Zone</title>
+    <style>
+        /* ============================================================
+        GLOBAL RESET & BASE
+        ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3e 50%, #2a1a4e 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+        MAIN CONTAINER
+        ============================================================ */
+        .profile-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+        }
+
+        /* ============================================================
+        HEADER
+        ============================================================ */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .header-left .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #fff;
+        }
+        .header-left .logo span {
+            color: #667eea;
+        }
+        .header-left .subtitle {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 2px;
+        }
+
+        .logout-btn {
+            background: rgba(244, 67, 54, 0.15);
+            color: #ef5350;
+            border: 1px solid rgba(244, 67, 54, 0.2);
+            padding: 0.4rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .logout-btn:hover {
+            background: rgba(244, 67, 54, 0.25);
+            transform: scale(1.05);
+        }
+
+        /* ============================================================
+        PROFILE LAYOUT
+        ============================================================ */
+        .profile-main {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        /* ===== LEFT: AVATAR SECTION ===== */
+        .avatar-section {
+            flex: 0 0 250px;
+            text-align: center;
+        }
+
+        .avatar-container {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .avatar-preview {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .avatar-preview:hover {
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .btn-avatar {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .btn-avatar:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.02);
+        }
+
+        .avatar-styles {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.3rem;
+        }
+        .avatar-styles .style-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            transition: all 0.3s;
+        }
+        .avatar-styles .style-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .avatar-styles .style-btn.active {
+            border-color: #667eea;
+            color: #fff;
+            background: rgba(102, 126, 234, 0.15);
+        }
+
+        /* ===== RIGHT: PROFILE FORM ===== */
+        .profile-form {
+            flex: 1;
+        }
+
+        .form-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-card .card-title {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.05);
+        }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+        .form-group input:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+            max-height: 120px;
+        }
+        .form-group .char-count {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.2);
+            text-align: right;
+            margin-top: 2px;
+        }
+        .form-group .char-count.warning {
+            color: #ffa726;
+        }
+        .form-group .char-count.danger {
+            color: #ef5350;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* ===== TITLE DISPLAY ===== */
+        .title-display {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            border-radius: 10px;
+            margin-top: 0.5rem;
+        }
+        .title-display .title-icon {
+            font-size: 2rem;
+        }
+        .title-display .title-info {
+            flex: 1;
+        }
+        .title-display .title-info .title-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffd700;
+        }
+        .title-display .title-info .title-desc {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .title-display .title-info .title-progress {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 2px;
+        }
+        .title-display .title-info .title-progress .highlight {
+            color: #ffd700;
+        }
+
+        /* ===== ACHIEVEMENTS ===== */
+        .achievements-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .achievement-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.8rem 0.3rem 0.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+        }
+        .achievement-badge.unlocked {
+            background: rgba(102, 126, 234, 0.12);
+            border-color: rgba(102, 126, 234, 0.2);
+            color: #fff;
+        }
+        .achievement-badge.unlocked:hover {
+            transform: scale(1.05);
+            background: rgba(102, 126, 234, 0.2);
+        }
+        .achievement-badge .icon {
+            font-size: 1.2rem;
+        }
+        .achievement-badge .name {
+            font-size: 0.7rem;
+        }
+        .achievement-badge.locked {
+            opacity: 0.3;
+        }
+        .achievement-progress {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 0.5rem;
+        }
+
+        /* ===== SOCIAL LINKS ===== */
+        .social-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .social-row .form-group {
+            flex: 1;
+            min-width: 120px;
+        }
+        .social-row .form-group .social-icon {
+            font-size: 1.1rem;
+            margin-right: 4px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+        }
+        .btn-save:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        /* ============================================================
+        TOAST NOTIFICATION
+        ============================================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9rem;
+            z-index: 9999;
+            animation: toastSlideIn 0.5s ease;
+            max-width: 350px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            font-weight: 500;
+        }
+        .toast.success {
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+        }
+        .toast.error {
+            background: linear-gradient(135deg, #e53935, #b71c1c);
+        }
+        .toast.info {
+            background: linear-gradient(135deg, #1e88e5, #0d47a1);
+        }
+        .toast.hide {
+            animation: toastSlideOut 0.5s ease forwards;
+        }
+
+        @keyframes toastSlideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes toastSlideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100px); opacity: 0; }
+        }
+
+        /* ============================================================
+        RESPONSIVE
+        ============================================================ */
+        @media (max-width: 768px) {
+            .profile-main {
+                flex-direction: column;
+                align-items: center;
+            }
+            .avatar-section {
+                flex: 0 0 auto;
+                width: 100%;
+                max-width: 300px;
+            }
+            .avatar-preview {
+                width: 150px;
+                height: 150px;
+            }
+            .profile-form {
+                width: 100%;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .social-row {
+                flex-direction: column;
+            }
+            .social-row .form-group {
+                min-width: unset;
+            }
+            .form-card {
+                padding: 1.2rem;
+            }
+            .title-display {
+                flex-direction: column;
+                text-align: center;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-group button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-wrapper {
+                padding: 0.8rem;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .avatar-preview {
+                width: 120px;
+                height: 120px;
+            }
+            .form-card {
+                padding: 0.8rem;
+            }
+        }
+
+        /* ============================================================
+        LOADING
+        ============================================================ */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 0.8s ease-in-out infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================================
+        BACK BUTTON
+        ============================================================ */
+        .back-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0.3rem 0;
+            transition: color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .back-btn:hover {
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-wrapper">
+
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">👤 <span>PROFILE</span></div>
+                <div class="subtitle">Manage your personal information</div>
+            </div>
+            <div style="display:flex; gap:0.8rem; align-items:center;">
+                <button class="back-btn" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+                <button class="logout-btn" onclick="studentLogout()">🚪 Exit</button>
+            </div>
+        </div>
+
+        <!-- ===== PROFILE MAIN ===== -->
+        <div class="profile-main">
+
+            <!-- ===== LEFT: AVATAR ===== -->
+            <div class="avatar-section">
+                <div class="avatar-container">
+                    <div class="avatar-preview" id="avatarPreview">
+                        <img id="avatarImg" src="https://robohash.org/default?set=set1" alt="Avatar">
+                    </div>
+
+                    <div class="avatar-actions">
+                        <button class="btn-avatar" onclick="regenerateAvatar()">🔄 Regenerate</button>
+                        <div class="avatar-styles">
+                            <button class="style-btn active" data-style="set1" onclick="setAvatarStyle('set1')">set1</button>
+                            <button class="style-btn" data-style="set2" onclick="setAvatarStyle('set2')">set2</button>
+                            <button class="style-btn" data-style="set3" onclick="setAvatarStyle('set3')">set3</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RIGHT: PROFILE FORM ===== -->
+            <div class="profile-form">
+
+                <!-- Basic Info -->
+                <div class="form-card">
+                    <div class="card-title">📝 Basic Information</div>
+
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profileName" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Class</label>
+                            <select id="profileClass">
+                                <option value="">Select Class</option>
+                                <option value="6-A">6-A</option>
+                                <option value="6-B">6-B</option>
+                                <option value="7-A">7-A</option>
+                                <option value="7-B">7-B</option>
+                                <option value="8-A">8-A</option>
+                                <option value="8-B">8-B</option>
+                                <option value="9-A">9-A</option>
+                                <option value="9-B">9-B</option>
+                                <option value="10-A">10-A</option>
+                                <option value="10-B">10-B</option>
+                                <option value="11-A">11-A</option>
+                                <option value="11-B">11-B</option>
+                                <option value="12-A">12-A</option>
+                                <option value="12-B">12-B</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Roll No</label>
+                            <input type="number" id="profileRollNo" placeholder="Enter roll number">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>📧 Email (Read Only)</label>
+                        <input type="email" id="profileEmail" disabled>
+                    </div>
+                </div>
+
+                <!-- Title Display -->
+                <div class="form-card">
+                    <div class="card-title">🏆 Your Title</div>
+                    <div class="title-display" id="titleDisplay">
+                        <div class="title-icon" id="titleIcon">🧑‍🎓</div>
+                        <div class="title-info">
+                            <div class="title-name" id="titleName">Explorer</div>
+                            <div class="title-desc" id="titleDesc">Complete quizzes to earn new titles!</div>
+                            <div class="title-progress" id="titleProgress">Next: <span class="highlight">Scholar</span> (5 quizzes)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="form-card">
+                    <div class="card-title">🏅 Achievements</div>
+                    <div class="achievements-grid" id="achievementsGrid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <div class="achievement-progress" id="achievementProgress">0 / 12 unlocked</div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="form-card">
+                    <div class="card-title">📊 Quick Stats</div>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:0.8rem;">
+                        <div style="text-align:center;">
+                            <div style="font-size:1.5rem; font-weight:700; color:#667eea;" id="statPoints">0</div>
+                            <div style="font-size:0.65rem; color:rgba(255,255,255,0.3);">⭐ Points</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:1.5rem; font-weight:700; color:#ffd700;" id="statStreak">0</div>
+                            <div style="font-size:0.65rem; color:rgba(255,255,255,0.3);">🔥 Streak</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:1.5rem; font-weight:700; color:#ffa726;" id="statQuizzes">0</div>
+                            <div style="font-size:0.65rem; color:rgba(255,255,255,0.3);">📝 Quizzes</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:1.5rem; font-weight:700; color:#66bb6a;" id="statDuels">0</div>
+                            <div style="font-size:0.65rem; color:rgba(255,255,255,0.3);">⚔️ Duels</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bio -->
+                <div class="form-card">
+                    <div class="card-title">✏️ About Me</div>
+                    <div class="form-group">
+                        <textarea id="profileBio" placeholder="Tell us about yourself... (max 150 characters)" maxlength="150"></textarea>
+                        <div class="char-count" id="bioCount">0 / 150</div>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="form-card">
+                    <div class="card-title">🔗 Social Links</div>
+                    <div class="social-row">
+                        <div class="form-group">
+                            <label><span class="social-icon">📸</span> Instagram</label>
+                            <input type="text" id="socialInstagram" placeholder="@username">
+                        </div>
+                        <div class="form-group">
+                            <label><span class="social-icon">🐙</span> GitHub</label>
+                            <input type="text" id="socialGithub" placeholder="username">
+                        </div>
+                        <div class="form-group">
+                            <label><span class="social-icon">💬</span> Discord</label>
+                            <input type="text" id="socialDiscord" placeholder="username#1234">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="btn-group">
+                    <button class="btn-save" id="saveBtn" onclick="saveProfile()">💾 Save Profile</button>
+                    <button class="btn-reset" onclick="resetProfile()">↺ Reset Changes</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.06); text-align:center; color:rgba(255,255,255,0.15); font-size:0.7rem;">
+            SVGMS • BHIM • RAJASTHAN — © 2026
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+    FIREBASE SDK
+    ============================================================ -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ============================================================
+        // FIREBASE CONFIG
+        // ============================================================
+        var firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        var auth = firebase.auth();
+        var db = firebase.firestore();
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        var currentUser = null;
+        var currentData = {};
+        var avatarStyle = 'set1';
+        var originalData = {};
+        var allAchievements = [
+            { id: 'first_quiz', icon: '🎯', name: 'First Quiz', desc: 'Complete your first quiz' },
+            { id: 'perfect_score', icon: '💯', name: 'Perfect Score', desc: 'Score 100% on any quiz' },
+            { id: 'quiz_warrior', icon: '⚔️', name: 'Quiz Warrior', desc: 'Complete 10 quizzes' },
+            { id: 'quiz_master', icon: '🏆', name: 'Quiz Master', desc: 'Complete 50 quizzes' },
+            { id: 'streak_7', icon: '🔥', name: '7-Day Streak', desc: 'Maintain a 7-day streak' },
+            { id: 'streak_30', icon: '🌟', name: '30-Day Streak', desc: 'Maintain a 30-day streak' },
+            { id: 'physics_pro', icon: '⚛️', name: 'Physics Pro', desc: 'Complete 5 physics quizzes' },
+            { id: 'chemistry_whiz', icon: '🧪', name: 'Chemistry Whiz', desc: 'Complete 5 chemistry quizzes' },
+            { id: 'math_genius', icon: '📐', name: 'Math Genius', desc: 'Complete 5 math quizzes' },
+            { id: 'biology_expert', icon: '🧬', name: 'Biology Expert', desc: 'Complete 5 biology quizzes' },
+            { id: 'duel_champion', icon: '⚔️', name: 'Duel Champion', desc: 'Win 10 duels' },
+            { id: 'student_of_week', icon: '🏆', name: 'Student of Week', desc: 'Be Student of the Week' }
+        ];
+
+        // ============================================================
+        // TITLE SYSTEM
+        // ============================================================
+        var titleDefinitions = [
+            { id: 'explorer', icon: '🧑‍🎓', name: 'Explorer', desc: 'Default explorer', requirement: 'Default', check: function() { return true; } },
+            { id: 'scholar', icon: '📚', name: 'Scholar', desc: 'Complete 5 quizzes', check: function(d) { return d.quizCount >= 5; } },
+            { id: 'duelist', icon: '⚔️', name: 'Duelist', desc: 'Play 10 duels', check: function(d) { return d.duelCount >= 10; } },
+            { id: 'champion', icon: '🏆', name: 'Champion', desc: 'Win 5 duels', check: function(d) { return d.duelWins >= 5; } },
+            { id: 'streak_master', icon: '🔥', name: 'Streak Master', desc: '7-day streak', check: function(d) { return d.streak >= 7; } },
+            { id: 'quiz_master', icon: '🎯', name: 'Quiz Master', desc: '10 quizzes with 80%+', check: function(d) { return d.quizMaster >= 10; } },
+            { id: 'legend', icon: '👑', name: 'Legend', desc: '30-day streak', check: function(d) { return d.streak >= 30; } },
+            { id: 'royal', icon: '👑', name: 'Royal', desc: 'Student of the Week', check: function(d) { return d.studentOfWeek === true; } }
+        ];
+
+        function getCurrentTitle(data) {
+            // Find the highest title the user has earned
+            var earned = [];
+            for (var i = 0; i < titleDefinitions.length; i++) {
+                var def = titleDefinitions[i];
+                if (def.check(data)) {
+                    earned.push(def);
+                }
+            }
+            // Return the highest (last one)
+            return earned.length > 0 ? earned[earned.length - 1] : titleDefinitions[0];
+        }
+
+        function getNextTitle(data) {
+            var current = getCurrentTitle(data);
+            var currentIndex = -1;
+            for (var i = 0; i < titleDefinitions.length; i++) {
+                if (titleDefinitions[i].id === current.id) {
+                    currentIndex = i;
+                    break;
+                }
+            }
+            var nextIndex = currentIndex + 1;
+            if (nextIndex < titleDefinitions.length) {
+                return titleDefinitions[nextIndex];
+            }
+            return null;
+        }
+
+        function getTitleProgress(data) {
+            var next = getNextTitle(data);
+            if (!next) return null;
+            // Check if next is already earned
+            if (next.check(data)) {
+                return { title: next, progress: 100, complete: true };
+            }
+            return { title: next, progress: 0, complete: false };
+        }
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(message, type) {
+            type = type || 'info';
+            var existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            var toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(function() {
+                toast.classList.add('hide');
+                setTimeout(function() { toast.remove(); }, 500);
+            }, 4000);
+        }
+
+        // ============================================================
+        // AVATAR FUNCTIONS
+        // ============================================================
+        function getAvatarUrl(username, style) {
+            style = style || 'set1';
+            var seed = username || 'default';
+            return 'https://robohash.org/' + encodeURIComponent(seed) + '?set=' + style;
+        }
+
+        function regenerateAvatar() {
+            var name = document.getElementById('profileName').value || 'student';
+            var seed = name + '_' + Date.now();
+            var url = getAvatarUrl(seed, avatarStyle);
+            document.getElementById('avatarImg').src = url;
+            // Store for saving
+            currentData.avatar = url;
+        }
+
+        function setAvatarStyle(style) {
+            avatarStyle = style;
+            document.querySelectorAll('.style-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.dataset.style === style);
+            });
+            regenerateAvatar();
+        }
+
+        // ============================================================
+        // LOAD PROFILE
+        // ============================================================
+        async function loadProfile(user) {
+            currentUser = user;
+
+            try {
+                var doc = await db.collection('students').doc(user.uid).get();
+                var data = doc.data();
+
+                if (!data) {
+                    // Create default profile
+                    var defaultData = {
+                        name: user.displayName || 'Student',
+                        class: '',
+                        rollNo: '',
+                        email: user.email,
+                        avatar: getAvatarUrl('default', 'set1'),
+                        bio: '',
+                        social: { instagram: '', github: '', discord: '' },
+                        achievements: [],
+                        totalPoints: 0,
+                        streak: 0,
+                        quizCount: 0,
+                        duelCount: 0,
+                        duelWins: 0,
+                        studentOfWeek: false
+                    };
+                    await db.collection('students').doc(user.uid).set(defaultData);
+                    data = defaultData;
+                }
+
+                currentData = data;
+                originalData = JSON.parse(JSON.stringify(data));
+
+                // Populate form
+                document.getElementById('profileName').value = data.name || '';
+                document.getElementById('profileClass').value = data.class || '';
+                document.getElementById('profileRollNo').value = data.rollNo || '';
+                document.getElementById('profileEmail').value = data.email || user.email;
+
+                // Avatar
+                var avatarUrl = data.avatar || getAvatarUrl('default', 'set1');
+                document.getElementById('avatarImg').src = avatarUrl;
+
+                // Bio
+                document.getElementById('profileBio').value = data.bio || '';
+                updateCharCount();
+
+                // Social
+                document.getElementById('socialInstagram').value = data.social?.instagram || '';
+                document.getElementById('socialGithub').value = data.social?.github || '';
+                document.getElementById('socialDiscord').value = data.social?.discord || '';
+
+                // Stats for title calculation
+                var titleData = {
+                    quizCount: data.quizCount || 0,
+                    duelCount: data.duelCount || 0,
+                    duelWins: data.duelWins || 0,
+                    streak: data.streak || 0,
+                    studentOfWeek: data.studentOfWeek || false,
+                    quizMaster: data.quizMaster || 0
+                };
+
+                // Update title
+                updateTitleDisplay(titleData);
+
+                // Update achievements
+                updateAchievements(data.achievements || []);
+
+                // Update stats
+                document.getElementById('statPoints').textContent = data.totalPoints || 0;
+                document.getElementById('statStreak').textContent = data.streak || 0;
+                document.getElementById('statQuizzes').textContent = data.quizCount || 0;
+                document.getElementById('statDuels').textContent = data.duelCount || 0;
+
+                console.log('✅ Profile loaded successfully');
+
+            } catch (error) {
+                console.error('❌ Error loading profile:', error);
+                showToast('Error loading profile: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // TITLE DISPLAY
+        // ============================================================
+        function updateTitleDisplay(data) {
+            var current = getCurrentTitle(data);
+            var next = getNextTitle(data);
+
+            document.getElementById('titleIcon').textContent = current.icon;
+            document.getElementById('titleName').textContent = current.name;
+            document.getElementById('titleDesc').textContent = current.desc;
+
+            var progressEl = document.getElementById('titleProgress');
+            if (next) {
+                progressEl.innerHTML = 'Next: <span class="highlight">' + next.name + '</span> (' + next.desc + ')';
+            } else {
+                progressEl.textContent = '🏆 Max title achieved! You\'re a Legend!';
+            }
+        }
+
+        // ============================================================
+        // ACHIEVEMENTS
+        // ============================================================
+        function updateAchievements(unlocked) {
+            var container = document.getElementById('achievementsGrid');
+            var unlockedSet = new Set(unlocked || []);
+
+            var html = '';
+            var unlockedCount = 0;
+
+            for (var i = 0; i < allAchievements.length; i++) {
+                var ach = allAchievements[i];
+                var isUnlocked = unlockedSet.has(ach.id);
+                if (isUnlocked) unlockedCount++;
+
+                html += '<div class="achievement-badge ' + (isUnlocked ? 'unlocked' : 'locked') + '" title="' + ach.desc + '">' +
+                    '<span class="icon">' + ach.icon + '</span>' +
+                    '<span class="name">' + ach.name + '</span>' +
+                    '</div>';
+            }
+
+            container.innerHTML = html;
+            document.getElementById('achievementProgress').textContent = unlockedCount + ' / ' + allAchievements.length + ' unlocked';
+        }
+
+        // ============================================================
+        // CHAR COUNT
+        // ============================================================
+        function updateCharCount() {
+            var bio = document.getElementById('profileBio');
+            var count = bio.value.length;
+            var el = document.getElementById('bioCount');
+            el.textContent = count + ' / 150';
+            el.className = 'char-count';
+            if (count > 130) el.classList.add('warning');
+            if (count >= 150) el.classList.add('danger');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('profileBio').addEventListener('input', updateCharCount);
+        });
+
+        // ============================================================
+        // SAVE PROFILE
+        // ============================================================
+        async function saveProfile() {
+            if (!currentUser) {
+                showToast('Please login first', 'error');
+                return;
+            }
+
+            var saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+
+            try {
+                var name = document.getElementById('profileName').value.trim();
+                var className = document.getElementById('profileClass').value;
+                var rollNo = document.getElementById('profileRollNo').value.trim();
+                var bio = document.getElementById('profileBio').value.trim();
+                var instagram = document.getElementById('socialInstagram').value.trim();
+                var github = document.getElementById('socialGithub').value.trim();
+                var discord = document.getElementById('socialDiscord').value.trim();
+
+                if (!name) {
+                    showToast('Please enter your name', 'error');
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '💾 Save Profile';
+                    return;
+                }
+
+                var updateData = {
+                    name: name,
+                    class: className,
+                    rollNo: rollNo,
+                    avatar: currentData.avatar || document.getElementById('avatarImg').src,
+                    bio: bio,
+                    'social.instagram': instagram,
+                    'social.github': github,
+                    'social.discord': discord,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection('students').doc(currentUser.uid).update(updateData);
+
+                // Update local data
+                currentData.name = name;
+                currentData.class = className;
+                currentData.rollNo = rollNo;
+                currentData.bio = bio;
+                currentData.social = { instagram: instagram, github: github, discord: discord };
+                currentData.avatar = document.getElementById('avatarImg').src;
+                originalData = JSON.parse(JSON.stringify(currentData));
+
+                showToast('✅ Profile saved successfully!', 'success');
+
+            } catch (error) {
+                console.error('❌ Error saving profile:', error);
+                showToast('Error saving profile: ' + error.message, 'error');
+            }
+
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '💾 Save Profile';
+        }
+
+        // ============================================================
+        // RESET
+        // ============================================================
+        function resetProfile() {
+            if (!originalData.name) {
+                showToast('Nothing to reset', 'info');
+                return;
+            }
+
+            if (!confirm('Reset all changes? Unsaved changes will be lost.')) return;
+
+            document.getElementById('profileName').value = originalData.name || '';
+            document.getElementById('profileClass').value = originalData.class || '';
+            document.getElementById('profileRollNo').value = originalData.rollNo || '';
+            document.getElementById('profileBio').value = originalData.bio || '';
+            updateCharCount();
+            document.getElementById('socialInstagram').value = originalData.social?.instagram || '';
+            document.getElementById('socialGithub').value = originalData.social?.github || '';
+            document.getElementById('socialDiscord').value = originalData.social?.discord || '';
+
+            var avatar = originalData.avatar || getAvatarUrl('default', 'set1');
+            document.getElementById('avatarImg').src = avatar;
+            currentData.avatar = avatar;
+
+            showToast('↺ Reset to last saved', 'info');
+        }
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        function studentLogout() {
+            if (confirm('Exit Student Zone?')) {
+                auth.signOut().then(function() {
+                    window.location.href = 'login.html';
+                }).catch(function(error) {
+                    console.error('❌ Logout error:', error);
+                });
+            }
+        }
+
+        // ============================================================
+        // AUTH STATE
+        // ============================================================
+        auth.onAuthStateChanged(async function(user) {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                await user.reload();
+            } catch (e) {
+                console.warn('Token refresh failed:', e);
+            }
+
+            if (!user.emailVerified) {
+                await auth.signOut();
+                window.location.href = 'login.html?error=not-verified';
+                return;
+            }
+
+            await loadProfile(user);
+        });
+
+        console.log('✅ Profile page loaded!');
+    </script>
+
+</body>
+</html>

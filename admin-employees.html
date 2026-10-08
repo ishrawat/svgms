@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Employees - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imgs/logo1.png" type="image/png" />
+
+    
+    <!-- ===== Cropper.js CSS ===== -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    
+    <style>
+        /* ===== EMPLOYEE MANAGEMENT STYLES ===== */
+        :root {
+            --primary: #1a237e;
+            --primary-light: #283593;
+            --accent: #d4af37;
+            --bg-light: #f5f5f5;
+            --white: #ffffff;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --shadow: 0 2px 10px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+
+        .admin-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .admin-header .links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .admin-header .links a:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: var(--white);
+            padding: 1.2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--primary);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-box .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stat-box.working { border-top-color: #28a745; }
+        .stat-box.working .number { color: #28a745; }
+        .stat-box.former { border-top-color: #d4af37; }
+        .stat-box.former .number { color: #d4af37; }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 1.5rem;
+            background: var(--bg-light);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .tabs button {
+            flex: 1;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .tabs button.active {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .tabs button:hover:not(.active) {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .tabs button .badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 6px;
+        }
+
+        .tabs button .badge.working-badge { background: #28a745; }
+        .tabs button .badge.former-badge { background: #d4af37; }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            align-items: center;
+            background: var(--white);
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .toolbar input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+            padding: 0.6rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: var(--bg-light);
+            transition: var(--transition);
+        }
+
+        .toolbar input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .toolbar select {
+            padding: 0.6rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: var(--bg-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toolbar select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+
+        .btn-left {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-left:hover {
+            background: #c82333;
+        }
+
+        .btn-restore {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-restore:hover {
+            background: #218838;
+        }
+
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .employee-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid #28a745;
+            transition: var(--transition);
+        }
+
+        .employee-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .employee-card.former {
+            border-left-color: #d4af37;
+            opacity: 0.85;
+        }
+
+        .employee-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .employee-card .card-header h3 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .employee-card .card-header .post {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .employee-card .qualification {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 2px 0 8px 0;
+        }
+
+        .employee-card .details {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            margin: 6px 0;
+        }
+
+        .employee-card .details .label {
+            color: var(--text-muted);
+        }
+
+        .employee-card .actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-badge.working {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.former {
+            background: #fff8e1;
+            color: #f9a825;
+            border: 1px solid #d4af37;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 560px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h2 {
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            font-size: 1.4rem;
+        }
+
+        .modal .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .modal .form-group input,
+        .modal .form-group select,
+        .modal .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: var(--bg-light);
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .modal .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal .form-group input:focus,
+        .modal .form-group select:focus,
+        .modal .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .modal .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 1.5rem;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning-text {
+            color: #dc3545;
+            font-size: 0.85rem;
+            padding: 0.5rem;
+            background: #fff3f3;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+            margin: 0.5rem 0;
+        }
+
+        .toast {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .toast.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .toast.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .toast.loading {
+            display: block;
+            background: #e2e3e5;
+            color: #383d41;
+            border-left: 4px solid #6c757d;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== PHOTO UPLOAD & CROP STYLES ===== */
+        .crop-modal {
+            max-width: 600px !important;
+        }
+
+        .crop-container {
+            width: 100%;
+            max-height: 400px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .crop-container img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .cropper-view-box,
+        .cropper-face {
+            border-radius: 50% !important;
+        }
+
+        .cropper-view-box {
+            outline: 2px solid var(--accent) !important;
+            outline-offset: -1px;
+        }
+
+        .crop-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+
+        .crop-controls label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .crop-controls input[type="range"] {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .photo-upload-area {
+            border: 2px dashed #4CAF50;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: #f0f8f0;
+            margin: 0.5rem 0 1rem 0;
+            position: relative;
+        }
+
+        .photo-upload-area:hover {
+            border-color: var(--accent);
+            background: #e8f5e9;
+            transform: scale(1.01);
+        }
+
+        .photo-upload-area .preview-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .photo-upload-area .current-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+        }
+
+        .photo-upload-area .upload-hint {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .photo-upload-area .upload-hint .icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .photo-upload-area .upload-hint .sub-text {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .employee-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            flex-shrink: 0;
+        }
+
+        .employee-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid var(--text-muted);
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .card-header-flex {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .upload-btn:hover {
+            background: var(--primary-light);
+        }
+
+        /* Progress bar */
+        #progressContainer {
+            margin: 0.5rem 0 1rem 0;
+            padding: 0.5rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            display: none;
+        }
+
+        #progressContainer .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        #progressContainer .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        #progressContainer .progress-bar .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .admin-wrapper {
+                padding: 1rem;
+            }
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .tabs button {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.8rem;
+            }
+            .modal .form-row {
+                grid-template-columns: 1fr;
+            }
+            .employee-grid {
+                grid-template-columns: 1fr;
+            }
+            .toolbar {
+                flex-direction: column;
+            }
+            .toolbar input[type="text"] {
+                width: 100%;
+            }
+            .crop-modal {
+                max-width: 95% !important;
+            }
+            .crop-controls {
+                flex-direction: column;
+            }
+            .crop-controls input[type="range"] {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="site-header"></div>
+
+    <div class="dashboard-wrapper">
+
+    <div id="nav-placeholder"></div>
+
+    <div class="admin-wrapper">
+
+        <header class="admin-header">
+            <h1>👤 Employee Management</h1>
+            <div class="links">
+                <a href="admin.html">← Dashboard</a>
+                <a href="employees.html">View Public</a>
+                <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
+            </div>
+        </header>
+
+        <div id="toast" class="toast"></div>
+
+        <div class="stats-row" id="statsRow">
+            <div class="stat-box">
+                <div class="number" id="totalCount">0</div>
+                <div class="label">Total Employees</div>
+            </div>
+            <div class="stat-box working">
+                <div class="number" id="workingCount">0</div>
+                <div class="label">🟢 Working</div>
+            </div>
+            <div class="stat-box former">
+                <div class="number" id="formerCount">0</div>
+                <div class="label">🏅 Legacy Members</div>
+            </div>
+            <div class="stat-box" style="border-top-color: var(--accent); cursor:pointer;" onclick="openAddModal()">
+                <div class="number" style="font-size:1.8rem;">➕</div>
+                <div class="label">Add Employee</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="active" data-tab="working" onclick="switchTab('working', this)">
+                🟢 Working Staff
+                <span class="badge working-badge" id="workingBadge">0</span>
+            </button>
+            <button data-tab="former" onclick="switchTab('former', this)">
+                🏅 Legacy Members
+                <span class="badge former-badge" id="formerBadge">0</span>
+            </button>
+            <button data-tab="all" onclick="switchTab('all', this)">
+                📋 All Employees
+                <span class="badge" id="allBadge">0</span>
+            </button>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" id="searchInput" placeholder="🔍 Search by name, post, or department..." oninput="applyFilters()">
+            <select id="departmentFilter" onchange="applyFilters()">
+                <option value="all">All Departments</option>
+            </select>
+            <button class="btn-primary" onclick="openAddModal()">➕ Add Employee</button>
+        </div>
+
+        <div class="employee-grid" id="employeeGrid">
+            <div class="empty-state">
+                <div class="icon">⏳</div>
+                <div>Loading employees...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- ===== ADD/EDIT MODAL ===== -->
+    <div class="modal-overlay" id="employeeModal">
+        <div class="modal">
+            <h2 id="modalTitle">➕ Add Employee</h2>
+            <form id="employeeForm" novalidate>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="empName">Full Name *</label>
+                        <input type="text" id="empName" placeholder="e.g., Dr. Rajesh Kumar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="empPost">Post/Position *</label>
+                        <select id="empPost" required>
+                            <option value="">Select Post...</option>
+                            <option value="Principal">Principal</option>
+                            <option value="Sr. Teacher">Sr. Teacher</option>
+                            <option value="Sr. Lecturer">Sr. Lecturer</option>
+                            <option value="Teacher">Teacher</option>
+                            <option value="Lecturer">Lecturer</option>
+                            <option value="Staff">Staff</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="empQualification">Qualification *</label>
+                    <input type="text" id="empQualification" placeholder="e.g., Ph.D. in Physics, M.Sc." required>
+                </div>
+
+                <!-- ===== PHOTO UPLOAD SECTION ===== -->
+                <div class="form-group">
+                    <label>📸 Profile Photo <span style="color:#999;font-weight:normal;font-size:0.8rem;">(Optional)</span></label>
+                    <div class="photo-upload-area" id="photoUploadArea">
+                        <div class="preview-container">
+                            <img id="currentPhotoPreview" class="current-photo" style="display:none;" alt="Profile Photo">
+                            <div id="photoUploadHint" class="upload-hint">
+                                <span class="icon">🖼️</span>
+                                <div><strong>Click or drag to upload photo</strong></div>
+                                <div class="sub-text">JPG, PNG, WebP • Max 5MB</div>
+                                <div class="upload-btn">Choose Image</div>
+                            </div>
+                        </div>
+                        <input type="file" id="photoFileInput" accept="image/*" style="display:none;">
+                    </div>
+                    <div style="font-size:0.8rem;color:#999;margin-top:-0.5rem;margin-bottom:0.5rem;">
+                        💡 Photo will be cropped to a circle automatically
+                    </div>
+                </div>
+
+                <!-- ===== PROGRESS BAR ===== -->
+                <div id="progressContainer">
+                    <div class="progress-label">
+                        <span id="progressText">Uploading photo...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="empDepartment">Department</label>
+                    <input type="text" id="empDepartment" placeholder="e.g., Science, Arts, Administration">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="empEmail">Email</label>
+                        <input type="email" id="empEmail" placeholder="employee@svgms.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="empPhone">Phone</label>
+                        <input type="tel" id="empPhone" placeholder="+91-9876543210">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="empJoiningDate">Joining Date *</label>
+                    <input type="date" id="empJoiningDate" required>
+                </div>
+
+                <input type="hidden" id="editId">
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="saveBtn">💾 Save Employee</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MARK LEFT MODAL ===== -->
+    <div class="modal-overlay" id="leftModal">
+        <div class="modal">
+            <h2>🏅 Mark as Legacy Member</h2>
+            <p style="color:var(--text-muted); margin-bottom:1rem;">Enter the date this employee left the organization.</p>
+            <div class="form-group">
+                <label for="leftDate">Leaving Date *</label>
+                <input type="date" id="leftDate" required>
+            </div>
+            
+            <!-- ===== LEGACY MESSAGE FIELD ===== -->
+            <div class="form-group">
+                <label for="legacyMessage">💬 Legacy Message <span style="color:#999;font-weight:normal;font-size:0.8rem;">(Optional)</span></label>
+                <textarea id="legacyMessage" placeholder="Leave a farewell message for everyone..."></textarea>
+                <div class="btn-warning-text">
+                    ⚠️ This message will be <strong>permanently displayed</strong> on the public page. 
+                    It cannot be edited after saving.
+                </div>
+            </div>
+            
+            <input type="hidden" id="leftEmployeeId">
+            <div class="form-actions">
+                <button class="btn-danger" onclick="confirmLeft()">✅ Confirm</button>
+                <button type="button" class="btn-secondary" onclick="closeLeftModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== IMAGE CROP MODAL ===== -->
+    <div class="modal-overlay" id="cropModal">
+        <div class="modal crop-modal">
+            <h2>✂️ Crop Profile Photo</h2>
+            <p style="color:var(--text-muted); margin-bottom:1rem;">
+                Adjust the image to fit the circular frame. Drag to reposition, use slider to zoom.
+            </p>
+            
+            <div class="crop-container">
+                <img id="cropImage" src="" alt="Crop Preview">
+            </div>
+            
+            <div class="crop-controls">
+                <label>
+                    🔍 Zoom:
+                    <input type="range" id="zoomSlider" min="0.1" max="3" step="0.01" value="1">
+                </label>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-primary" id="confirmCropBtn">✅ Confirm & Upload</button>
+                <button class="btn-secondary" onclick="closeCropModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- ===== IMAGE PROCESSING LIBRARIES ===== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
+
+    <script>
+        // ============================================================
+        //  FIREBASE CONFIGURATION
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ============================================================
+        //  CLOUDINARY CONFIG
+        // ============================================================
+        const CLOUDINARY = {
+            cloudName: "zh3vg8mi",
+            uploadPreset: "school_notices"
+        };
+
+        // ============================================================
+        //  STATE MANAGEMENT
+        // ============================================================
+        const state = {
+            employees: [],
+            currentTab: 'working',
+            filteredEmployees: [],
+            departments: new Set(),
+            isLoading: false,
+            cropImageFile: null,
+            cropInstance: null,
+            tempPhotoData: null,
+            tempEmployeeId: null,
+            isUploading: false
+        };
+
+        // ============================================================
+        //  DOM REFERENCES
+        // ============================================================
+        const DOM = {
+            toast: document.getElementById('toast'),
+            employeeGrid: document.getElementById('employeeGrid'),
+            searchInput: document.getElementById('searchInput'),
+            departmentFilter: document.getElementById('departmentFilter'),
+            employeeModal: document.getElementById('employeeModal'),
+            leftModal: document.getElementById('leftModal'),
+            employeeForm: document.getElementById('employeeForm'),
+            saveBtn: document.getElementById('saveBtn'),
+            modalTitle: document.getElementById('modalTitle'),
+            editId: document.getElementById('editId'),
+            leftEmployeeId: document.getElementById('leftEmployeeId'),
+            leftDate: document.getElementById('leftDate'),
+            legacyMessage: document.getElementById('legacyMessage'),
+            progressContainer: document.getElementById('progressContainer'),
+            progressFill: document.getElementById('progressFill'),
+            progressText: document.getElementById('progressText'),
+            progressPercent: document.getElementById('progressPercent'),
+            stats: {
+                total: document.getElementById('totalCount'),
+                working: document.getElementById('workingCount'),
+                former: document.getElementById('formerCount')
+            },
+            badges: {
+                working: document.getElementById('workingBadge'),
+                former: document.getElementById('formerBadge'),
+                all: document.getElementById('allBadge')
+            }
+        };
+
+        // ============================================================
+        //  LOAD HEADER, NAV, FOOTER
+        // ============================================================
+        async function loadExternalComponents() {
+            try {
+                const [header, nav, footer] = await Promise.all([
+                    fetch('header.html').then(r => r.text()),
+                    fetch('nav.html').then(r => r.text()),
+                    fetch('footer.html').then(r => r.text())
+                ]);
+                
+                document.getElementById('site-header').innerHTML = header;
+                document.getElementById('nav-placeholder').innerHTML = nav;
+                document.getElementById('footer-placeholder').innerHTML = footer;
+            } catch (error) {
+                console.warn('Failed to load external components:', error);
+            }
+        }
+        loadExternalComponents();
+
+        // ============================================================
+        //  TOAST NOTIFICATION SYSTEM
+        // ============================================================
+        let toastTimer = null;
+
+        function showToast(message, type = 'success', duration = 4000) {
+            const toast = DOM.toast;
+            
+            if (toastTimer) {
+                clearTimeout(toastTimer);
+                toastTimer = null;
+            }
+
+            toast.className = 'toast';
+            toast.textContent = message;
+            void toast.offsetWidth;
+            toast.classList.add(type);
+
+            toastTimer = setTimeout(() => {
+                toast.className = 'toast';
+                toast.textContent = '';
+                toastTimer = null;
+            }, duration);
+        }
+
+        // ============================================================
+        //  PROGRESS BAR
+        // ============================================================
+        function showProgress(show, text = 'Uploading...', percent = 0) {
+            DOM.progressContainer.style.display = show ? 'block' : 'none';
+            DOM.progressText.textContent = text;
+            DOM.progressPercent.textContent = percent + '%';
+            DOM.progressFill.style.width = percent + '%';
+        }
+
+        function updateProgress(percent, text = 'Uploading...') {
+            DOM.progressPercent.textContent = percent + '%';
+            DOM.progressFill.style.width = percent + '%';
+            DOM.progressText.textContent = text;
+        }
+
+        // ============================================================
+        //  IMAGE UPLOAD TO CLOUDINARY
+        // ============================================================
+        async function uploadToCloudinary(file) {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', CLOUDINARY.uploadPreset);
+                formData.append('resource_type', 'auto');
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/upload`, true);
+
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        updateProgress(percent, 'Uploading to Cloudinary...');
+                    }
+                };
+
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        try {
+                            const data = JSON.parse(xhr.responseText);
+                            if (data.secure_url) {
+                                resolve(data.secure_url);
+                            } else {
+                                reject(new Error('No secure_url in response'));
+                            }
+                        } catch (error) {
+                            reject(new Error('Failed to parse Cloudinary response'));
+                        }
+                    } else {
+                        reject(new Error('Upload failed with status: ' + xhr.status));
+                    }
+                };
+
+                xhr.onerror = function() {
+                    reject(new Error('Network error during upload'));
+                };
+
+                xhr.send(formData);
+            });
+        }
+
+        // ============================================================
+        //  COMPRESS IMAGE
+        // ============================================================
+        function compressImage(file, maxWidth, maxHeight, quality) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > maxWidth || height > maxHeight) {
+                            const ratio = Math.min(maxWidth / width, maxHeight / height);
+                            width = Math.round(width * ratio);
+                            height = Math.round(height * ratio);
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        canvas.toBlob((blob) => {
+                            resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                        }, 'image/jpeg', quality);
+                    };
+                };
+            });
+        }
+
+        // ============================================================
+        //  EMPLOYEE DATA OPERATIONS
+        // ============================================================
+        async function loadEmployees() {
+            if (state.isLoading) return;
+            
+            state.isLoading = true;
+            DOM.employeeGrid.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">⏳</div>
+                    <div>Loading employees...</div>
+                </div>
+            `;
+
+            try {
+                const snapshot = await db.collection('employees')
+                    .orderBy('name')
+                    .get();
+
+                state.employees = [];
+                state.departments = new Set();
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const employee = { id: doc.id, ...data };
+                    state.employees.push(employee);
+                    if (data.department) {
+                        state.departments.add(data.department);
+                    }
+                });
+
+                populateDepartments();
+                updateStats();
+                applyFilters();
+                
+            } catch (error) {
+                console.error('Error loading employees:', error);
+                DOM.employeeGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <div>Error loading employees. Please refresh.</div>
+                        <button class="btn-primary" onclick="loadEmployees()" style="margin-top:16px;">
+                            🔄 Retry
+                        </button>
+                    </div>
+                `;
+                showToast('Failed to load employees', 'error');
+            } finally {
+                state.isLoading = false;
+            }
+        }
+
+        // ============================================================
+        //  UI UPDATE FUNCTIONS
+        // ============================================================
+        function populateDepartments() {
+            const select = DOM.departmentFilter;
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="all">All Departments</option>';
+            [...state.departments].sort().forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                select.appendChild(option);
+            });
+            
+            if (currentValue !== 'all' && state.departments.has(currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        function updateStats() {
+            const working = state.employees.filter(e => e.status !== 'left');
+            const former = state.employees.filter(e => e.status === 'left');
+            const total = state.employees.length;
+
+            DOM.stats.total.textContent = total;
+            DOM.stats.working.textContent = working.length;
+            DOM.stats.former.textContent = former.length;
+            
+            DOM.badges.working.textContent = working.length;
+            DOM.badges.former.textContent = former.length;
+            DOM.badges.all.textContent = total;
+        }
+
+        function getExperience(joiningDate, leavingDate = null) {
+            if (!joiningDate) return 'N/A';
+            
+            const start = new Date(joiningDate);
+            const end = leavingDate ? new Date(leavingDate) : new Date();
+            const diff = end - start;
+            
+            if (diff < 0) return 'N/A';
+            
+            const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+            const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
+            
+            const parts = [];
+            if (years > 0) parts.push(`${years} yr${years > 1 ? 's' : ''}`);
+            if (months > 0) parts.push(`${months} mo${months > 1 ? 's' : ''}`);
+            
+            return parts.length > 0 ? parts.join(', ') : 'New';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================================
+        //  FILTERING & RENDERING
+        // ============================================================
+        function applyFilters() {
+            const search = DOM.searchInput.value.toLowerCase().trim();
+            const department = DOM.departmentFilter.value;
+
+            let filtered = [...state.employees];
+
+            if (state.currentTab === 'working') {
+                filtered = filtered.filter(e => e.status !== 'left');
+            } else if (state.currentTab === 'former') {
+                filtered = filtered.filter(e => e.status === 'left');
+            }
+
+            if (search) {
+                filtered = filtered.filter(emp =>
+                    (emp.name || '').toLowerCase().includes(search) ||
+                    (emp.post || '').toLowerCase().includes(search) ||
+                    (emp.department || '').toLowerCase().includes(search) ||
+                    (emp.qualification || '').toLowerCase().includes(search)
+                );
+            }
+
+            if (department !== 'all') {
+                filtered = filtered.filter(emp => emp.department === department);
+            }
+
+            state.filteredEmployees = filtered;
+            renderEmployees(filtered);
+        }
+
+        function renderEmployees(employees) {
+            const grid = DOM.employeeGrid;
+
+            if (employees.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">👀</div>
+                        <div>No employees found</div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = employees.map(emp => {
+                const isFormer = emp.status === 'left';
+                const badgeClass = isFormer ? 'former' : 'working';
+                const badgeText = isFormer ? '🏅 Legacy Member' : 'Working';
+                const cardClass = isFormer ? 'former' : '';
+                const experience = getExperience(emp.joiningDate, emp.leavingDate);
+                
+                let duration = '';
+                if (isFormer && emp.joiningDate && emp.leavingDate) {
+                    const join = new Date(emp.joiningDate);
+                    const left = new Date(emp.leavingDate);
+                    const joinStr = join.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+                    const leftStr = left.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+                    duration = `${joinStr} → ${leftStr}`;
+                }
+
+                // Show active period for former employees
+                let activePeriod = '';
+                if (isFormer && emp.joiningDate && emp.leavingDate) {
+                    const join = new Date(emp.joiningDate);
+                    const left = new Date(emp.leavingDate);
+                    activePeriod = `${join.getFullYear()} - ${left.getFullYear()}`;
+                }
+
+                const photoHTML = emp.photoURL ? 
+                    `<img src="${escapeHtml(emp.photoURL)}" alt="${escapeHtml(emp.name)}" class="employee-photo">` :
+                    `<div class="employee-avatar">${escapeHtml(emp.name ? emp.name.charAt(0).toUpperCase() : '?')}</div>`;
+
+                // Legacy message for former employees
+                const legacyHTML = isFormer && emp.legacyMessage ? `
+                    <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0e6d0;font-style:italic;color:#8d6e3f;font-size:0.8rem;">
+                        ❝ ${escapeHtml(emp.legacyMessage)} ❞
+                        <div style="font-style:normal;font-weight:500;color:#5d4037;margin-top:2px;font-size:0.75rem;">
+                            — ${escapeHtml(emp.name)}
+                        </div>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="employee-card ${cardClass}">
+                        <div class="card-header">
+                            <div class="card-header-flex">
+                                ${photoHTML}
+                                <div>
+                                    <h3>${escapeHtml(emp.name || 'Unknown')}</h3>
+                                    <div class="post" style="${isFormer ? 'color:#d4af37;' : ''}">
+                                        ${isFormer ? 'Former ' : ''}${escapeHtml(emp.post || 'N/A')}
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="status-badge ${badgeClass}">${badgeText}</span>
+                        </div>
+
+                        <div class="qualification">${escapeHtml(emp.qualification || 'Qualification not specified')}</div>
+
+                        <div class="details">
+                            ${isFormer && activePeriod ? 
+                                `<div><span class="label">📅 Active:</span> ${escapeHtml(activePeriod)}</div>` :
+                                `<div><span class="label">📅 Joined:</span> ${escapeHtml(emp.joiningDate || 'N/A')}</div>`
+                            }
+                            ${isFormer && emp.leavingDate ? 
+                                `<div><span class="label">📅 Left:</span> ${escapeHtml(emp.leavingDate)}</div>` : ''}
+                            ${emp.department ? 
+                                `<div><span class="label">🏢 Dept:</span> ${escapeHtml(emp.department)}</div>` : ''}
+                            ${!isFormer && experience ? 
+                                `<div><span class="label">⭐ Experience:</span> ${escapeHtml(experience)}</div>` : ''}
+                            ${emp.email ? 
+                                `<div><span class="label">📧 Email:</span> ${escapeHtml(emp.email)}</div>` : ''}
+                        </div>
+
+                        ${legacyHTML}
+
+                        <div class="actions">
+                            ${!isFormer ? `
+                                <button class="btn-sm btn-edit" onclick="openEditModal('${emp.id}')">✏️ Edit</button>
+                                <button class="btn-sm btn-left" onclick="openLeftModal('${emp.id}')">🏅 Mark Legacy</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        //  TAB SWITCHING
+        // ============================================================
+        function switchTab(tab, button) {
+            state.currentTab = tab;
+            
+            document.querySelectorAll('.tabs button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (button) {
+                button.classList.add('active');
+            } else {
+                document.querySelector(`.tabs button[data-tab="${tab}"]`)?.classList.add('active');
+            }
+            
+            applyFilters();
+        }
+
+        // ============================================================
+        //  MODAL CONTROLS
+        // ============================================================
+        function resetPhotoUpload() {
+            const preview = document.getElementById('currentPhotoPreview');
+            const hint = document.getElementById('photoUploadHint');
+            
+            preview.src = '';
+            preview.style.display = 'none';
+            hint.style.display = 'block';
+            document.getElementById('photoFileInput').value = '';
+            state.tempPhotoData = null;
+            state.cropImageFile = null;
+            showProgress(false);
+        }
+
+        function openAddModal() {
+            DOM.modalTitle.textContent = '➕ Add Employee';
+            DOM.editId.value = '';
+            DOM.employeeForm.reset();
+            document.getElementById('empPost').value = '';
+            resetPhotoUpload();
+            DOM.employeeModal.classList.add('show');
+        }
+
+        function openEditModal(id) {
+            const emp = state.employees.find(e => e.id === id);
+            if (!emp) {
+                showToast('Employee not found', 'error');
+                return;
+            }
+
+            DOM.modalTitle.textContent = '✏️ Edit Employee';
+            DOM.editId.value = id;
+            document.getElementById('empName').value = emp.name || '';
+            document.getElementById('empPost').value = emp.post || '';
+            document.getElementById('empQualification').value = emp.qualification || '';
+            document.getElementById('empDepartment').value = emp.department || '';
+            document.getElementById('empEmail').value = emp.email || '';
+            document.getElementById('empPhone').value = emp.phone || '';
+            document.getElementById('empJoiningDate').value = emp.joiningDate || '';
+            
+            if (emp.photoURL) {
+                document.getElementById('currentPhotoPreview').src = emp.photoURL;
+                document.getElementById('currentPhotoPreview').style.display = 'block';
+                document.getElementById('photoUploadHint').style.display = 'none';
+                state.tempPhotoData = emp.photoURL;
+            } else {
+                resetPhotoUpload();
+            }
+            
+            DOM.employeeModal.classList.add('show');
+        }
+
+        function closeModal() {
+            DOM.employeeModal.classList.remove('show');
+            DOM.employeeForm.reset();
+            DOM.editId.value = '';
+            resetPhotoUpload();
+            state.cropImageFile = null;
+            state.tempPhotoData = null;
+            showProgress(false);
+        }
+
+        function openLeftModal(id) {
+            DOM.leftEmployeeId.value = id;
+            DOM.leftDate.value = new Date().toISOString().split('T')[0];
+            DOM.legacyMessage.value = '';
+            
+            // Check if employee already has a legacy message
+            const emp = state.employees.find(e => e.id === id);
+            if (emp && emp.legacyMessage) {
+                DOM.legacyMessage.value = emp.legacyMessage;
+                DOM.legacyMessage.disabled = true;
+                document.querySelector('.btn-warning-text').style.display = 'block';
+            } else {
+                DOM.legacyMessage.disabled = false;
+                document.querySelector('.btn-warning-text').style.display = 'block';
+            }
+            
+            DOM.leftModal.classList.add('show');
+        }
+
+        function closeLeftModal() {
+            DOM.leftModal.classList.remove('show');
+            DOM.leftEmployeeId.value = '';
+            DOM.legacyMessage.value = '';
+            DOM.legacyMessage.disabled = false;
+        }
+
+        // ============================================================
+        //  PHOTO UPLOAD & CROP FUNCTIONS
+        // ============================================================
+        function handleFileSelect(file) {
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select an image file', 'error');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image too large. Please select image under 5MB.', 'error');
+                return;
+            }
+
+            state.cropImageFile = file;
+            openCropModal(file);
+        }
+
+        function openCropModal(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('cropImage');
+                img.src = e.target.result;
+                document.getElementById('cropModal').classList.add('show');
+                
+                img.onload = function() {
+                    if (state.cropInstance) {
+                        state.cropInstance.destroy();
+                    }
+                    
+                    state.cropInstance = new Cropper(img, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 0.8,
+                        restore: false,
+                        guides: false,
+                        center: false,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                        ready: function() {
+                            this.cropper.zoomTo(0.8);
+                            document.getElementById('zoomSlider').value = 0.8;
+                        }
+                    });
+                    
+                    document.getElementById('zoomSlider').oninput = function() {
+                        if (state.cropInstance) {
+                            state.cropInstance.zoomTo(parseFloat(this.value));
+                        }
+                    };
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function closeCropModal() {
+            if (state.cropInstance) {
+                state.cropInstance.destroy();
+                state.cropInstance = null;
+            }
+            document.getElementById('cropModal').classList.remove('show');
+            document.getElementById('cropImage').src = '';
+            state.cropImageFile = null;
+        }
+
+        async function confirmCropAndUpload() {
+            if (!state.cropInstance) {
+                showToast('No image to crop', 'error');
+                return;
+            }
+
+            if (state.isUploading) {
+                showToast('Upload in progress...', 'loading');
+                return;
+            }
+
+            try {
+                state.isUploading = true;
+                showProgress(true, 'Preparing image...', 0);
+
+                const canvas = state.cropInstance.getCroppedCanvas({
+                    width: 400,
+                    height: 400,
+                    imageSmoothingQuality: 'high'
+                });
+
+                if (!canvas) {
+                    showToast('Failed to crop image', 'error');
+                    state.isUploading = false;
+                    showProgress(false);
+                    return;
+                }
+
+                updateProgress(20, 'Processing cropped image...');
+
+                const blob = await new Promise((resolve) => {
+                    canvas.toBlob((blob) => {
+                        resolve(blob);
+                    }, 'image/jpeg', 0.9);
+                });
+
+                if (!blob) {
+                    showToast('Failed to process image', 'error');
+                    state.isUploading = false;
+                    showProgress(false);
+                    return;
+                }
+
+                updateProgress(40, 'Compressing image...');
+
+                const croppedFile = new File([blob], 'profile.jpg', { 
+                    type: 'image/jpeg' 
+                });
+
+                const compressedFile = await compressImage(croppedFile, 400, 400, 0.7);
+                
+                updateProgress(60, 'Uploading to Cloudinary...');
+
+                const photoURL = await uploadToCloudinary(compressedFile);
+
+                if (!photoURL) {
+                    showToast('Failed to upload photo', 'error');
+                    state.isUploading = false;
+                    showProgress(false);
+                    return;
+                }
+
+                updateProgress(100, 'Upload complete!');
+
+                const preview = document.getElementById('currentPhotoPreview');
+                const hint = document.getElementById('photoUploadHint');
+                
+                preview.src = photoURL;
+                preview.style.display = 'block';
+                hint.style.display = 'none';
+                
+                state.tempPhotoData = photoURL;
+                
+                closeCropModal();
+                
+                setTimeout(() => {
+                    showProgress(false);
+                    state.isUploading = false;
+                }, 500);
+
+                showToast('✅ Photo uploaded successfully!', 'success');
+
+            } catch (error) {
+                console.error('Error in confirmCropAndUpload:', error);
+                showToast('❌ Failed to upload: ' + error.message, 'error');
+                state.isUploading = false;
+                showProgress(false);
+            }
+        }
+
+        // ============================================================
+        //  FILE INPUT & DRAG DROP HANDLERS
+        // ============================================================
+        document.getElementById('photoFileInput').addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                handleFileSelect(this.files[0]);
+            }
+        });
+
+        const uploadArea = document.getElementById('photoUploadArea');
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = 'var(--accent)';
+                this.style.background = '#e8f5e9';
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#4CAF50';
+                this.style.background = '#f0f8f0';
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#4CAF50';
+                this.style.background = '#f0f8f0';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    handleFileSelect(e.dataTransfer.files[0]);
+                }
+            });
+
+            uploadArea.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'IMG') {
+                    document.getElementById('photoFileInput').click();
+                }
+            });
+        }
+
+        document.getElementById('confirmCropBtn').addEventListener('click', confirmCropAndUpload);
+
+        // ============================================================
+        //  EMPLOYEE CRUD OPERATIONS
+        // ============================================================
+        async function saveEmployee(data, id = null) {
+            DOM.saveBtn.disabled = true;
+            DOM.saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
+
+            try {
+                if (id) {
+                    const updateData = {
+                        ...data,
+                        updatedAt: new Date().toISOString()
+                    };
+                    
+                    if (state.tempPhotoData && state.tempPhotoData.startsWith('https://')) {
+                        updateData.photoURL = state.tempPhotoData;
+                    }
+                    
+                    await db.collection('employees').doc(id).update(updateData);
+                    showToast('✅ Employee updated successfully!', 'success');
+                    
+                } else {
+                    const docRef = await db.collection('employees').add({
+                        ...data,
+                        status: 'active',
+                        createdAt: new Date().toISOString(),
+                        addedBy: auth.currentUser?.email || 'admin'
+                    });
+                    
+                    if (state.tempPhotoData) {
+                        await docRef.update({ photoURL: state.tempPhotoData });
+                    }
+                    
+                    showToast('✅ Employee added successfully!', 'success');
+                }
+
+                closeModal();
+                resetPhotoUpload();
+                await loadEmployees();
+                
+            } catch (error) {
+                console.error('Error saving employee:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+                throw error;
+            } finally {
+                DOM.saveBtn.disabled = false;
+                DOM.saveBtn.innerHTML = '💾 Save Employee';
+            }
+        }
+
+        DOM.employeeForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const id = DOM.editId.value;
+            const data = {
+                name: document.getElementById('empName').value.trim(),
+                post: document.getElementById('empPost').value.trim(),
+                qualification: document.getElementById('empQualification').value.trim(),
+                department: document.getElementById('empDepartment').value.trim(),
+                email: document.getElementById('empEmail').value.trim(),
+                phone: document.getElementById('empPhone').value.trim(),
+                joiningDate: document.getElementById('empJoiningDate').value
+            };
+
+            if (!data.name || !data.post || !data.qualification || !data.joiningDate) {
+                showToast('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            await saveEmployee(data, id || null);
+        });
+
+        async function confirmLeft() {
+            const id = DOM.leftEmployeeId.value;
+            const leavingDate = DOM.leftDate.value;
+            const legacyMessage = DOM.legacyMessage.value.trim();
+
+            if (!leavingDate) {
+                showToast('Please select a leaving date', 'error');
+                return;
+            }
+
+            try {
+                const updateData = {
+                    status: 'left',
+                    leavingDate: leavingDate,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // Add legacy message if provided (permanent)
+                if (legacyMessage) {
+                    updateData.legacyMessage = legacyMessage;
+                }
+                
+                await db.collection('employees').doc(id).update(updateData);
+
+                closeLeftModal();
+                showToast('🏅 Employee marked as Legacy Member!', 'success');
+                await loadEmployees();
+
+            } catch (error) {
+                console.error('Error marking employee as former:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        async function restoreEmployee(id) {
+            if (!confirm('Restore this employee to active status?')) return;
+
+            try {
+                await db.collection('employees').doc(id).update({
+                    status: 'active',
+                    leavingDate: null,
+                    updatedAt: new Date().toISOString()
+                });
+
+                showToast('✅ Employee restored successfully', 'success');
+                await loadEmployees();
+
+            } catch (error) {
+                console.error('Error restoring employee:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================
+        //  AUTHENTICATION
+        // ============================================================
+        function handleLogout() {
+            auth.signOut();
+            window.location.href = 'admin.html';
+        }
+
+        // ============================================================
+        //  MODAL CLOSE HANDLERS
+        // ============================================================
+        DOM.employeeModal.addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        DOM.leftModal.addEventListener('click', function(e) {
+            if (e.target === this) closeLeftModal();
+        });
+
+        document.getElementById('cropModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCropModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeLeftModal();
+                closeCropModal();
+            }
+        });
+
+        // ============================================================
+        //  AUTH STATE OBSERVER
+        // ============================================================
+        auth.onAuthStateChanged(async function(user) {
+            if (!user) {
+                showToast('⚠️ Please login as admin', 'error');
+                DOM.employeeGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔒</div>
+                        <div>Please login to manage employees</div>
+                        <button class="btn-primary" onclick="window.location.href='admin.html'" style="margin-top:16px;">
+                            Login
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists && doc.data().role === 'admin') {
+                    await loadEmployees();
+                } else {
+                    await loadEmployees();
+                }
+            } catch (error) {
+                console.warn('Users collection check failed, allowing access:', error);
+                await loadEmployees();
+            }
+        });
+
+        // ============================================================
+        //  INITIALIZATION
+        // ============================================================
+        console.log('✅ Employee Management System initialized with Cloudinary upload');
+    </script>
+
+</body>
+</html>

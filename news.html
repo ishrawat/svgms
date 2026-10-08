@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Latest news, events, and announcements from Swami Vivekanand Govt. Model School, Bhim.">
+<title>News &amp; Events — SVGMS Bhim</title>
+<link rel="icon" href="imgs/logo1.png" type="image/png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="News &amp; Events — SVGMS Bhim">
+<meta property="og:description" content="Latest news, events, and announcements from SVGMS Bhim.">
+<meta property="og:image" content="https://raw.githubusercontent.com/ishrawat/imagess/refs/heads/main/logo.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-nav-active="news">
+
+<div id="site-chrome"></div>
+
+<section class="page-hero">
+    <h1>News &amp; Events <small>what's happening at SVGMS</small></h1>
+</section>
+
+<main class="news-page">
+
+    <div class="category-tabs" id="categoryTabs">
+        <button class="category-tab active" data-category="all">All</button>
+        <button class="category-tab" data-category="Announcement">Announcement</button>
+        <button class="category-tab" data-category="Event">Event</button>
+        <button class="category-tab" data-category="Exam Update">Exam Update</button>
+        <button class="category-tab" data-category="Achievement">Achievement</button>
+        <button class="category-tab" data-category="Notice">Notice</button>
+        <button class="category-tab" data-category="General">General</button>
+    </div>
+
+    <div id="postsContainer" class="posts-grid">
+        <div class="no-posts">
+            <span class="big-icon">📰</span>
+            <p>Loading posts…</p>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <p>&copy; 2026 Swami Vivekanand Govt. Model School, Bhim. All Rights Reserved.</p>
+</footer>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Shared chrome + Firebase init -->
+<script src="site.js"></script>
+
+<!-- Page-specific -->
+<script>
+(function () {
+    'use strict';
+
+    var db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+    var postsContainer = document.getElementById('postsContainer');
+    var categoryTabs = document.querySelectorAll('.category-tab');
+
+    function escapeHtml(text) {
+        if (text == null) return '';
+        var div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
+
+    function formatDate(value) {
+        if (!value) return '';
+        try {
+            return new Date(value).toLocaleDateString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        } catch (e) { return ''; }
+    }
+
+    function badgeClass(category) {
+        var c = (category || 'General').toLowerCase();
+        if (c.indexOf('announcement') === 0) return 'announcement';
+        if (c.indexOf('event') === 0)        return 'event';
+        if (c.indexOf('exam') === 0)         return 'exam';
+        if (c.indexOf('achievement') === 0)  return 'achievement';
+        if (c.indexOf('notice') === 0)       return 'notice';
+        return 'general';
+    }
+
+    function renderLoading() {
+        postsContainer.innerHTML =
+            '<div class="no-posts"><span class="big-icon">📰</span><p>Loading posts…</p></div>';
+    }
+
+    function renderEmpty() {
+        postsContainer.innerHTML =
+            '<div class="no-posts"><span class="big-icon">📭</span><p>No posts in this category.</p></div>';
+    }
+
+    function renderError() {
+        postsContainer.innerHTML =
+            '<div class="no-posts"><span class="big-icon">⚠️</span><p>Could not load posts. Please refresh.</p></div>';
+    }
+
+    function renderPosts(posts) {
+        postsContainer.innerHTML = '';
+        posts.forEach(function (post) {
+            var cat = post.category || 'General';
+            var dateStr = formatDate(post.date);
+            var author = post.author || 'Teacher';
+
+            var pdfHtml = '';
+            if (post.pdfUrl) {
+                var href = String(post.pdfUrl);
+                var withAttach = href + (href.indexOf('?') === -1 ? '?' : '&') + 'fl_attachment=true';
+                pdfHtml = '<a class="pdf-btn" href="' + escapeHtml(withAttach) +
+                          '" target="_blank" rel="noopener">📄 Download PDF</a>';
+            }
+
+            var card = document.createElement('article');
+            card.className = 'post-card';
+            card.innerHTML =
+                '<span class="category-badge ' + badgeClass(cat) + '">' + escapeHtml(cat) + '</span>' +
+                '<h2 class="post-title">' + escapeHtml(post.title || 'Untitled') + '</h2>' +
+                '<div class="post-meta">' +
+                    '<span>📅 ' + escapeHtml(dateStr) + '</span>' +
+                    '<span>👤 ' + escapeHtml(author) + '</span>' +
+                '</div>' +
+                '<div class="post-content">' + escapeHtml(post.content || '') + '</div>' +
+                (pdfHtml ? '<div class="post-actions">' + pdfHtml + '</div>' : '');
+
+            postsContainer.appendChild(card);
+        });
+    }
+
+    function loadPosts(category) {
+        category = category || 'all';
+        if (!postsContainer) return;
+
+        if (!db) {
+            renderError();
+            return;
+        }
+
+        renderLoading();
+
+        var query = db.collection('posts');
+        if (category !== 'all') {
+            query = query.where('category', '==', category);
+        }
+
+        query.get()
+            .then(function (snapshot) {
+                if (snapshot.empty) { renderEmpty(); return; }
+
+                var posts = [];
+                snapshot.forEach(function (doc) {
+                    var data = doc.data();
+                    data.id = doc.id;
+                    posts.push(data);
+                });
+
+                posts.sort(function (a, b) {
+                    var da = a.date ? new Date(a.date).getTime() : 0;
+                    var dbv = b.date ? new Date(b.date).getTime() : 0;
+                    return dbv - da;
+                });
+
+                renderPosts(posts);
+            })
+            .catch(function (err) {
+                console.warn('News unavailable:', err);
+                renderError();
+            });
+    }
+
+    categoryTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            categoryTabs.forEach(function (t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            loadPosts(tab.dataset.category);
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadPosts('all');
+    });
+})();
+</script>
+
+</body>
+</html>

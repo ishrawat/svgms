@@ -1,0 +1,51 @@
+<!-- ===== TOP RIBBON ===== -->
+<div class="top-ribbon">
+    <div class="ribbon-welcome">Welcome to SVGMS Bhim</div>
+    <div class="ribbon-info">
+        <span><strong>REGION:</strong> RAJSAMAND</span>
+        <span><strong>AFFILIATION NO:</strong> 0000000</span>
+        <span><strong>SCHOOL CODE:</strong> 0000</span>
+    </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="main-header">
+    <div class="brand-container">
+        <a class="brand-link" href="index.html">
+            <img class="logo-image"
+                 src="https://raw.githubusercontent.com/ishrawat/imagess/refs/heads/main/logo.jpg"
+                 alt="School Logo">
+            <div class="brand-text">
+                <h1>Swami Vivekanand Govt. Model School</h1>
+                <p>Bhim, Rajasthan</p>
+            </div>
+        </a>
+    </div>
+</header>
+
+<!-- ===== FLOATING THOUGHT BOX ===== -->
+<div id="thoughtIcon" role="button" tabindex="0"
+     aria-label="Open Principal's message"
+     onclick="openThought()"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openThought();}">
+    💭
+</div>
+
+<div id="thoughtBox" role="dialog" aria-labelledby="thoughtHeading" aria-live="polite">
+    <div class="thought-header">
+        <div class="thought-title">
+            <span aria-hidden="true">💭</span>
+            <span id="thoughtHeading">Principal's Message</span>
+        </div>
+        <button type="button" class="thought-close"
+                aria-label="Close message"
+                onclick="closeThought()">✕</button>
+    </div>
+
+    <div id="thoughtMessage" class="thought-message">Loading...</div>
+
+    <div class="thought-footer">
+        <span id="thoughtAuthor" class="thought-author">— Principal</span>
+        <span id="thoughtDate" class="thought-date"></span>
+    </div>
+</div>

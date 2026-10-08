@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Photo gallery and event highlights from Swami Vivekanand Govt. Model School, Bhim.">
+<title>Photo Gallery — SVGMS Bhim</title>
+<link rel="icon" href="imgs/logo1.png" type="image/png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Photo Gallery — SVGMS Bhim">
+<meta property="og:description" content="Moments and events from Swami Vivekanand Govt. Model School, Bhim.">
+<meta property="og:image" content="https://raw.githubusercontent.com/ishrawat/imagess/refs/heads/main/logo.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     TOP RIBBON
+     ═══════════════════════════════════════════════ -->
+<div class="top-ribbon">
+    <div class="ribbon-welcome">Welcome to SVGMS Bhim</div>
+    <div class="ribbon-info">
+        <span><strong>Region:</strong> Rajsamand</span>
+        <span><strong>Affiliation No:</strong> 0000000</span>
+        <span><strong>School Code:</strong> 0000</span>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════ -->
+<header class="main-header">
+    <div class="brand-container">
+        <a class="brand-link" href="index.html">
+            <img class="logo-image" src="https://raw.githubusercontent.com/ishrawat/imagess/refs/heads/main/logo.jpg" alt="School Logo">
+            <div class="brand-text">
+                <h1>Swami Vivekanand Govt. Model School</h1>
+                <p>Bhim, Rajasthan</p>
+            </div>
+        </a>
+    </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════
+     NAVIGATION
+     ═══════════════════════════════════════════════ -->
+<nav class="nav-container" aria-label="Main navigation">
+    <div class="nav-inner">
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+        <ul class="main-nav" id="navList">
+
+            <li class="nav-item">
+                <a href="index.html#home" class="nav-link" onclick="showPage('home');return false;">Home</a>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link" aria-haspopup="true" onclick="toggleMenu(event, this)">School ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="index.html#about" onclick="showPage('about');return false;">About School</a></li>
+                    <li><a href="employees.html">Our Team</a></li>
+                    <li><a href="index.html#principal" onclick="showPage('principal');return false;">Principal's Message</a></li>
+                    <li><a href="#">School Infrastructure</a></li>
+                    <li><a href="#">Transport Facilities</a></li>
+                    <li><a href="#">Computer Lab</a></li>
+                    <li><a href="#">Games &amp; Sports</a></li>
+                    <li><a href="#">Library</a></li>
+                    <li><a href="#">Yoga &amp; Meditation</a></li>
+                    <li><a href="#">Art &amp; Craft</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link" aria-haspopup="true" onclick="toggleMenu(event, this)">Academics ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="methodology.html">Methodology</a></li>
+                    <li><a href="academic-planner.html">Academic Session Planner</a></li>
+                    <li><a href="cbse-corner.html">CBSE Corner</a></li>
+                    <li><a href="exams-cce.html">Exams &amp; CCE</a></li>
+                    <li><a href="result-lookup.html">Result Section</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link" aria-haspopup="true" onclick="toggleMenu(event, this)">Admission ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="shortlist.html">Shortlist of Admission Candidates</a></li>
+                    <li><a href="#">Rules &amp; Regulations</a></li>
+                    <li><a href="#">Parent's Involvement</a></li>
+                    <li><a href="#">School Timings</a></li>
+                    <li><a href="#">School Uniform</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a href="library.html" class="nav-link">Digital Library</a>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link" aria-haspopup="true" onclick="toggleMenu(event, this)">News ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="news.html">News &amp; Events</a></li>
+                    <li><a href="notices.html">Notices &amp; Downloads</a></li>
+                    <li><a href="bhamashah.html">Bhamashah</a></li>
+                    <li><a href="awards.html">Awards</a></li>
+                    <li><a href="shortlist.html">Shortlist of Admission Candidates</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link active" aria-haspopup="true" onclick="toggleMenu(event, this)">Gallery ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="gallery.html">Photo Gallery</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a href="index.html#contact" class="nav-link" onclick="showPage('contact');return false;">Contact</a>
+            </li>
+
+            <li class="nav-item nav-right">
+                <a href="admin.html" class="nav-link">🔐 Staff Login</a>
+            </li>
+
+            <li class="nav-item">
+                <a href="student/login.html" class="nav-link student-zone" id="studentZoneLink">
+                    <span id="rocketSpan">🚀</span><span>Student Zone</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE HERO
+     ═══════════════════════════════════════════════ -->
+<section class="page-hero">
+    <h1>Photo Gallery <small>moments from SVGMS</small></h1>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     GALLERY
+     ═══════════════════════════════════════════════ -->
+<main class="gallery-list">
+    <div id="galleryContainer">
+        <div class="gallery-loading">
+            <span class="big-icon">📸</span>
+            Loading events…
+        </div>
+    </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════
+     LIGHTBOX
+     ═══════════════════════════════════════════════ -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">✕</button>
+    <img id="lightboxImage" src="" alt="">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════ -->
+<footer>
+    <p>&copy; 2026 Swami Vivekanand Govt. Model School, Bhim. All Rights Reserved.</p>
+</footer>
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ---------- Firebase ---------- */
+    var db = null;
+    if (typeof firebase !== 'undefined') {
+        try {
+            firebase.initializeApp({
+                apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+                authDomain: "svgms-backend.firebaseapp.com",
+                projectId: "svgms-backend",
+                storageBucket: "svgms-backend.firebasestorage.app",
+                messagingSenderId: "1065359559935",
+                appId: "1:1065359559935:web:977cea73a68e05813750ca"
+            });
+            db = firebase.firestore();
+        } catch (e) { console.warn('Firebase init skipped:', e); }
+    }
+
+    /* ---------- Navigation ---------- */
+    function closeAllMenus() {
+        document.querySelectorAll('.nav-item').forEach(function (item) {
+            item.classList.remove('active');
+            var menu = item.querySelector('.dropdown-menu');
+            if (menu) menu.style.display = 'none';
+        });
+    }
+
+    function toggleMenu(event, element) {
+        if (event) { event.preventDefault(); event.stopPropagation(); }
+        var parent = element.closest('.nav-item');
+        if (!parent) return;
+        var menu = parent.querySelector('.dropdown-menu');
+        if (!menu) return;
+        var wasOpen = parent.classList.contains('active');
+        closeAllMenus();
+        if (!wasOpen) {
+            parent.classList.add('active');
+            menu.style.display = 'block';
+        }
+    }
+
+    function showPage(pageName) {
+        window.location.href = 'index.html#' + pageName;
+    }
+
+    window.toggleMenu = toggleMenu;
+    window.showPage = showPage;
+
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.nav-item')) closeAllMenus();
+    });
+
+    var navToggle = document.getElementById('navToggle');
+    var navList = document.getElementById('navList');
+    if (navToggle && navList) {
+        navToggle.addEventListener('click', function () {
+            var open = navList.classList.toggle('open');
+            navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            navToggle.textContent = open ? '✕' : '☰';
+        });
+    }
+
+    /* ---------- Helpers ---------- */
+    function escapeHtml(text) {
+        if (text == null) return '';
+        var div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
+
+    function formatDate(value) {
+        if (!value) return '';
+        try {
+            return new Date(value).toLocaleDateString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        } catch (e) { return ''; }
+    }
+
+    /* ---------- Lightbox ---------- */
+    var lightbox, lightboxImage, lightboxCaption;
+
+    function openLightbox(imageUrl, caption) {
+        if (!lightbox) return;
+        lightboxImage.src = imageUrl;
+        lightboxImage.alt = caption || '';
+        lightboxCaption.textContent = caption || '';
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        if (!lightbox) return;
+        lightbox.classList.remove('active');
+        lightboxImage.src = '';
+        document.body.style.overflow = '';
+    }
+
+    window.openLightbox = openLightbox;
+    window.closeLightbox = closeLightbox;
+
+    /* ---------- Rendering ---------- */
+    function renderLoading(container) {
+        container.innerHTML =
+            '<div class="gallery-loading"><span class="big-icon">📸</span>Loading events…</div>';
+    }
+
+    function renderEmpty(container) {
+        container.innerHTML =
+            '<div class="gallery-empty"><span class="big-icon">🖼️</span>No events yet. Check back soon.</div>';
+    }
+
+    function renderError(container, message) {
+        container.innerHTML =
+            '<div class="gallery-error"><span class="big-icon">⚠️</span>' +
+            escapeHtml(message || 'Could not load gallery. Please refresh the page.') +
+            '</div>';
+    }
+
+    function renderEvents(container, events) {
+        if (!events.length) { renderEmpty(container); return; }
+
+        container.innerHTML = '';
+        events.forEach(function (event) {
+            var card = document.createElement('article');
+            card.className = 'gallery-event';
+
+            var dateStr = formatDate(event.date);
+            var metaHtml = '';
+            if (dateStr) metaHtml += '<span>📅 ' + escapeHtml(dateStr) + '</span>';
+
+            var imagesHtml = '';
+            if (event.images.length === 0) {
+                imagesHtml = '<p class="gallery-event-empty">No photos from this event yet.</p>';
+            } else {
+                imagesHtml = event.images.map(function (img) {
+                    var caption = img.caption || event.title || '';
+                    return '<button type="button" class="gallery-thumb"' +
+                           ' data-src="' + escapeHtml(img.imageUrl) + '"' +
+                           ' data-caption="' + escapeHtml(caption) + '">' +
+                           '<img src="' + escapeHtml(img.imageUrl) + '" alt="' + escapeHtml(caption) + '" loading="lazy">' +
+                           (img.caption ? '<span class="thumb-caption">' + escapeHtml(img.caption) + '</span>' : '') +
+                           '</button>';
+                }).join('');
+            }
+
+            card.innerHTML =
+                '<header class="gallery-event-header">' +
+                    '<h2>' + escapeHtml(event.title || 'Event') + '</h2>' +
+                    (metaHtml ? '<div class="gallery-event-meta">' + metaHtml + '</div>' : '') +
+                    (event.description
+                        ? '<p class="gallery-event-desc">' + escapeHtml(event.description) + '</p>'
+                        : '') +
+                '</header>' +
+                '<div class="gallery-event-images">' + imagesHtml + '</div>';
+
+            container.appendChild(card);
+        });
+    }
+
+    /* ---------- Load gallery ---------- */
+    async function loadGallery() {
+        var container = document.getElementById('galleryContainer');
+        if (!container) return;
+
+        if (!db) {
+            renderError(container, 'Gallery loads when you are online.');
+            return;
+        }
+
+        renderLoading(container);
+
+        try {
+            var eventsSnap = await db.collection('events').orderBy('date', 'desc').get();
+
+            if (eventsSnap.empty) {
+                renderEmpty(container);
+                return;
+            }
+
+            var events = [];
+
+            for (var i = 0; i < eventsSnap.docs.length; i++) {
+                var doc = eventsSnap.docs[i];
+                var data = doc.data();
+
+                var imagesSnap = await db.collection('eventImages')
+                    .where('eventId', '==', doc.id)
+                    .orderBy('order', 'asc')
+                    .get();
+
+                var images = [];
+                imagesSnap.forEach(function (imgDoc) { images.push(imgDoc.data()); });
+
+                events.push({
+                    id: doc.id,
+                    title: data.title,
+                    date: data.date,
+                    description: data.description,
+                    images: images
+                });
+            }
+
+            renderEvents(container, events);
+
+        } catch (err) {
+            console.warn('Gallery unavailable:', err);
+            renderError(container);
+        }
+    }
+
+    /* ---------- Boot ---------- */
+    document.addEventListener('DOMContentLoaded', function () {
+        lightbox = document.getElementById('lightbox');
+        lightboxImage = document.getElementById('lightboxImage');
+        lightboxCaption = document.getElementById('lightboxCaption');
+
+        if (lightbox) {
+            lightbox.addEventListener('click', function (e) {
+                if (e.target === lightbox) closeLightbox();
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        /* Event delegation — thumbs are added dynamically */
+        var container = document.getElementById('galleryContainer');
+        if (container) {
+            container.addEventListener('click', function (e) {
+                var thumb = e.target.closest('.gallery-thumb');
+                if (!thumb) return;
+                openLightbox(thumb.dataset.src, thumb.dataset.caption);
+            });
+        }
+
+        loadGallery();
+    });
+})();
+</script>
+
+</body>
+</html>

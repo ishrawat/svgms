@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#1e3a8a">
+<title>Result Lookup — SVGMS Bhim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#1e3a8a;
+  --navy-dark:#1e293b;
+  --maroon:#7f1d1d;
+  --text:#0f172a;
+  --muted:#64748b;
+  --line:#cbd5e1;
+  --line-light:#e2e8f0;
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --green:#15803d;
+  --red:#b91c1c;
+  --amber:#b45309;
+  --blue:#1d4ed8;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{padding:20px 14px 40px}
+
+.page{max-width:920px;margin:0 auto}
+
+/* ================= SCHOOL HEADER ================= */
+.school-header{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-top:5px solid var(--navy);
+  padding:22px 24px;
+  display:flex;
+  align-items:center;
+  gap:22px;
+  margin-bottom:16px;
+  box-shadow:0 1px 3px rgba(15,23,42,.06);
+}
+.school-header .logo{
+  width:78px;height:78px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);
+  background:#fafbfc;
+}
+.school-header .logo img{max-width:100%;max-height:100%}
+.school-header .logo .fallback{
+  font-family:'Libre Baskerville',serif;
+  font-size:26px;font-weight:700;color:var(--navy);
+}
+.school-header .info{flex-grow:1;text-align:center}
+.school-header h1{
+  font-family:'Libre Baskerville',serif;
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:.4px;
+  color:var(--navy);
+  line-height:1.25;
+}
+.school-header .sub{
+  font-size:13px;
+  color:var(--text);
+  font-weight:600;
+  margin-top:4px;
+  letter-spacing:.3px;
+}
+.school-header .meta{
+  font-size:11px;
+  color:var(--muted);
+  font-weight:600;
+  margin-top:6px;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+}
+
+/* ================= SEARCH PANEL ================= */
+.search-panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  padding:24px;
+  margin-bottom:16px;
+  box-shadow:0 1px 3px rgba(15,23,42,.06);
+}
+.search-panel h2{
+  font-size:13px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--navy);
+  padding-bottom:10px;
+  border-bottom:2px solid var(--navy);
+  margin-bottom:20px;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:16px;
+}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  color:var(--muted);
+}
+.field select,.field input{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  background:#fafbfc;
+  color:var(--text);
+  font-family:inherit;
+  font-size:14px;
+  font-weight:600;
+  outline:none;
+  border-radius:0;
+  transition:border-color .15s;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  background-size:14px;
+  padding-right:34px;
+}
+.field select:focus,.field input:focus{
+  border-color:var(--navy);
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(30,58,138,.10);
+}
+.btn{
+  padding:12px 28px;
+  border:none;
+  background:var(--navy);
+  color:#fff;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:background .15s;
+}
+.btn:hover{background:var(--navy-dark)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn-outline{
+  background:transparent;
+  color:var(--navy);
+  border:1px solid var(--navy);
+}
+.btn-outline:hover{background:#eff6ff}
+.error{
+  margin-top:14px;
+  padding:12px 14px;
+  background:#fef2f2;
+  border-left:4px solid var(--red);
+  color:#7f1d1d;
+  font-size:13px;
+  font-weight:600;
+  line-height:1.5;
+  display:none;
+}
+.error.show{display:block}
+
+/* ================= RESULT DOCUMENT ================= */
+.result-section{display:none}
+.result-section.show{display:block}
+
+.document{
+  background:var(--card);
+  border:1px solid var(--line);
+  padding:0;
+  box-shadow:0 1px 3px rgba(15,23,42,.06);
+  margin-bottom:16px;
+}
+.doc-banner{
+  background:var(--navy);
+  color:#fff;
+  text-align:center;
+  padding:14px 20px;
+}
+.doc-banner .line1{
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:3px;
+  text-transform:uppercase;
+}
+.doc-banner .line2{
+  font-family:'Libre Baskerville',serif;
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:1px;
+  margin-top:5px;
+}
+
+.doc-body{padding:26px 28px 28px}
+
+.doc-subhead{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  border-bottom:1px solid var(--line-light);
+  padding-bottom:10px;
+  margin-bottom:18px;
+}
+.doc-subhead .left{
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--muted);
+}
+.doc-subhead .right{
+  font-size:12px;
+  font-weight:600;
+  color:var(--muted);
+}
+
+/* Student info grid */
+.student-info{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:0 40px;
+  margin-bottom:22px;
+}
+.info-row{
+  display:flex;
+  gap:10px;
+  padding:6px 0;
+  border-bottom:1px dotted var(--line);
+  font-size:13.5px;
+  align-items:baseline;
+}
+.info-row .label{
+  width:120px;
+  flex-shrink:0;
+  color:var(--muted);
+  font-weight:600;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+.info-row .value{
+  color:var(--text);
+  font-weight:700;
+  flex-grow:1;
+}
+
+/* Marks table */
+.marks-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:0;
+  font-size:13.5px;
+}
+.marks-table thead th{
+  background:#f1f5f9;
+  color:var(--navy);
+  text-align:left;
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  padding:10px 12px;
+  border-top:1px solid var(--line);
+  border-bottom:2px solid var(--navy);
+}
+.marks-table thead th.num{text-align:right}
+.marks-table tbody td{
+  padding:11px 12px;
+  border-bottom:1px solid var(--line-light);
+  vertical-align:middle;
+}
+.marks-table tbody td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.marks-table tbody td.subject{
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:.2px;
+}
+.marks-table tbody tr:nth-child(even){background:#fafbfc}
+.marks-table .grade{
+  font-weight:800;
+  text-align:center;
+}
+.grade.g-A\*, .grade.g-A1, .grade.g-A2, .grade.g-A{color:var(--green)}
+.grade.g-B1, .grade.g-B2, .grade.g-B{color:var(--blue)}
+.grade.g-C1, .grade.g-C2, .grade.g-C{color:var(--amber)}
+.grade.g-D{color:#9a3412}
+.grade.g-E, .grade.g-E1, .grade.g-E2, .grade.g-F{color:var(--red)}
+
+.marks-table tfoot td{
+  padding:12px;
+  border-top:2px solid var(--navy);
+  background:#f8fafc;
+  font-weight:800;
+  font-size:13.5px;
+}
+.marks-table tfoot td.num{text-align:right;font-variant-numeric:tabular-nums}
+.marks-table tfoot td.grade{text-align:center;font-size:15px}
+
+/* Summary strip */
+.summary-strip{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  border:1px solid var(--line);
+  margin-top:22px;
+}
+.summary-cell{
+  padding:14px 12px;
+  text-align:center;
+  border-right:1px solid var(--line);
+}
+.summary-cell:last-child{border-right:none}
+.summary-cell .k{
+  font-size:10px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.summary-cell .v{
+  font-size:18px;
+  font-weight:800;
+  color:var(--text);
+  font-variant-numeric:tabular-nums;
+}
+.summary-cell .v.pass{color:var(--green)}
+.summary-cell .v.fail{color:var(--red)}
+
+/* Remarks */
+.remarks-block{
+  margin-top:20px;
+  padding:12px 14px;
+  border-left:3px solid var(--navy);
+  background:#f8fafc;
+  font-size:13px;
+  line-height:1.55;
+}
+.remarks-block .k{
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+.remarks-block .v{
+  color:var(--text);
+  font-style:italic;
+}
+
+/* Signatures */
+.signatures{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+  margin-top:50px;
+  padding-top:12px;
+}
+.sig{
+  text-align:center;
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+  color:var(--muted);
+  border-top:1px solid var(--text);
+  padding-top:6px;
+}
+
+/* Doc footer */
+.doc-footer{
+  margin-top:30px;
+  padding-top:12px;
+  border-top:1px solid var(--line-light);
+  font-size:11px;
+  color:var(--muted);
+  text-align:center;
+  line-height:1.6;
+}
+.doc-footer strong{color:var(--text)}
+
+/* Actions */
+.actions{
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+  margin-top:16px;
+}
+
+/* Loading */
+.loading{
+  text-align:center;
+  padding:60px 20px;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:600;
+}
+.spinner{
+  width:28px;height:28px;
+  border:3px solid var(--line);
+  border-top-color:var(--navy);
+  border-radius:50%;
+  animation:spin .9s linear infinite;
+  margin:0 auto 14px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ================= PRINT ================= */
+@media print {
+  @page { size: A4 portrait; margin: 12mm; }
+  html, body { background: #fff !important; padding: 0 !important; }
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+    padding: 0;
+  }
+  .no-print { display: none !important; }
+  .document {
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+  .doc-banner { background: #1e3a8a !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .marks-table thead th { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .marks-table tbody tr:nth-child(even) { background: #fafbfc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .marks-table tfoot td { background: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .summary-strip { background: #fff !important; }
+  .remarks-block { background: #f8fafc !important; }
+  .actions { display: none !important; }
+  .search-panel { display: none !important; }
+  .school-header { display: none !important; }
+  .print-header { display: block !important; }
+}
+
+/* Print-only duplicate header inside document */
+.print-header{
+  display: none;
+  text-align: center;
+  padding-bottom: 14px;
+  border-bottom: 2px solid #1e3a8a;
+  margin-bottom: 16px;
+}
+.print-header h1{
+  font-family: 'Libre Baskerville', serif;
+  font-size: 20px;
+  color: #1e3a8a;
+  font-weight: 700;
+  letter-spacing: .4px;
+}
+.print-header .sub{ font-size: 12px; font-weight: 600; margin-top: 3px; }
+.print-header .meta{ font-size: 10px; color: #64748b; margin-top: 3px; text-transform: uppercase; letter-spacing: .4px; }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 720px){
+  .school-header{flex-direction:column;text-align:center;gap:14px;padding:18px}
+  .school-header h1{font-size:17px}
+  .form-grid{grid-template-columns:1fr}
+  .student-info{grid-template-columns:1fr;gap:0}
+  .summary-strip{grid-template-columns:repeat(2,1fr)}
+  .summary-cell:nth-child(2){border-right:none}
+  .summary-cell:nth-child(1), .summary-cell:nth-child(2){border-bottom:1px solid var(--line)}
+  .signatures{grid-template-columns:1fr;gap:40px;margin-top:36px}
+  .doc-body{padding:18px 16px 22px}
+  .marks-table thead th, .marks-table tbody td{padding:9px 8px;font-size:12.5px}
+  .actions{flex-direction:column}
+  .btn{width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ============== SCHOOL HEADER ============== -->
+  <header class="school-header">
+    <div class="logo">
+      <img src="logomodern.png" alt="School Logo"
+           onerror="this.outerHTML='<div class=&quot;fallback&quot;>S</div>'">
+    </div>
+    <div class="info">
+      <h1>SWAMI VIVEKANAND GOVT. MODEL SCHOOL</h1>
+      <div class="sub">BHIM, RAJSAMAND — RAJASTHAN</div>
+      <div class="meta">Affiliated to CBSE &nbsp;|&nbsp; Student Result Portal</div>
+    </div>
+  </header>
+
+  <!-- ============== SEARCH PANEL ============== -->
+  <div class="search-panel no-print">
+    <h2>Result Lookup</h2>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Class</label>
+        <select id="f-cls">
+          <option value="">Select Class</option>
+          <option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option>
+          <option>VI</option><option>VII</option><option>VIII</option>
+          <option>IX</option><option>X</option><option>XI</option><option>XII</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Section</label>
+        <select id="f-sec">
+          <option value="">Select Section</option>
+          <option>A</option><option>B</option><option>C</option><option>D</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Exam Type</label>
+        <select id="f-exam">
+          <option value="">Select Exam</option>
+          <option value="PT1">Periodic Test 1</option>
+          <option value="PT2">Periodic Test 2</option>
+          <option value="Half-Yearly">Half Yearly</option>
+          <option value="Annual">Annual Examination</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Roll Number</label>
+        <input type="text" id="f-roll" placeholder="e.g. 1" inputmode="numeric" autocomplete="off">
+      </div>
+      <div class="field" style="grid-column: span 2;">
+        <label>Date of Birth</label>
+        <input type="date" id="f-dob">
+      </div>
+    </div>
+
+    <button class="btn" id="btn-search" type="button">View Result</button>
+    <div class="error" id="err"></div>
+  </div>
+
+  <!-- ============== RESULT ============== -->
+  <div class="result-section" id="resultSection">
+    <div class="print-area" id="printArea"></div>
+    <div class="actions no-print">
+      <button class="btn btn-outline" onclick="resetLookup()">New Search</button>
+      <button class="btn" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+const FIREBASE_PROJECT_ID = "svgms-backend";
+const FIREBASE_API_KEY    = "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA";
+// ══════════════════════════════════════════════════════════
+
+const CURRENT_SESSION = '2026-27';
+
+const EXAM_LABELS = {
+  'PT1': 'Periodic Test 1',
+  'PT2': 'Periodic Test 2',
+  'Half-Yearly': 'Half Yearly Examination',
+  'Annual': 'Annual Examination'
+};
+
+const SCHOOL = {
+  name: 'SWAMI VIVEKANAND GOVT. MODEL SCHOOL',
+  address: 'BHIM, RAJSAMAND — RAJASTHAN',
+  affiliation: 'Affiliated to CBSE'
+};
+
+// ---- Grade helper (mirrors script.js) ----
+function calculateGrade(pct, cls){
+  const scales = {
+    'I':   [[90,'A*'],[75,'A'],[56,'B'],[35,'C'],[0,'D']],
+    'II':  [[90,'A*'],[75,'A'],[56,'B'],[35,'C'],[0,'D']],
+    'III': [[90,'A'],[75,'B'],[56,'C'],[35,'D'],[0,'E']],
+    'IV':  [[90,'A'],[75,'B'],[56,'C'],[35,'D'],[0,'E']],
+    'V':   [[90,'A'],[75,'B'],[56,'C'],[35,'D'],[0,'E']],
+    'VI':  [[91,'A1'],[81,'A2'],[71,'B1'],[61,'B2'],[51,'C1'],[41,'C2'],[33,'D'],[0,'E']],
+    'VII': [[91,'A1'],[81,'A2'],[71,'B1'],[61,'B2'],[51,'C1'],[41,'C2'],[33,'D'],[0,'E']],
+    'VIII':[[91,'A1'],[81,'A2'],[71,'B1'],[61,'B2'],[51,'C1'],[41,'C2'],[33,'D'],[0,'E']],
+    'IX':  [[91,'A1'],[81,'A2'],[71,'B1'],[61,'B2'],[51,'C1'],[41,'C2'],[33,'D'],[0,'E']],
+    'X':   [[91,'A1'],[81,'A2'],[71,'B1'],[61,'B2'],[51,'C1'],[41,'C2'],[33,'D'],[0,'E']],
+    'XI':  [[85,'A'],[70,'B'],[55,'C'],[40,'D'],[33,'E'],[0,'F']],
+    'XII': [[85,'A'],[70,'B'],[55,'C'],[40,'D'],[33,'E'],[0,'F']]
+  };
+  const scale = scales[cls] || scales['IX'];
+  for (const [from, g] of scale) if (pct >= from) return g;
+  return 'E';
+}
+
+// ---- Crypto ----
+async function sha256Hex(str){
+  const buf = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function normalizeDob(dob){
+  if (!dob) return '';
+  const parts = String(dob).split(/[-\/]/).map(p => p.trim());
+  if (parts.length !== 3) return String(dob).trim().toUpperCase();
+  let y, m, d;
+  if (parts[0].length === 4) { y = parts[0]; m = parts[1]; d = parts[2]; }
+  else { d = parts[0]; m = parts[1]; y = parts[2]; }
+  return `${y.padStart(4,'0')}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+}
+function formatDob(dob){
+  if (!dob) return '—';
+  const parts = String(dob).split('-');
+  if (parts.length === 3 && parts[0].length === 4) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  return dob;
+}
+
+// ---- Firestore REST decoder ----
+function decodeValue(v){
+  if (!v) return null;
+  if ('stringValue'    in v) return v.stringValue;
+  if ('integerValue'   in v) return parseInt(v.integerValue, 10);
+  if ('doubleValue'    in v) return parseFloat(v.doubleValue);
+  if ('booleanValue'   in v) return v.booleanValue;
+  if ('nullValue'      in v) return null;
+  if ('timestampValue' in v) return v.timestampValue;
+  if ('arrayValue'     in v) return (v.arrayValue.values || []).map(decodeValue);
+  if ('mapValue'       in v){
+    const out = {};
+    const fields = v.mapValue.fields || {};
+    for (const k in fields) out[k] = decodeValue(fields[k]);
+    return out;
+  }
+  return null;
+}
+function decodeDoc(doc){
+  const out = {};
+  const fields = doc.fields || {};
+  for (const k in fields) out[k] = decodeValue(fields[k]);
+  return out;
+}
+
+// ---- Per-subject computation ----
+function computeSubject(raw, cls, meta){
+  raw = raw || {}; meta = meta || {};
+  let obtained = 0, max = 0, theory = 0, practical = 0;
+  let hasTheoryPractical = false;
+
+  if (raw.obtained != null && raw.obtained !== ''){
+    obtained  = parseFloat(raw.obtained) || 0;
+    max       = parseFloat(raw.max) || 0;
+    theory    = parseFloat(raw.theory) || 0;
+    practical = parseFloat(raw.practical) || 0;
+    hasTheoryPractical = !!meta.hasPractical && (raw.theory != null || raw.practical != null);
+  } else if (raw.achieved != null && raw.achieved !== ''){
+    obtained = parseFloat(raw.achieved) || 0;
+    max      = parseFloat(raw.maxMarks) || 0;
+  } else if (raw.marks != null && raw.marks !== ''){
+    obtained = parseFloat(raw.marks) || 0;
+    max      = parseFloat(meta.totalMax) || 0;
+  }
+
+  const pct = max > 0 ? (obtained / max) * 100 : 0;
+  return {
+    obtained, max, theory, practical, hasTheoryPractical,
+    pct,
+    grade: pct > 0 ? calculateGrade(pct, cls) : '—'
+  };
+}
+
+// ---- Lookup ----
+async function doLookup(){
+  const cls  = document.getElementById('f-cls').value;
+  const sec  = document.getElementById('f-sec').value;
+  const exam = document.getElementById('f-exam').value;
+  const roll = document.getElementById('f-roll').value.trim();
+  const dob  = document.getElementById('f-dob').value;
+  const err  = document.getElementById('err');
+  const resultSection = document.getElementById('resultSection');
+  const printArea = document.getElementById('printArea');
+  const btn = document.getElementById('btn-search');
+
+  err.classList.remove('show');
+  resultSection.classList.remove('show');
+  printArea.innerHTML = '<div class="loading"><div class="spinner"></div>Fetching result...</div>';
+  resultSection.classList.add('show');
+
+  if (!cls || !sec || !exam || !roll || !dob){
+    printArea.innerHTML = '';
+    resultSection.classList.remove('show');
+    err.textContent = 'Please fill all fields including Exam Type.';
+    err.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Searching...';
+
+  try {
+    const dobHash = await sha256Hex(normalizeDob(dob));
+    const docId = `${CURRENT_SESSION}_${cls}_${sec}_${roll}_${exam}_${dobHash.slice(0,10)}`;
+    const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/results/${docId}?key=${FIREBASE_API_KEY}`;
+
+    const res = await fetch(url);
+    if (res.status === 404){
+      printArea.innerHTML = '';
+      resultSection.classList.remove('show');
+      err.textContent = `No result found for ${EXAM_LABELS[exam] || exam}. Please verify Class, Section, Exam Type, Roll Number, and Date of Birth.`;
+      err.classList.add('show');
+    } else if (!res.ok){
+      const text = await res.text();
+      printArea.innerHTML = '';
+      resultSection.classList.remove('show');
+      err.textContent = `Server returned ${res.status}. ${text}`;
+      err.classList.add('show');
+    } else {
+      const doc = await res.json();
+      const stu = decodeDoc(doc);
+      renderResult(stu, exam);
+    }
+  } catch(e){
+    console.error(e);
+    printArea.innerHTML = '';
+    resultSection.classList.remove('show');
+    err.textContent = 'Search failed: ' + e.message;
+    err.classList.add('show');
+  }
+  btn.disabled = false;
+  btn.textContent = 'View Result';
+}
+
+// ---- Render ----
+function renderResult(stu, examType){
+  const printArea = document.getElementById('printArea');
+  const cls = stu.class;
+  const meta = stu.subjectMeta || {};
+  const subjects = stu.subjects || [];
+  const sectionKey = stu.section || sec;
+const entry = (stu.entries && stu.entries[sectionKey]) || {};
+  const subjectData = entry.subjects || {};
+  const remarks = entry.remarks || stu.remarks || '';
+
+  const rows = subjects.map(s => {
+    const r = computeSubject(subjectData[s], cls, meta[s]);
+    return { subject: s, ...r };
+  });
+
+  const valid = rows.filter(r => r.max > 0);
+  const totalObtained = valid.reduce((sum, r) => sum + r.obtained, 0);
+  const totalMax      = valid.reduce((sum, r) => sum + r.max, 0);
+  const overallPct    = totalMax > 0 ? Math.round((totalObtained / totalMax) * 10000) / 100 : 0;
+  const overallGrade  = overallPct > 0 ? calculateGrade(overallPct, cls) : '—';
+  const passed        = overallPct >= 33;
+
+  const session = stu.session || CURRENT_SESSION;
+  const dobDisplay = formatDob(stu.dob);
+  const examLabel = EXAM_LABELS[examType] || examType;
+
+  const rowsHTML = rows.map((r, i) => {
+    const gc = 'g-' + String(r.grade).replace('*', '');
+    return `
+      <tr>
+        <td class="num" style="width:40px">${i + 1}</td>
+        <td class="subject">${r.subject}</td>
+        <td class="num">${r.max || '—'}</td>
+        <td class="num">${r.obtained}</td>
+        <td class="num">${r.max > 0 ? r.pct.toFixed(1) + '%' : '—'}</td>
+        <td class="grade ${gc}">${r.grade}</td>
+      </tr>
+    `;
+  }).join('');
+
+  printArea.innerHTML = `
+    <div class="document" id="resultDoc">
+
+      <div class="doc-banner">
+        <div class="line1">Statement of Marks</div>
+        <div class="line2">${examLabel}</div>
+      </div>
+
+      <div class="doc-body">
+
+        <!-- Print-only school header -->
+        <div class="print-header">
+          <h1>${SCHOOL.name}</h1>
+          <div class="sub">${SCHOOL.address}</div>
+          <div class="meta">${SCHOOL.affiliation}</div>
+        </div>
+
+        <div class="doc-subhead">
+          <div class="left">Session ${session}</div>
+          <div class="right">Issued: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+        </div>
+
+        <div class="student-info">
+          <div class="info-row"><span class="label">Name</span><span class="value">${stu.name || '—'}</span></div>
+          <div class="info-row"><span class="label">Roll No</span><span class="value">${stu.rollNo || '—'}</span></div>
+          <div class="info-row"><span class="label">Father's Name</span><span class="value">${stu.fatherName || '—'}</span></div>
+          <div class="info-row"><span class="label">Class</span><span class="value">${stu.class || '—'}${stu.section ? '-' + stu.section : ''}</span></div>
+          <div class="info-row"><span class="label">Mother's Name</span><span class="value">${stu.motherName || '—'}</span></div>
+          <div class="info-row"><span class="label">Date of Birth</span><span class="value">${dobDisplay}</span></div>
+          <div class="info-row"><span class="label">Admission No</span><span class="value">${stu.admissionNo || '—'}</span></div>
+          <div class="info-row"><span class="label">Exam</span><span class="value">${examLabel}</span></div>
+        </div>
+
+        <table class="marks-table">
+          <thead>
+            <tr>
+              <th class="num" style="width:40px">#</th>
+              <th>Subject</th>
+              <th class="num" style="width:90px">Max Marks</th>
+              <th class="num" style="width:110px">Marks Obtained</th>
+              <th class="num" style="width:90px">Percentage</th>
+              <th style="width:70px;text-align:center">Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHTML || '<tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">No subject data available.</td></tr>'}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2">TOTAL</td>
+              <td class="num">${totalMax}</td>
+              <td class="num">${totalObtained}</td>
+              <td class="num">${overallPct.toFixed(2)}%</td>
+              <td class="grade g-${String(overallGrade).replace('*','')}">${overallGrade}</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="summary-strip">
+          <div class="summary-cell">
+            <div class="k">Total Marks</div>
+            <div class="v">${totalObtained} / ${totalMax}</div>
+          </div>
+          <div class="summary-cell">
+            <div class="k">Percentage</div>
+            <div class="v">${overallPct.toFixed(2)}%</div>
+          </div>
+          <div class="summary-cell">
+            <div class="k">Overall Grade</div>
+            <div class="v">${overallGrade}</div>
+          </div>
+          <div class="summary-cell">
+            <div class="k">Result</div>
+            <div class="v ${passed ? 'pass' : 'fail'}">${passed ? 'PASS' : 'FAIL'}</div>
+          </div>
+        </div>
+
+        ${remarks ? `
+          <div class="remarks-block">
+            <div class="k">Remarks</div>
+            <div class="v">${remarks}</div>
+          </div>
+        ` : ''}
+
+        <div class="signatures">
+          <div class="sig">Class Teacher</div>
+          <div class="sig">Exam In-charge</div>
+          <div class="sig">Principal</div>
+        </div>
+
+        <div class="doc-footer">
+          This is a computer-generated statement of marks issued by <strong>${SCHOOL.name}</strong>.<br>
+          In case of any discrepancy, contact the school office within 7 days of publication.
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  document.getElementById('resultSection').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetLookup(){
+  document.getElementById('resultSection').classList.remove('show');
+  document.getElementById('printArea').innerHTML = '';
+  document.getElementById('f-roll').value = '';
+  document.getElementById('f-dob').value = '';
+  document.getElementById('err').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('btn-search').addEventListener('click', doLookup);
+document.getElementById('f-dob').addEventListener('keydown', e => { if (e.key === 'Enter') doLookup(); });
+document.getElementById('f-roll').addEventListener('keydown', e => { if (e.key === 'Enter') doLookup(); });
+</script>
+</body>
+</html>

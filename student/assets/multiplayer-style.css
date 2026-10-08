@@ -1,0 +1,500 @@
+/* ============================================================
+   MULTIPLAYER-STYLE.CSS - Matches Student Zone Theme
+   ============================================================ */
+
+/* ===== MULTIPLAYER CONTAINER ===== */
+.multiplayer-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+    z-index: 1;
+}
+
+.multiplayer-container h2 {
+    color: #fff;
+    font-weight: 400;
+    letter-spacing: 1px;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.multiplayer-container p {
+    color: rgba(255,255,255,0.6);
+    font-size: 1rem;
+}
+
+/* ===== TABS ===== */
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+    border-bottom: 2px solid rgba(255,255,255,0.06);
+    padding-bottom: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 0.6rem 1.8rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: -0.8rem;
+}
+
+.tab-btn:hover {
+    color: rgba(255,255,255,0.8);
+}
+
+.tab-btn.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+}
+
+.tab-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* ===== TAB CONTENT ===== */
+.tab-content {
+    display: none;
+    padding: 1.5rem 0;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ===== FORM SECTIONS ===== */
+.form-section {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.form-section:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.1);
+}
+
+.form-section h4 {
+    color: #fff;
+    font-weight: 400;
+    margin: 0 0 1.2rem 0;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
+
+/* ===== FORM ROW ===== */
+.form-row {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.form-group label {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 20px rgba(102,126,234,0.05);
+}
+
+.form-group input::placeholder {
+    color: rgba(255,255,255,0.25);
+}
+
+.form-group select option {
+    background: #1a1a3e;
+    color: #fff;
+}
+
+/* ===== CHECKBOX ===== */
+.form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+    padding-top: 0.8rem;
+}
+
+.form-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #667eea;
+    cursor: pointer;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(102,126,234,0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary.btn-block {
+    width: 100%;
+}
+
+.btn-success {
+    background: rgba(76,175,80,0.2);
+    color: #66bb6a;
+    border: 1px solid rgba(76,175,80,0.2);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.btn-success:hover {
+    background: rgba(76,175,80,0.3);
+    transform: scale(1.05);
+}
+
+.btn-danger {
+    background: rgba(244,67,54,0.2);
+    color: #ef5350;
+    border: 1px solid rgba(244,67,54,0.2);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.btn-danger:hover {
+    background: rgba(244,67,54,0.3);
+    transform: scale(1.05);
+}
+
+.btn-warning {
+    background: rgba(255,152,0,0.2);
+    color: #ffa726;
+    border: 1px solid rgba(255,152,0,0.2);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.btn-warning:hover {
+    background: rgba(255,152,0,0.3);
+    transform: scale(1.05);
+}
+
+.btn-sm {
+    padding: 0.25rem 0.8rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+/* ===== CHALLENGE CARDS ===== */
+.challenge-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.challenge-card:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.12);
+}
+
+.challenge-card .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.challenge-card .title {
+    color: #fff;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.challenge-card .meta {
+    color: rgba(255,255,255,0.4);
+    font-size: 0.8rem;
+}
+
+.challenge-card .actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* ===== STATUS BADGES ===== */
+.status {
+    padding: 0.15rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-waiting {
+    background: rgba(255,152,0,0.15);
+    color: #ffa726;
+    border: 1px solid rgba(255,152,0,0.1);
+}
+
+.status-active {
+    background: rgba(76,175,80,0.15);
+    color: #66bb6a;
+    border: 1px solid rgba(76,175,80,0.1);
+}
+
+.status-completed {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.status-rejected {
+    background: rgba(244,67,54,0.15);
+    color: #ef5350;
+    border: 1px solid rgba(244,67,54,0.1);
+}
+
+/* ===== CHALLENGE ID DISPLAY ===== */
+.challenge-id-display {
+    background: rgba(102,126,234,0.08);
+    border: 1px solid rgba(102,126,234,0.15);
+    border-radius: 8px;
+    padding: 0.4rem 1rem;
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #667eea;
+    font-weight: 500;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    font-family: monospace;
+}
+
+/* ===== COPY BUTTON ===== */
+.copy-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.4);
+    padding: 0.15rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.65rem;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.8);
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: rgba(255,255,255,0.25);
+}
+
+.empty-state .icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.8rem;
+    opacity: 0.5;
+}
+
+/* ===== CREATED CHALLENGE BOX ===== */
+.created-challenge-box {
+    background: rgba(76,175,80,0.06);
+    border: 1px solid rgba(76,175,80,0.12);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.created-challenge-box .icon {
+    font-size: 2.5rem;
+}
+
+.created-challenge-box .message {
+    color: rgba(255,255,255,0.6);
+    margin: 0.5rem 0;
+}
+
+/* ===== OPEN CHALLENGES SECTION ===== */
+.open-challenges-section {
+    margin-top: 2rem;
+}
+
+.open-challenges-section h4 {
+    color: rgba(255,255,255,0.4);
+    font-weight: 400;
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== TOAST NOTIFICATIONS ===== */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 14px 24px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+    z-index: 9999;
+    animation: toastSlideIn 0.5s ease;
+    max-width: 350px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    font-weight: 500;
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #43a047, #2e7d32);
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #e53935, #b71c1c);
+}
+
+.toast.info {
+    background: linear-gradient(135deg, #1e88e5, #0d47a1);
+}
+
+.toast.warning {
+    background: linear-gradient(135deg, #ff6f00, #e65100);
+}
+
+.toast.hide {
+    animation: toastSlideOut 0.5s ease forwards;
+}
+
+@keyframes toastSlideIn {
+    from { transform: translateX(100px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes toastSlideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100px); opacity: 0; }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 600px) {
+    .multiplayer-container {
+        padding: 1rem;
+        margin: 1rem;
+    }
+
+    .tabs {
+        gap: 0.3rem;
+    }
+
+    .tab-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .form-group {
+        min-width: 100%;
+    }
+
+    .form-section {
+        padding: 1rem;
+    }
+
+    .challenge-card {
+        padding: 1rem;
+    }
+
+    .challenge-card .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .toast {
+        bottom: 15px;
+        right: 15px;
+        left: 15px;
+        max-width: unset;
+        font-size: 0.85rem;
+        padding: 12px 18px;
+    }
+}

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Log - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imgs/logo1.png" type="image/png" />
+
+    <style>
+        .admin-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .admin-header .links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .admin-header .links a:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        /* ===== STATS ===== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-box .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-box .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== FILTERS ===== */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            align-items: center;
+        }
+
+        .filters input,
+        .filters select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: var(--bg-light);
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .filters .search-input {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filters .filter-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filters .filter-btn:hover {
+            background: var(--primary-light);
+        }
+
+        .filters .clear-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filters .clear-btn:hover {
+            background: #5a6268;
+        }
+
+        /* ===== ACTIVITY LIST ===== */
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--white);
+            border-radius: 8px;
+            margin-bottom: 0.6rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border-left: 4px solid var(--accent);
+            transition: var(--transition);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .activity-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .activity-item .info {
+            flex: 1;
+        }
+
+        .activity-item .info .student {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .activity-item .info .class {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-left: 0.3rem;
+        }
+
+        .activity-item .info .activity {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            margin-top: 0.1rem;
+        }
+
+        .activity-item .info .details {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.1rem;
+        }
+
+        .activity-item .info .time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .activity-item .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .activity-item .badge.quiz {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .activity-item .badge.pictionary {
+            background: #fce4ec;
+            color: #c62828;
+        }
+
+        .activity-item .badge.login {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .activity-item .badge.logout {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .activity-item .badge.achievement {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+
+        .activity-item .badge.streak {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        .activity-item .badge.profile {
+            background: #e0f7fa;
+            color: #00838f;
+        }
+
+        .no-activities {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .no-activities .icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.3rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            padding: 0.3rem 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: var(--white);
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .pagination button:hover {
+            background: var(--bg-light);
+        }
+
+        .pagination button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .admin-wrapper {
+                padding: 1rem;
+            }
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .filters {
+                flex-direction: column;
+            }
+            .filters .search-input {
+                min-width: auto;
+                width: 100%;
+            }
+            .activity-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <header class="admin-header">
+            <h1>📊 Activity Log</h1>
+            <div class="links">
+                <a href="admin.html">← Dashboard</a>
+                <a href="index.html">Website</a>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- ===== STATS ===== -->
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="number" id="totalActivities">0</div>
+                <div class="label">📊 Total Activities</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" id="todayActivities">0</div>
+                <div class="label">📅 Today</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" id="quizCount">0</div>
+                <div class="label">🧠 Quizzes</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" id="pictionaryCount">0</div>
+                <div class="label">🎨 Pictionary</div>
+            </div>
+        </div>
+
+        <!-- ===== FILTERS ===== -->
+        <div class="filters">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search by name, class, email...">
+            
+            <select id="typeFilter">
+                <option value="all">All Activities</option>
+                <option value="quiz">🧠 Quiz</option>
+                <option value="pictionary">🎨 Pictionary</option>
+                <option value="login">🔐 Login</option>
+                <option value="logout">🚪 Logout</option>
+                <option value="achievement">⭐ Achievement</option>
+                <option value="streak">🔥 Streak</option>
+                <option value="profile">👤 Profile</option>
+            </select>
+
+            <input type="date" id="dateFrom">
+            <span style="color:var(--text-muted); font-size:0.9rem;">to</span>
+            <input type="date" id="dateTo">
+
+            <button class="filter-btn" onclick="applyFilters()">Apply</button>
+            <button class="clear-btn" onclick="clearFilters()">Clear</button>
+        </div>
+
+        <!-- ===== FILTER MESSAGE ===== -->
+        <div id="filterMessage"></div>
+
+        <!-- ===== ACTIVITY LIST ===== -->
+        <div id="activityList">
+            <div class="no-activities">
+                <span class="icon">📭</span>
+                <p>Loading activities...</p>
+            </div>
+        </div>
+
+        <!-- ===== PAGINATION ===== -->
+        <div class="pagination" id="pagination"></div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+
+        // ===== CHECK FOR STUDENT FILTER =====
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentFilter = urlParams.get('student');
+
+            if (studentFilter) {
+                // Auto-filter by student ID
+                document.getElementById('searchInput').value = studentFilter;
+            }
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ===== DOM REFS =====
+        const activityList = document.getElementById('activityList');
+        const pagination = document.getElementById('pagination');
+
+        let allActivities = [];
+        let filteredActivities = [];
+        let currentPage = 1;
+        const perPage = 20;
+
+        // ===== CHECK ADMIN =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'admin.html';
+                return;
+            }
+            loadActivities();
+        });
+
+        // ============================================================
+        // LOAD ACTIVITIES
+        // ============================================================
+        async function loadActivities() {
+            activityList.innerHTML = '<div class="no-activities"><span class="icon">📭</span><p>Loading activities...</p></div>';
+
+            try {
+                const snapshot = await db.collection('student_activities')
+                    .orderBy('timestamp', 'desc')
+                    .limit(100)
+                    .get();
+
+                allActivities = [];
+                snapshot.forEach(doc => {
+                    allActivities.push({ id: doc.id, ...doc.data() });
+                });
+
+                updateStats();
+                applyFilters();
+
+            } catch (error) {
+                console.error('Error loading activities:', error);
+                activityList.innerHTML = '<div class="no-activities"><span class="icon">❌</span><p>Error loading activities</p></div>';
+            }
+        }
+
+        // ============================================================
+        // UPDATE STATS
+        // ============================================================
+        function updateStats() {
+            const total = allActivities.length;
+            const today = allActivities.filter(a => {
+                const date = a.timestamp ? new Date(a.timestamp) : new Date();
+                return date.toDateString() === new Date().toDateString();
+            }).length;
+
+            const quizCount = allActivities.filter(a => a.activityType === 'quiz').length;
+            const pictionaryCount = allActivities.filter(a => a.activityType === 'pictionary').length;
+
+            document.getElementById('totalActivities').textContent = total;
+            document.getElementById('todayActivities').textContent = today;
+            document.getElementById('quizCount').textContent = quizCount;
+            document.getElementById('pictionaryCount').textContent = pictionaryCount;
+        }
+
+        // ============================================================
+        // APPLY FILTERS
+        // ============================================================
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase().trim();
+            const type = document.getElementById('typeFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+
+            filteredActivities = allActivities.filter(a => {
+                // Search
+                if (search) {
+                    const name = (a.studentName || '').toLowerCase();
+                    const email = (a.email || '').toLowerCase();
+                    const classVal = (a.class || '').toLowerCase();
+                    if (!name.includes(search) && !email.includes(search) && !classVal.includes(search)) {
+                        return false;
+                    }
+                }
+
+                // Type
+                if (type !== 'all' && a.activityType !== type) {
+                    return false;
+                }
+
+                // Date range
+                if (dateFrom) {
+                    const d = new Date(a.timestamp);
+                    if (d < new Date(dateFrom)) return false;
+                }
+                if (dateTo) {
+                    const d = new Date(a.timestamp);
+                    const endDate = new Date(dateTo);
+                    endDate.setHours(23, 59, 59);
+                    if (d > endDate) return false;
+                }
+
+                return true;
+            });
+
+            currentPage = 1;
+            renderActivities();
+        }
+
+        // ============================================================
+        // CLEAR FILTERS
+        // ============================================================
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = 'all';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            applyFilters();
+        }
+
+        // ============================================================
+        // RENDER ACTIVITIES
+        // ============================================================
+        function renderActivities() {
+            const total = filteredActivities.length;
+
+            if (total === 0) {
+                activityList.innerHTML = `
+                    <div class="no-activities">
+                        <span class="icon">📭</span>
+                        <p>No activities found. Students haven't started exploring yet!</p>
+                    </div>
+                `;
+                pagination.innerHTML = '';
+                return;
+            }
+
+            const start = (currentPage - 1) * perPage;
+            const end = Math.min(start + perPage, total);
+            const pageItems = filteredActivities.slice(start, end);
+
+            let html = '';
+            pageItems.forEach(item => {
+                const date = item.timestamp ? new Date(item.timestamp) : new Date();
+                const formattedDate = date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                const formattedTime = date.toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                let detailsHtml = '';
+                let badgeClass = '';
+
+                if (item.activityType === 'quiz') {
+                    badgeClass = 'quiz';
+                    detailsHtml = `📊 ${item.details?.score || 0}/${item.details?.total || 5} (${item.details?.pointsEarned || 0} pts) ⏱️ ${item.details?.timeTaken || 0}s`;
+                } else if (item.activityType === 'pictionary') {
+                    badgeClass = 'pictionary';
+                    detailsHtml = `🎯 ${item.details?.wordsGuessed || 0} words (${item.details?.pointsEarned || 0} pts)`;
+                } else if (item.activityType === 'login') {
+                    badgeClass = 'login';
+                    detailsHtml = `🌐 ${item.details?.ip || 'Unknown IP'}`;
+                } else if (item.activityType === 'logout') {
+                    badgeClass = 'logout';
+                    detailsHtml = '👋 Logged out';
+                } else if (item.activityType === 'achievement') {
+                    badgeClass = 'achievement';
+                    detailsHtml = `🏅 ${item.details?.badge || 'Achievement'}`;
+                } else if (item.activityType === 'streak') {
+                    badgeClass = 'streak';
+                    detailsHtml = `🔥 ${item.details?.streak || 0} day streak`;
+                } else if (item.activityType === 'profile') {
+                    badgeClass = 'profile';
+                    detailsHtml = `✏️ ${item.details?.field || 'Profile'} updated`;
+                } else {
+                    badgeClass = '';
+                    detailsHtml = item.details ? JSON.stringify(item.details) : '';
+                }
+
+                const activityIcons = {
+                    quiz: '🧠',
+                    pictionary: '🎨',
+                    login: '🔐',
+                    logout: '🚪',
+                    achievement: '⭐',
+                    streak: '🔥',
+                    profile: '👤'
+                };
+                const icon = activityIcons[item.activityType] || '📌';
+
+                html += `
+                    <div class="activity-item">
+                        <div class="info">
+                            <div>
+                                <span class="student">${item.studentName || 'Unknown'}</span>
+                                <span class="class">${item.class || ''}</span>
+                            </div>
+                            <div class="activity">${icon} ${item.activityType.charAt(0).toUpperCase() + item.activityType.slice(1)}</div>
+                            <div class="details">${detailsHtml}</div>
+                            <div class="time">📅 ${formattedDate} ${formattedTime}</div>
+                        </div>
+                        <span class="badge ${badgeClass}">${item.activityType}</span>
+                    </div>
+                `;
+            });
+
+            activityList.innerHTML = html;
+            renderPagination(total);
+        }
+
+        // ============================================================
+        // PAGINATION
+        // ============================================================
+        function renderPagination(total) {
+            const totalPages = Math.ceil(total / perPage);
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            html += `<button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button onclick="goToPage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+            }
+
+            html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            const total = filteredActivities.length;
+            const totalPages = Math.ceil(total / perPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderActivities();
+        }
+
+        // ============================================================
+        // LOG ACTIVITY (Helper Function)
+        // ============================================================
+        window.logActivity = async function(studentId, studentName, className, activityType, details) {
+            try {
+                await db.collection('student_activities').add({
+                    studentId: studentId,
+                    studentName: studentName || 'Unknown',
+                    class: className || '',
+                    activityType: activityType,
+                    details: details || {},
+                    timestamp: new Date().toISOString()
+                });
+                console.log('✅ Activity logged:', activityType, studentName);
+            } catch (error) {
+                console.error('❌ Error logging activity:', error);
+            }
+        };
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'admin.html';
+            });
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Student Zone</title>
+    <link rel="stylesheet" href="assets/student-style.css">
+    <style>
+        /* Add these styles for password strength indicator and spinner */
+        .password-strength {
+            margin-top: 5px;
+            height: 4px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+        
+        .password-strength-text {
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+            min-height: 18px;
+        }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 5px;
+            color: #666;
+        }
+        
+        .password-toggle:hover {
+            color: #333;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .student-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="student-body">
+
+    <div class="student-container">
+        <div id="student-header"></div>
+
+        <div class="student-card">
+            <div class="student-header">
+                <span class="icon">📝</span>
+                <span class="mission-badge">✦ Join the Mission ✦</span>
+                <h1>Create Account</h1>
+                <p class="subtitle">Become an explorer of knowledge</p>
+            </div>
+
+            <div id="message" class="student-message"></div>
+
+            <form id="registerForm" class="student-form" onsubmit="registerUser(event)" novalidate>
+                <label for="fullName">👤 Full Name</label>
+                <input type="text" id="fullName" placeholder="e.g., Rahul Kumar" required autofocus>
+
+                <label for="classSelect">📚 Class</label>
+                <select id="classSelect" required>
+                    <option value="">Select your class</option>
+                    <option value="8-A">8-A</option>
+                    <option value="8-B">8-B</option>
+                    <option value="9-A">9-A</option>
+                    <option value="9-B">9-B</option>
+                    <option value="10-A">10-A</option>
+                    <option value="10-B">10-B</option>
+                    <option value="11-A">11-A</option>
+                    <option value="11-B">11-B</option>
+                    <option value="12-A">12-A</option>
+                    <option value="12-B">12-B</option>
+                </select>
+
+                <label for="rollNo">🔢 Roll Number</label>
+                <input type="number" id="rollNo" placeholder="e.g., 15" min="1" max="50" required>
+
+                <label for="email">📧 Email</label>
+                <input type="email" id="email" placeholder="student@email.com" required>
+
+                <label for="password">🔒 Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Min 6 characters" minlength="6" required>
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')" title="Show/Hide Password">
+                        🙈
+                    </button>
+                </div>
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                </div>
+                <span class="password-strength-text" id="passwordStrengthText"></span>
+
+                <label for="confirmPassword">🔒 Confirm Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirmPassword" placeholder="Re-enter password" required>
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirmPassword')" title="Show/Hide Password">
+                        🙈
+                    </button>
+                </div>
+
+                <button type="submit" class="student-btn" id="registerBtn" disabled>🚀 Register</button>
+            </form>
+
+            <div class="student-links">
+                Already have an account? <a href="login.html">🔐 Login</a>
+                <br>
+                <a href="../index.html" class="student-back">← Back to School</a>
+            </div>
+        </div>
+
+        <div id="student-footer"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com", // ✅ FIXED
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Load header and footer
+        fetch('components/header.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-header').innerHTML = data);
+
+        fetch('components/footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-footer').innerHTML = data);
+
+        // ✅ 3. Password Toggle Function (with monkey emoji)
+        function togglePasswordVisibility(fieldId) {
+            const input = document.getElementById(fieldId);
+            const toggle = input.parentElement.querySelector('.password-toggle');
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                toggle.textContent = '🙈';
+            }
+        }
+
+        // ✅ 7. Password Strength Indicator
+        function checkPasswordStrength(password) {
+            const bar = document.getElementById('passwordStrengthBar');
+            const text = document.getElementById('passwordStrengthText');
+            
+            if (!password) {
+                bar.style.width = '0%';
+                bar.style.background = '#e0e0e0';
+                text.textContent = '';
+                return;
+            }
+
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.length >= 10) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+
+            const levels = [
+                { width: '20%', color: '#ff4444', label: 'Weak' },
+                { width: '40%', color: '#ff8800', label: 'Fair' },
+                { width: '60%', color: '#ffcc00', label: 'Good' },
+                { width: '80%', color: '#44bb44', label: 'Strong' },
+                { width: '100%', color: '#00aa00', label: 'Very Strong' }
+            ];
+
+            const level = levels[Math.min(strength, levels.length - 1)];
+            bar.style.width = level.width;
+            bar.style.background = level.color;
+            text.textContent = `Password Strength: ${level.label}`;
+            text.style.color = level.color;
+        }
+
+        // ✅ 10. Enable/Disable Submit Button Based on Form Validity
+        function validateForm() {
+            const form = document.getElementById('registerForm');
+            const btn = document.getElementById('registerBtn');
+            btn.disabled = !form.checkValidity();
+        }
+
+        // Add event listeners for form validation
+        document.querySelectorAll('#registerForm input, #registerForm select').forEach(element => {
+            element.addEventListener('input', validateForm);
+            element.addEventListener('change', validateForm);
+        });
+
+        // Password strength check on input
+        document.getElementById('password').addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+        });
+
+        // ✅ 12. Trim whitespace from roll number
+        document.getElementById('rollNo').addEventListener('blur', function() {
+            if (this.value) {
+                this.value = this.value.trim();
+            }
+        });
+
+        // ✅ 8. Auto-focus already set in HTML (autofocus attribute)
+
+        // Helper function to show messages
+        function showMessage(text, type, isSpinner = false) {
+            const message = document.getElementById('message');
+            message.className = `student-message ${type}`;
+            if (isSpinner) {
+                message.innerHTML = `<span class="spinner"></span> ${text}`;
+            } else {
+                message.textContent = text;
+            }
+        }
+
+        // ✅ 4. User-friendly error messages
+        const ERROR_MESSAGES = {
+            'auth/email-already-in-use': 'This email is already registered. Please login instead.',
+            'auth/invalid-email': 'Please enter a valid email address (e.g., name@domain.com).',
+            'auth/weak-password': 'Password is too weak. Please use at least 6 characters with letters and numbers.',
+            'auth/too-many-requests': 'Too many registration attempts. Please wait a moment and try again.',
+            'auth/network-request-failed': 'Network connection issue. Please check your internet and try again.',
+            'auth/operation-not-allowed': 'Registration is currently disabled. Please contact support.',
+            'auth/user-disabled': 'This account has been disabled. Please contact support.',
+            'auth/internal-error': 'An internal error occurred. Please try again later.',
+            'auth/invalid-api-key': 'Configuration error. Please contact support.',
+            'auth/app-not-authorized': 'Application not authorized. Please contact support.',
+            'auth/unauthorized-domain': 'This domain is not authorized. Please contact support.'
+        };
+
+        // ✅ 5. Spinner + Loading State
+        function setLoadingState(isLoading) {
+            const btn = document.getElementById('registerBtn');
+            btn.disabled = isLoading;
+            if (isLoading) {
+                btn.innerHTML = '<span class="spinner"></span> Creating Account...';
+                btn.style.opacity = '0.8';
+            } else {
+                btn.textContent = '🚀 Register';
+                btn.style.opacity = '1';
+            }
+        }
+
+       async function registerUser(event) {
+            event.preventDefault();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const classValue = document.getElementById('classSelect').value;
+            const rollNo = parseInt(document.getElementById('rollNo').value);
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const btn = document.getElementById('registerBtn');
+
+            // Validation
+            if (!fullName) {
+                showMessage('❌ Please enter your full name.', 'error');
+                return;
+            }
+            if (!classValue) {
+                showMessage('❌ Please select your class.', 'error');
+                return;
+            }
+            if (!rollNo || rollNo < 1 || rollNo > 50) {
+                showMessage('❌ Please enter a valid roll number (1-50).', 'error');
+                return;
+            }
+            if (password !== confirmPassword) {
+                showMessage('❌ Passwords do not match. Please re-enter.', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                showMessage('❌ Password must be at least 6 characters.', 'error');
+                return;
+            }
+
+            // Show loading with spinner
+            showMessage('🔐 Creating your account...', 'loading', true);
+            setLoadingState(true);
+
+            try {
+                // Step 1: Create auth account
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // 👇 NEW: Send verification email immediately after account creation
+                try {
+                    await user.sendEmailVerification();
+                    console.log('✅ Verification email sent to:', email);
+                } catch (emailError) {
+                    console.error('❌ Failed to send verification email:', emailError);
+                    // Continue with registration even if email fails
+                    // User can request resend later
+                }
+
+                // Step 2: Prepare user data
+                const studentData = {
+                    uid: user.uid,
+                    name: fullName,
+                    class: classValue,
+                    rollNo: rollNo,
+                    email: email,
+                    role: 'student',
+                    totalPoints: 0,
+                    streak: 0,
+                    joinedDate: new Date().toISOString(),
+                    achievements: [],
+                    emailVerified: false, // 👈 Track verification status
+                    verificationSent: true // 👈 Track if email was sent
+                };
+
+                // Step 3: Write to Firestore
+                const docRef = db.collection('students').doc(user.uid);
+                await docRef.set(studentData);
+
+                // Step 4: Verify database write
+                const verifyDoc = await docRef.get();
+                if (verifyDoc.exists) {
+                    // 👇 UPDATED: Show verification instructions instead of redirecting to dashboard
+                    const messageDiv = document.getElementById('message');
+                    messageDiv.className = 'student-message success';
+                    messageDiv.innerHTML = `
+                        <div style="text-align: left; padding: 10px;">
+                            <div style="font-size: 48px; text-align: center; margin-bottom: 15px;">📧</div>
+                            <h2 style="text-align: center; color: #2e7d32; margin-bottom: 10px;">Account Created Successfully!</h2>
+                            <p style="text-align: center; margin-bottom: 15px;">
+                                We've sent a verification email to:<br>
+                                <strong style="font-size: 18px; color: #1a237e;">${email}</strong>
+                            </p>
+                            
+                            <div style="background: #f5f5f5; border-radius: 10px; padding: 15px; margin: 15px 0;">
+                                <h3 style="color: #333; margin-bottom: 10px;">📋 Next Steps:</h3>
+                                <ul style="list-style: none; padding: 0;">
+                                    <li style="margin: 10px 0; padding: 8px; background: white; border-radius: 5px;">
+                                        <span style="font-size: 20px; margin-right: 10px;">1️⃣</span>
+                                        Check your inbox for the verification email
+                                    </li>
+                                    <li style="margin: 10px 0; padding: 8px; background: white; border-radius: 5px;">
+                                        <span style="font-size: 20px; margin-right: 10px;">2️⃣</span>
+                                        Click the verification link in the email
+                                    </li>
+                                    <li style="margin: 10px 0; padding: 8px; background: white; border-radius: 5px;">
+                                        <span style="font-size: 20px; margin-right: 10px;">3️⃣</span>
+                                        Return to login page and sign in
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div style="text-align: center; margin: 15px 0;">
+                                <p style="font-size: 14px; color: #666;">
+                                    💡 Didn't get the email? Check your <strong>Spam/Junk</strong> folder
+                                </p>
+                                <button onclick="resendVerification('${email}')" 
+                                        style="background: #4CAF50; color: white; border: none; 
+                                            padding: 10px 20px; border-radius: 5px; 
+                                            cursor: pointer; font-size: 14px; margin: 5px;">
+                                    🔄 Resend Verification Email
+                                </button>
+                            </div>
+
+                            <div style="text-align: center; margin-top: 15px;">
+                                <button onclick="window.location.href='login.html'" 
+                                        style="background: #1a237e; color: white; border: none; 
+                                            padding: 12px 30px; border-radius: 5px; 
+                                            cursor: pointer; font-size: 16px;">
+                                    🔐 Go to Login
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    // Store email for resend functionality
+                    localStorage.setItem('pendingVerificationEmail', email);
+                    localStorage.setItem('pendingVerificationUid', user.uid);
+
+                    setLoadingState(false);
+                    btn.innerHTML = '✅ Account Created!';
+
+                    // 👇 Auto-redirect to login after 10 seconds (give user time to read)
+                    setTimeout(() => {
+                        window.location.href = 'login.html?verify=pending';
+                    }, 10000);
+
+                } else {
+                    throw new Error('Database verification failed.');
+                }
+
+            } catch (error) {
+                console.error('❌ Registration error:', error);
+
+                // Cleanup: Delete auth account if database failed
+                if (auth.currentUser) {
+                    try {
+                        await auth.currentUser.delete();
+                    } catch (deleteError) {
+                        console.error("Failed to delete incomplete user:", deleteError);
+                    }
+                }
+
+                // Show user-friendly error message
+                let errorMsg = ERROR_MESSAGES[error.code] || error.message;
+                
+                // If it's a database verification error
+                if (error.message.includes('verification')) {
+                    errorMsg = 'Registration partially completed. Please try again.';
+                }
+
+                showMessage(`❌ ${errorMsg}`, 'error');
+                setLoadingState(false);
+            }
+        }
+        // Initial validation
+        validateForm();
+    </script>
+    <script src="particles.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Chat Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3e 50%, #2a1a4e 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            color: #ffffff;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .passcode-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .passcode-overlay.hidden {
+            display: none;
+        }
+
+        .passcode-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .passcode-box .lock-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .passcode-box h2 {
+            color: #fff;
+            font-weight: 400;
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .passcode-box p {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .passcode-box input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 4px;
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: monospace;
+        }
+
+        .passcode-box input:focus {
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .passcode-box input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+
+        .passcode-box .error-msg {
+            color: #ef5350;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            min-height: 20px;
+        }
+
+        .passcode-box .passcode-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .passcode-box .passcode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .passcode-box .passcode-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .passcode-box .hint {
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 0.6rem;
+            margin-top: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #fff;
+        }
+        .header h1 span {
+            color: #667eea;
+        }
+        .header .badge {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
+        .stat-card.purple .number { color: #667eea; }
+        .stat-card.green .number { color: #66bb6a; }
+        .stat-card.orange .number { color: #ffa726; }
+        .stat-card.gold .number { color: #ffd700; }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.6rem 1.8rem;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .tab-btn:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .message-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .message-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .message-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .message-item .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .message-item .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-item .sender {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 120px;
+            flex-shrink: 0;
+        }
+        .message-item .sender .uid {
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.6rem;
+            display: block;
+        }
+
+        .message-item .msg-text {
+            flex: 1;
+            color: rgba(255, 255, 255, 0.85);
+            word-break: break-word;
+            min-width: 100px;
+        }
+
+        .message-item .time {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .message-item .msg-type {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+        .message-item .msg-type.global {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+        }
+        .message-item .msg-type.private {
+            background: rgba(255, 152, 0, 0.15);
+            color: #ffa726;
+        }
+        .message-item .room-id {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.15);
+            flex-shrink: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.2);
+            padding: 3rem 1rem;
+        }
+        .empty-state .icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 0.8rem;
+            opacity: 0.4;
+        }
+
+        .room-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .room-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.3s;
+        }
+        .room-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .room-card .room-id {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.2);
+            font-family: monospace;
+            margin-bottom: 4px;
+        }
+        .room-card .participants {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .room-card .participants strong {
+            color: #fff;
+        }
+        .room-card .last-msg {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 4px;
+            word-break: break-word;
+        }
+        .room-card .msg-count {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.15);
+            margin-top: 4px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .refresh-btn {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .refresh-btn:hover {
+            background: rgba(102, 126, 234, 0.25);
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            .message-item { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .message-item .sender { min-width: unset; }
+            .room-list { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.3rem; }
+            .passcode-box { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Passcode Overlay -->
+    <div class="passcode-overlay" id="passcodeOverlay">
+        <div class="passcode-box">
+            <div class="lock-icon">🔐</div>
+            <h2>Admin Access</h2>
+            <input type="password" id="passcodeInput" placeholder="Enter passcode" maxlength="20" autofocus>
+            <div class="error-msg" id="passcodeError"></div>
+            <button class="passcode-btn" id="passcodeBtn">🔓 Unlock</button>
+            <div class="hint">🔑 Hint: 7 digits</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container" id="mainContent" style="display:none;">
+        <div class="header">
+            <div>
+                <h1>📊 Admin <span>Chat Dashboard</span></h1>
+                <span class="badge">🔒 Developer Access Only</span>
+            </div>
+            <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
+                <button class="refresh-btn" onclick="loadAllData()">🔄 Refresh</button>
+                <button class="back-btn" onclick="window.location.href='dashboard.html'">← Back</button>
+                <button class="back-btn" onclick="lockDashboard()">🔒 Lock</button>
+            </div>
+        </div>
+
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card purple">
+                <div class="number" id="totalGlobal">0</div>
+                <div class="label">🌍 Global Messages</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="number" id="totalPrivate">0</div>
+                <div class="label">🔒 Private Messages</div>
+            </div>
+            <div class="stat-card green">
+                <div class="number" id="totalRooms">0</div>
+                <div class="label">🏠 Private Rooms</div>
+            </div>
+            <div class="stat-card gold">
+                <div class="number" id="totalUsers">0</div>
+                <div class="label">👤 Unique Users</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="global" onclick="switchTab('global')">🌍 Global Chat</button>
+            <button class="tab-btn" data-tab="private" onclick="switchTab('private')">🔒 Private Chats</button>
+            <button class="tab-btn" data-tab="rooms" onclick="switchTab('rooms')">🏠 Chat Rooms</button>
+        </div>
+
+        <div id="tab-global" class="tab-content active">
+            <div class="message-list" id="globalMessages">
+                <div class="empty-state"><span class="icon">💬</span><p>Loading global messages...</p></div>
+            </div>
+        </div>
+
+        <div id="tab-private" class="tab-content">
+            <div class="message-list" id="privateMessages">
+                <div class="empty-state"><span class="icon">🔒</span><p>Loading private messages...</p></div>
+            </div>
+        </div>
+
+        <div id="tab-rooms" class="tab-content">
+            <div class="room-list" id="roomList">
+                <div class="empty-state"><span class="icon">🏠</span><p>Loading chat rooms...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        var auth = firebase.auth();
+        var db = firebase.firestore();
+
+        var PASSCODE = '2309838';
+        var isUnlocked = false;
+
+        // Global variables
+        var globalMessages = [];
+        var privateMessages = [];
+        var chatRooms = [];
+
+        // ============================================================
+        // PASSCODE HANDLERS
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            var input = document.getElementById('passcodeInput');
+            var btn = document.getElementById('passcodeBtn');
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkPasscode();
+                }
+            });
+
+            btn.addEventListener('click', function() {
+                checkPasscode();
+            });
+
+            setTimeout(function() {
+                input.focus();
+            }, 300);
+        });
+
+        function checkPasscode() {
+            var input = document.getElementById('passcodeInput');
+            var error = document.getElementById('passcodeError');
+
+            if (input.value.trim() === PASSCODE) {
+                error.textContent = '';
+                isUnlocked = true;
+                document.getElementById('passcodeOverlay').classList.add('hidden');
+                document.getElementById('mainContent').style.display = 'block';
+                loadAllData();
+                console.log('🔓 Admin access granted');
+            } else {
+                error.textContent = '❌ Incorrect passcode. Try again.';
+                input.value = '';
+                input.focus();
+                input.style.borderColor = '#ef5350';
+                setTimeout(function() { input.style.borderColor = ''; }, 1000);
+            }
+        }
+
+        function lockDashboard() {
+            isUnlocked = false;
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('passcodeOverlay').classList.remove('hidden');
+            document.getElementById('passcodeInput').value = '';
+            document.getElementById('passcodeInput').focus();
+            document.getElementById('passcodeError').textContent = '';
+            console.log('🔒 Dashboard locked');
+        }
+
+        // ============================================================
+        // TAB SWITCHING
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(function(el) {
+                el.classList.toggle('active', el.dataset.tab === tab);
+            });
+            document.querySelectorAll('.tab-content').forEach(function(el) {
+                el.classList.toggle('active', el.id === 'tab-' + tab);
+            });
+        }
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function formatTime(date) {
+            if (!date) return '';
+            var now = new Date();
+            var diff = (now - date) / 1000;
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================================
+        // LOAD ALL DATA
+        // ============================================================
+        function loadAllData() {
+            if (!isUnlocked) return;
+            loadGlobalMessages();
+            loadPrivateMessages();
+            loadChatRooms();
+        }
+
+        // ============================================================
+        // LOAD GLOBAL MESSAGES
+        // ============================================================
+        function loadGlobalMessages() {
+            console.log('📡 Loading global messages...');
+
+            db.collection('chat_messages')
+                .orderBy('timestamp', 'desc')
+                .limit(500)
+                .get()
+                .then(function(snapshot) {
+                    var messages = [];
+                    snapshot.forEach(function(doc) {
+                        var data = doc.data();
+                        messages.push({
+                            id: doc.id,
+                            uid: data.uid || 'unknown',
+                            name: data.name || 'Unknown',
+                            avatar: data.avatar || '',
+                            message: data.message || '',
+                            timestamp: data.timestamp?.toDate?.() || new Date()
+                        });
+                    });
+
+                    globalMessages = messages;
+                    renderGlobalMessages(messages);
+                    updateStats();
+
+                    console.log('✅ Loaded', messages.length, 'global messages');
+                })
+                .catch(function(error) {
+                    console.error('❌ Error loading global messages:', error);
+                    document.getElementById('globalMessages').innerHTML = `
+                        <div class="empty-state"><span class="icon">⚠️</span><p>Error loading messages: ${error.message}</p></div>
+                    `;
+                });
+        }
+
+        function renderGlobalMessages(messages) {
+            var container = document.getElementById('globalMessages');
+
+            if (!messages || messages.length === 0) {
+                container.innerHTML = `<div class="empty-state"><span class="icon">💬</span><p>No global messages yet.</p></div>`;
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < messages.length; i++) {
+                var msg = messages[i];
+                var avatarUrl = msg.avatar || 'https://robohash.org/' + encodeURIComponent(msg.name) + '?set=set1&size=32x32';
+
+                html += `
+                    <div class="message-item">
+                        <div class="avatar"><img src="${avatarUrl}" alt="${msg.name}" loading="lazy"></div>
+                        <div class="sender">
+                            ${escapeHtml(msg.name)}
+                            <span class="uid">${msg.uid}</span>
+                        </div>
+                        <div class="msg-text">${escapeHtml(msg.message)}</div>
+                        <span class="msg-type global">🌍 Global</span>
+                        <span class="time">${formatTime(msg.timestamp)}</span>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // LOAD PRIVATE MESSAGES
+        // ============================================================
+        function loadPrivateMessages() {
+            console.log('📡 Loading private messages...');
+
+            db.collection('chat_private_messages')
+                .limit(500)
+                .get()
+                .then(function(snapshot) {
+                    var messages = [];
+                    snapshot.forEach(function(doc) {
+                        var data = doc.data();
+                        messages.push({
+                            id: doc.id,
+                            roomId: data.roomId || 'unknown',
+                            senderId: data.senderId || 'unknown',
+                            senderName: data.senderName || 'Unknown',
+                            message: data.message || '',
+                            timestamp: data.timestamp?.toDate?.() || new Date()
+                        });
+                    });
+
+                    messages.sort(function(a, b) {
+                        return b.timestamp - a.timestamp;
+                    });
+
+                    privateMessages = messages;
+                    renderPrivateMessages(messages);
+                    updateStats();
+
+                    console.log('✅ Loaded', messages.length, 'private messages');
+                })
+                .catch(function(error) {
+                    console.error('❌ Error loading private messages:', error);
+                    document.getElementById('privateMessages').innerHTML = `
+                        <div class="empty-state"><span class="icon">⚠️</span><p>Error loading private messages: ${error.message}</p></div>
+                    `;
+                });
+        }
+
+        function renderPrivateMessages(messages) {
+            var container = document.getElementById('privateMessages');
+
+            if (!messages || messages.length === 0) {
+                container.innerHTML = `<div class="empty-state"><span class="icon">🔒</span><p>No private messages yet.</p></div>`;
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < messages.length; i++) {
+                var msg = messages[i];
+                var avatarUrl = 'https://robohash.org/' + encodeURIComponent(msg.senderName) + '?set=set1&size=32x32';
+
+                html += `
+                    <div class="message-item">
+                        <div class="avatar"><img src="${avatarUrl}" alt="${msg.senderName}" loading="lazy"></div>
+                        <div class="sender">
+                            ${escapeHtml(msg.senderName)}
+                            <span class="uid">${msg.senderId}</span>
+                        </div>
+                        <div class="msg-text">${escapeHtml(msg.message)}</div>
+                        <span class="msg-type private">🔒 Private</span>
+                        <span class="room-id">🏠 ${msg.roomId}</span>
+                        <span class="time">${formatTime(msg.timestamp)}</span>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // LOAD CHAT ROOMS
+        // ============================================================
+        function loadChatRooms() {
+            console.log('📡 Loading chat rooms...');
+
+            db.collection('chat_rooms')
+                .get()
+                .then(function(snapshot) {
+                    var rooms = [];
+                    snapshot.forEach(function(doc) {
+                        var data = doc.data();
+                        rooms.push({
+                            id: doc.id,
+                            participants: data.participants || [],
+                            participantNames: data.participantNames || {},
+                            lastMessage: data.lastMessage || '',
+                            lastUpdated: data.lastUpdated?.toDate?.() || new Date(),
+                            type: data.type || 'private'
+                        });
+                    });
+
+                    rooms.sort(function(a, b) {
+                        return b.lastUpdated - a.lastUpdated;
+                    });
+
+                    chatRooms = rooms;
+                    renderChatRooms(rooms);
+                    updateStats();
+
+                    console.log('✅ Loaded', rooms.length, 'chat rooms');
+                })
+                .catch(function(error) {
+                    console.error('❌ Error loading chat rooms:', error);
+                    document.getElementById('roomList').innerHTML = `
+                        <div class="empty-state"><span class="icon">⚠️</span><p>Error loading chat rooms: ${error.message}</p></div>
+                    `;
+                });
+        }
+
+        function renderChatRooms(rooms) {
+            var container = document.getElementById('roomList');
+
+            if (!rooms || rooms.length === 0) {
+                container.innerHTML = `<div class="empty-state"><span class="icon">🏠</span><p>No chat rooms yet.</p></div>`;
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < rooms.length; i++) {
+                var room = rooms[i];
+                var participants = room.participants || [];
+                var names = [];
+
+                for (var j = 0; j < participants.length; j++) {
+                    var uid = participants[j];
+                    var name = room.participantNames[uid] || uid.substring(0, 8);
+                    names.push('<strong>' + escapeHtml(name) + '</strong>');
+                }
+
+                html += `
+                    <div class="room-card">
+                        <div class="room-id">🏠 ${room.id}</div>
+                        <div class="participants">👥 ${names.join(' & ')}</div>
+                        <div class="last-msg">💬 ${escapeHtml(room.lastMessage || 'No messages yet')}</div>
+                        <div class="msg-count">📅 ${formatTime(room.lastUpdated)}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // UPDATE STATS - FIXED
+        // ============================================================
+        function updateStats() {
+            var globalCount = globalMessages.length || 0;
+            var privateCount = privateMessages.length || 0;
+            var roomsCount = chatRooms.length || 0;
+
+            document.getElementById('totalGlobal').textContent = globalCount;
+            document.getElementById('totalPrivate').textContent = privateCount;
+            document.getElementById('totalRooms').textContent = roomsCount;
+
+            var users = new Set();
+            globalMessages.forEach(function(msg) {
+                if (msg.uid) users.add(msg.uid);
+            });
+            privateMessages.forEach(function(msg) {
+                if (msg.senderId) users.add(msg.senderId);
+            });
+            document.getElementById('totalUsers').textContent = users.size;
+        }
+
+        // ============================================================
+        // AUTH CHECK
+        // ============================================================
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            console.log('👤 Admin logged in:', user.email);
+
+            document.getElementById('passcodeOverlay').classList.remove('hidden');
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('passcodeInput').focus();
+
+            // Pre-fetch data in background
+            loadAllData();
+        });
+
+        console.log('✅ Admin Chat Dashboard loaded (passcode protected)');
+    </script>
+
+</body>
+</html>

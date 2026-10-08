@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find the Country - Student Zone</title>
+    
+    <!-- Leaflet CSS (for the map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Student Zone Theme -->
+    <link rel="stylesheet" href="../assets/student-style.css">
+    
+    <style>
+        .game-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .game-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+        }
+
+        .game-stats span {
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .question-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .question-box .country-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .question-box .country-name .highlight {
+            color: var(--neon-cyan);
+        }
+
+        .question-box .feedback {
+            font-size: 1rem;
+            color: var(--text-gray);
+        }
+
+        .question-box .feedback.correct {
+            color: #00ff88;
+        }
+
+        .question-box .feedback.wrong {
+            color: #ff2d75;
+        }
+
+        #world-map {
+            height: 520px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: #0a0e1a;
+            margin-bottom: 1rem;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            border: none;
+            padding: 0.6rem 2rem;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: none;
+        }
+
+        .btn-next:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-next.show {
+            display: inline-block;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .game-wrapper {
+                padding: 1rem 0.8rem;
+            }
+            .game-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .game-header h1 {
+                font-size: 1.4rem;
+            }
+            #world-map {
+                height: 380px;
+            }
+            .question-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            .question-box .country-name {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #world-map {
+                height: 300px;
+            }
+            .game-stats {
+                font-size: 0.75rem;
+                gap: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body class="student-body">
+
+    <div class="game-wrapper">
+
+        <div id="student-header"></div>
+
+                    <a href="../dashboard.html" class="back-link">← Back to Dashboard</a>
+
+        <div class="game-header">
+            <h1>🗺️ Find the Country</h1>
+            <div class="game-stats">
+                <div>✅ Correct: <span id="score">0</span></div>
+                <div>❌ Wrong: <span id="wrong">0</span></div>
+                <div>🎯 Total: <span id="total">0</span></div>
+            </div>
+        </div>
+
+        <div class="question-box">
+            <div class="country-name">
+                🌍 Find: <span class="highlight" id="countryName">Loading...</span>
+            </div>
+            <div class="feedback" id="feedback">📍 Click on the map to find the country</div>
+        </div>
+
+        <div id="world-map"></div>
+
+        <div style="text-align: center; margin-top: 1rem;">
+            <button class="btn-next" id="nextBtn" onclick="nextCountry()">🚀 Next Country →</button>
+        </div>
+
+        <div id="student-footer"></div>
+
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ============================================================
+        // FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // ============================================================
+        // LOAD HEADER & FOOTER
+        // ============================================================
+        fetch('../../components/header.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-header').innerHTML = data);
+
+        fetch('../../components/footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-footer').innerHTML = data);
+
+        // ============================================================
+        // AUTH CHECK
+        // ============================================================
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = '../login.html';
+            }
+        });
+
+        function studentLogout() {
+            if (confirm('Exit Student Zone?')) {
+                auth.signOut().then(() => {
+                    window.location.href = '../login.html';
+                });
+            }
+        }
+
+        // ============================================================
+        // 🗺️ GAME LOGIC
+        // ============================================================
+
+        let map;
+        let countryLayers = [];
+        let countryNames = [];
+        let currentCountry = null;
+        let score = 0;
+        let wrong = 0;
+        let total = 0;
+        let isAnswered = false;
+
+        // ============================================================
+        // INITIALIZE MAP
+        // ============================================================
+        function initMap() {
+            map = L.map('world-map', {
+                center: [20, 0],
+                zoom: 2,
+                zoomControl: true,
+                minZoom: 2,
+                maxZoom: 6
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 6,
+                minZoom: 2
+            }).addTo(map);
+
+            map.on('click', onMapClick);
+
+            loadCountries();
+        }
+
+        // ============================================================
+        // LOAD COUNTRIES FROM GEOJSON
+        // ============================================================
+        async function loadCountries() {
+            try {
+                // Try multiple paths
+                let response = await fetch('../../../data/countries.geojson');
+                
+                if (!response.ok) {
+                    // Try alternative path
+                    response = await fetch('../data/countries.geojson');
+                }
+                
+                if (!response.ok) {
+                    throw new Error('GeoJSON file not found');
+                }
+                
+                const data = await response.json();
+                console.log('✅ GeoJSON loaded:', data.features.length, 'countries');
+
+                L.geoJSON(data, {
+                    style: {
+                        color: '#00d4ff',
+                        weight: 1,
+                        fillOpacity: 0.05,
+                        opacity: 0.5
+                    },
+                    onEachFeature: function(feature, layer) {
+                        const name = feature.properties.name || 
+                                    feature.properties.admin || 
+                                    feature.properties.NAME || 
+                                    'Unknown';
+                        
+                        layer.countryName = name;
+                        countryLayers.push(layer);
+                        countryNames.push(name);
+                        
+                        layer.on('mouseover', function() {
+                            this.setStyle({
+                                fillOpacity: 0.3,
+                                color: '#00d4ff',
+                                weight: 2
+                            });
+                        });
+                        
+                        layer.on('mouseout', function() {
+                            this.setStyle({
+                                fillOpacity: 0.05,
+                                color: '#00d4ff',
+                                weight: 1
+                            });
+                        });
+                    }
+                }).addTo(map);
+
+                console.log('✅ Loaded', countryNames.length, 'countries');
+                pickRandomCountry();
+
+            } catch (error) {
+                console.error('❌ Error:', error);
+                document.getElementById('feedback').textContent = '❌ Error loading map data. Please refresh.';
+                document.getElementById('feedback').className = 'feedback wrong';
+                document.getElementById('countryName').textContent = 'Error Loading';
+            }
+        }
+
+        // ============================================================
+        // PICK RANDOM COUNTRY
+        // ============================================================
+        function pickRandomCountry() {
+            if (countryNames.length === 0) {
+                document.getElementById('countryName').textContent = 'Loading...';
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * countryNames.length);
+            currentCountry = countryNames[randomIndex];
+            
+            document.getElementById('countryName').textContent = currentCountry;
+            document.getElementById('feedback').textContent = '📍 Click on the map to find this country!';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('nextBtn').classList.remove('show');
+            isAnswered = false;
+            
+            countryLayers.forEach(layer => {
+                layer.setStyle({
+                    fillOpacity: 0.05,
+                    color: '#00d4ff',
+                    weight: 1
+                });
+            });
+        }
+
+        // ============================================================
+        // ON MAP CLICK
+        // ============================================================
+        function onMapClick(e) {
+            if (isAnswered || !currentCountry) return;
+            
+            const clickPoint = e.latlng;
+            let found = false;
+            let clickedCountry = null;
+
+            for (let layer of countryLayers) {
+                if (isPointInPolygon(clickPoint, layer)) {
+                    clickedCountry = layer.countryName;
+                    found = true;
+                    layer.setStyle({
+                        fillOpacity: 0.3,
+                        color: '#ff2d75',
+                        weight: 2
+                    });
+                    break;
+                }
+            }
+
+            total++;
+
+            if (found && clickedCountry === currentCountry) {
+                score++;
+                document.getElementById('feedback').textContent = `✅ Correct! You found ${currentCountry}! 🎉`;
+                document.getElementById('feedback').className = 'feedback correct';
+                isAnswered = true;
+                
+                countryLayers.forEach(layer => {
+                    if (layer.countryName === currentCountry) {
+                        layer.setStyle({
+                            fillOpacity: 0.4,
+                            color: '#00ff88',
+                            weight: 3
+                        });
+                    }
+                });
+                
+                document.getElementById('nextBtn').classList.add('show');
+
+            } else if (found) {
+                wrong++;
+                document.getElementById('feedback').textContent = `❌ That's ${clickedCountry}! ${currentCountry} is somewhere else. Try again.`;
+                document.getElementById('feedback').className = 'feedback wrong';
+
+            } else {
+                wrong++;
+                document.getElementById('feedback').textContent = `❌ You clicked on the water! ${currentCountry} is on land. Try again.`;
+                document.getElementById('feedback').className = 'feedback wrong';
+            }
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('wrong').textContent = wrong;
+            document.getElementById('total').textContent = total;
+        }
+
+        // ============================================================
+        // CHECK IF POINT IS INSIDE POLYGON
+        // ============================================================
+        function isPointInPolygon(point, layer) {
+            const polygon = layer.getLatLngs()[0];
+            if (!polygon || polygon.length < 4) return false;
+            
+            let inside = false;
+            const x = point.lat;
+            const y = point.lng;
+            
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                const xi = polygon[i].lat, yi = polygon[i].lng;
+                const xj = polygon[j].lat, yj = polygon[j].lng;
+                
+                const intersect = ((yi > y) !== (yj > y)) &&
+                    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            
+            return inside;
+        }
+
+        // ============================================================
+        // NEXT COUNTRY
+        // ============================================================
+        function nextCountry() {
+            pickRandomCountry();
+        }
+
+        // ============================================================
+        // START THE GAME
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initMap, 500);
+        });
+
+        console.log('🗺️ Country Map Game loaded!');
+    </script>
+
+</body>
+</html>

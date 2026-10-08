@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geography Games - Student Zone</title>
+    <link rel="stylesheet" href="../../assets/student-style.css">
+    <style>
+        .games-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .games-header {
+            margin-bottom: 2rem;
+        }
+
+        .games-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .games-header p {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .game-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            transition: var(--transition);
+            text-decoration: none;
+            color: var(--text-white);
+        }
+
+        .game-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+            transform: translateX(5px);
+        }
+
+        .game-card .game-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-card .game-icon {
+            font-size: 2rem;
+        }
+
+        .game-card .game-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .game-card .game-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .game-card .game-status {
+            font-size: 0.75rem;
+            padding: 0.2rem 1rem;
+            border-radius: 20px;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--neon-cyan);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .game-card .game-status.coming {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .games-wrapper {
+                padding: 1rem 0.8rem;
+            }
+            .games-header h1 {
+                font-size: 1.5rem;
+            }
+            .game-card {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+            }
+            .game-card .game-info {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="student-body">
+
+    <div class="games-wrapper">
+
+        <div id="student-header"></div>
+
+        <a href="../game-index.html" class="back-link">← Back to Games</a>
+
+        <div class="games-header">
+            <h1>🗺️ Geography Games</h1>
+            <p>Learn about countries, capitals, and flags</p>
+        </div>
+
+        <div class="game-list">
+
+            <!-- Game 1: Find the Country -->
+            <a href="quiz-map.html" class="game-card">
+                <div class="game-info">
+                    <span class="game-icon">🌍</span>
+                    <div>
+                        <div class="game-name">Find the Country</div>
+                        <div class="game-desc">Click on the map to find the correct country</div>
+                    </div>
+                </div>
+                <span class="game-status">▶ Play Now</span>
+            </a>
+
+            <!-- Game 2: Capitals Quiz (Coming Soon) -->
+            <div class="game-card" style="opacity:0.6; cursor:default;">
+                <div class="game-info">
+                    <span class="game-icon">🏙️</span>
+                    <div>
+                        <div class="game-name">Capitals Quiz</div>
+                        <div class="game-desc">Match countries with their capitals</div>
+                    </div>
+                </div>
+                <span class="game-status coming">⏳ Coming Soon</span>
+            </div>
+
+            <!-- Game 3: Flags Quiz (Coming Soon) -->
+            <div class="game-card" style="opacity:0.6; cursor:default;">
+                <div class="game-info">
+                    <span class="game-icon">🚩</span>
+                    <div>
+                        <div class="game-name">Flags Quiz</div>
+                        <div class="game-desc">Identify countries by their flags</div>
+                    </div>
+                </div>
+                <span class="game-status coming">⏳ Coming Soon</span>
+            </div>
+
+        </div>
+
+        <div id="student-footer"></div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        fetch('../../components/header.html').then(r => r.text()).then(data => document.getElementById('student-header').innerHTML = data);
+        fetch('../../components/footer.html').then(r => r.text()).then(data => document.getElementById('student-footer').innerHTML = data);
+
+        auth.onAuthStateChanged(function(user) {
+            if (!user) window.location.href = '../../login.html';
+        });
+
+        function studentLogout() {
+            if (confirm('Exit Student Zone?')) {
+                auth.signOut().then(() => {
+                    window.location.href = '../../login.html';
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>

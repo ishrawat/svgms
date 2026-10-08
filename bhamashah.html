@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Bhamashah — honouring the generous donors and supporters of Swami Vivekanand Govt. Model School, Bhim.">
+<title>Bhamashah — SVGMS Bhim</title>
+<link rel="icon" href="imgs/logo1.png" type="image/png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bhamashah — SVGMS Bhim">
+<meta property="og:description" content="Honouring our generous donors and supporters.">
+<meta property="og:image" content="https://raw.githubusercontent.com/ishrawat/imagess/refs/heads/main/logo.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-nav-active="news">
+
+<div id="site-chrome"></div>
+
+<section class="page-hero">
+    <h1>Bhamashah <small>honouring our donors</small></h1>
+</section>
+
+<main class="donors-page">
+
+    <p class="donors-intro">
+        We are deeply grateful to the individuals and families whose generosity supports
+        the education of our students and the growth of our school.
+    </p>
+
+    <div id="donorsContainer">
+        <div class="donors-loading">
+            <span class="big-icon">🙏</span>
+            Loading donors…
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <p>&copy; 2026 Swami Vivekanand Govt. Model School, Bhim. All Rights Reserved.</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script src="site.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    var db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+    var container = document.getElementById('donorsContainer');
+    if (!container) return;
+
+    var PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">' +
+        '<rect width="300" height="200" fill="#f2e9d7"/>' +
+        '<text x="150" y="105" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#738290">No Image</text>' +
+        '</svg>'
+    );
+
+    function escapeHtml(text) {
+        if (text == null) return '';
+        var div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
+
+    function formatDate(value) {
+        try {
+            return new Date(value).toLocaleDateString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        } catch (e) { return ''; }
+    }
+
+    function renderLoading() {
+        container.innerHTML = '<div class="donors-loading"><span class="big-icon">🙏</span>Loading donors…</div>';
+    }
+    function renderEmpty() {
+        container.innerHTML = '<div class="donors-empty"><span class="big-icon">🙏</span>No donors listed yet. Please check back soon.</div>';
+    }
+    function renderError() {
+        container.innerHTML = '<div class="donors-error"><span class="big-icon">⚠️</span>Could not load donors. Please refresh.</div>';
+    }
+
+    function renderDonors(donors) {
+        container.innerHTML = '<div class="donors-grid">' + donors.map(function (d) {
+            var dateStr = d.date ? formatDate(d.date) : '';
+            return '<article class="donor-card">' +
+                '<img class="donor-photo" src="' + escapeHtml(d.photoUrl || PLACEHOLDER) + '" alt="' + escapeHtml(d.name || 'Donor') + '" loading="lazy">' +
+                '<h2 class="donor-name">' + escapeHtml(d.name || 'Anonymous') + '</h2>' +
+                (d.donation ? '<div class="donor-donation">' + escapeHtml(d.donation) + '</div>' : '') +
+                (d.description ? '<div class="donor-description">' + escapeHtml(d.description) + '</div>' : '') +
+                (dateStr ? '<div class="donor-date">📅 ' + escapeHtml(dateStr) + '</div>' : '') +
+            '</article>';
+        }).join('') + '</div>';
+    }
+
+    function loadDonors() {
+        if (!db) { renderError(); return; }
+        renderLoading();
+
+        db.collection('donors').orderBy('date', 'desc').get()
+            .then(function (snapshot) {
+                if (snapshot.empty) { renderEmpty(); return; }
+                var donors = [];
+                snapshot.forEach(function (doc) { donors.push(doc.data()); });
+                renderDonors(donors);
+            })
+            .catch(function (err) {
+                console.warn('Donors unavailable:', err);
+                renderError();
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDonors);
+})();
+</script>
+
+</body>
+</html>

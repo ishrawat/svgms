@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Timings - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imgs/logo1.png" type="image/png" />
+
+    <style>
+        .admin-wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .admin-header .links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .admin-header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .admin-header .links a:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .form-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--accent);
+        }
+
+        .form-section h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-section label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-dark);
+        }
+
+        .form-section input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .current-box {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .current-box .time {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .current-box .meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-section button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .form-section button:hover {
+            background: var(--primary-light);
+        }
+
+        .form-section button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.loading {
+            display: block;
+            background: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        @media (max-width: 768px) {
+            .admin-wrapper {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <header class="admin-header">
+            <h1>⏰ School Timings</h1>
+            <div class="links">
+                <a href="admin.html">← Dashboard</a>
+                <a href="index.html">Website</a>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </header>
+
+        <div class="form-section">
+            <h2>Update Timings</h2>
+            
+            <div id="message" class="message"></div>
+
+            <div class="current-box">
+                <div class="time" id="currentTime">Loading...</div>
+                <div class="meta" id="currentDays">Loading...</div>
+            </div>
+
+            <form id="timingsForm" onsubmit="updateTimings(event)">
+                <label for="startTime">Start Time</label>
+                <input type="text" id="startTime" placeholder="8:00 AM" required>
+
+                <label for="endTime">End Time</label>
+                <input type="text" id="endTime" placeholder="3:00 PM" required>
+
+                <label for="days">Days</label>
+                <input type="text" id="days" placeholder="Monday - Friday" required>
+
+                <button type="submit" id="updateBtn">🔄 Update Timings</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const form = document.getElementById('timingsForm');
+        const updateBtn = document.getElementById('updateBtn');
+        const message = document.getElementById('message');
+
+        // ===== CHECK LOGIN =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'admin.html';
+            } else {
+                loadCurrentTimings();
+            }
+        });
+
+        // ===== LOAD CURRENT TIMINGS =====
+        async function loadCurrentTimings() {
+            try {
+                const doc = await db.collection('settings').doc('schoolTimings').get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('currentTime').textContent = `${data.startTime} - ${data.endTime}`;
+                    document.getElementById('currentDays').textContent = data.days || 'Monday - Friday';
+                    document.getElementById('startTime').value = data.startTime || '';
+                    document.getElementById('endTime').value = data.endTime || '';
+                    document.getElementById('days').value = data.days || '';
+                }
+            } catch (error) {
+                console.error('Error loading timings:', error);
+            }
+        }
+
+        // ===== UPDATE TIMINGS =====
+        async function updateTimings(event) {
+            event.preventDefault();
+
+            const startTime = document.getElementById('startTime').value.trim();
+            const endTime = document.getElementById('endTime').value.trim();
+            const days = document.getElementById('days').value.trim();
+
+            if (!startTime || !endTime || !days) {
+                showMessage('❌ Please fill all fields', 'error');
+                return;
+            }
+
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Updating...';
+            showMessage('Updating timings...', 'loading');
+
+            try {
+                await db.collection('settings').doc('schoolTimings').set({
+                    startTime: startTime,
+                    endTime: endTime,
+                    days: days,
+                    lastUpdated: new Date().toISOString()
+                });
+
+                showMessage('✅ Timings updated successfully!', 'success');
+                loadCurrentTimings();
+
+            } catch (error) {
+                console.error('Error updating timings:', error);
+                showMessage('❌ Error updating timings: ' + error.message, 'error');
+            }
+
+            updateBtn.disabled = false;
+            updateBtn.textContent = '🔄 Update Timings';
+        }
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = 'message ' + type;
+        }
+
+        function logout() {
+            auth.signOut();
+            window.location.href = 'admin.html';
+        }
+    </script>
+
+</body>
+</html>

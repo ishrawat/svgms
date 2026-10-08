@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bhamashah - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imgs/logo1.png" type="image/png" />
+
+    <style>
+        .admin-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .admin-header .links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .admin-header .links a:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .form-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--accent);
+        }
+
+        .form-section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .form-section label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-section input,
+        .form-section textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--bg-light);
+            transition: var(--transition);
+        }
+
+        .form-section input:focus,
+        .form-section textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .form-section textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-section .file-input {
+            margin-bottom: 1rem;
+        }
+
+        .form-section .file-input label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-section .file-input input[type="file"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: var(--bg-light);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .form-section .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-section .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .form-section .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .form-section .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            margin-left: 0.5rem;
+        }
+
+        .form-section .btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        .form-section .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .toast {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .toast.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .toast.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .toast.loading {
+            display: block;
+            background: #e2e3e5;
+            color: #383d41;
+            border-left: 4px solid #6c757d;
+        }
+
+        /* Progress */
+        #progressContainer {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            display: none;
+        }
+
+        #progressContainer .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        #progressContainer .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        #progressContainer .progress-bar .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* List */
+        .list-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .list-section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .donor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 0.6rem;
+            border-left: 4px solid var(--accent);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .donor-item .info {
+            flex: 1;
+        }
+
+        .donor-item .info .name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .donor-item .info .meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .donor-item .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .donor-item .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .donor-item .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .admin-wrapper {
+                padding: 1rem;
+            }
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .donor-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .form-section .btn-row {
+                justify-content: center;
+            }
+            .form-section .btn-primary,
+            .form-section .btn-cancel {
+                width: 100%;
+                text-align: center;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <header class="admin-header">
+            <h1>🙏 Manage Bhamashah</h1>
+            <div class="links">
+                <a href="admin.html">← Dashboard</a>
+                <a href="index.html">Website</a>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- Add Donor Form -->
+        <div class="form-section">
+            <h2>➕ Add Donor</h2>
+            <div id="toast" class="toast"></div>
+            <form id="donorForm" onsubmit="addDonor(event)">
+                <label for="donorName">Donor Name *</label>
+                <input type="text" id="donorName" placeholder="e.g., Mr. Rajesh Sharma" required>
+
+                <label for="donorDonation">Donation Details *</label>
+                <input type="text" id="donorDonation" placeholder="e.g., ₹50,000 for Computers" required>
+
+                <label for="donorDescription">Description (Optional)</label>
+                <textarea id="donorDescription" placeholder="Brief description about the donation..."></textarea>
+
+                <div class="file-input">
+                    <label for="donorPhoto">Photo</label>
+                    <input type="file" id="donorPhoto" accept="image/*">
+                    <small style="color:var(--text-muted); font-size:0.8rem;">Recommended: Square image, JPG or PNG</small>
+                </div>
+
+                <div id="progressContainer">
+                    <div class="progress-label">
+                        <span id="progressText">Uploading photo...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn-primary" id="addBtn">➕ Add Donor</button>
+                    <button type="reset" class="btn-cancel" onclick="clearForm()">Clear</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Donors List -->
+        <div class="list-section">
+            <h2>📋 All Donors</h2>
+            <div id="donorsList">
+                <div class="empty-state">Loading donors...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ===== CLOUDINARY CONFIG =====
+        const CLOUDINARY = {
+            cloudName: "zh3vg8mi",
+            uploadPreset: "school_notices"
+        };
+
+        // ===== DOM REFS =====
+        const donorsList = document.getElementById('donorsList');
+        const toast = document.getElementById('toast');
+        const addBtn = document.getElementById('addBtn');
+
+        // ===== CHECK LOGIN =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) window.location.href = 'admin.html';
+            else loadDonors();
+        });
+
+        // ===== ADD DONOR =====
+        async function addDonor(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('donorName').value.trim();
+            const donation = document.getElementById('donorDonation').value.trim();
+            const description = document.getElementById('donorDescription').value.trim();
+            let file = document.getElementById('donorPhoto').files[0];
+            if (file) {
+                // Compress to 400x400, 70% quality
+                file = await compressImage(file, 400, 400, 0.7);
+            }
+            if (!name) {
+                showToast('Please enter the donor name.', 'error');
+                return;
+            }
+
+            if (!donation) {
+                showToast('Please enter donation details.', 'error');
+                return;
+            }
+
+            addBtn.disabled = true;
+            addBtn.textContent = 'Adding...';
+            showToast('Adding donor...', 'loading');
+
+            try {
+                let photoUrl = '';
+
+                // Upload photo if selected
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', CLOUDINARY.uploadPreset);
+                    formData.append('resource_type', 'auto');
+
+                    const response = await fetch(
+                        `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/upload`,
+                        { method: 'POST', body: formData }
+                    );
+
+                    const data = await response.json();
+                    if (data.secure_url) {
+                        photoUrl = data.secure_url;
+                    }
+                }
+
+                // Save to Firestore
+                await db.collection('donors').add({
+                    name: name,
+                    donation: donation,
+                    description: description || '',
+                    photoUrl: photoUrl,
+                    date: new Date().toISOString()
+                });
+
+                showToast('✅ Donor added successfully!', 'success');
+                document.getElementById('donorForm').reset();
+                document.getElementById('donorPhoto').value = '';
+                loadDonors();
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+
+            addBtn.disabled = false;
+            addBtn.textContent = '➕ Add Donor';
+        }
+
+        // ===== LOAD DONORS =====
+        async function loadDonors() {
+            donorsList.innerHTML = '<div class="empty-state">Loading donors...</div>';
+
+            try {
+                const snapshot = await db.collection('donors')
+                    .orderBy('date', 'desc')
+                    .get();
+
+                if (snapshot.empty) {
+                    donorsList.innerHTML = '<div class="empty-state">No donors added yet.</div>';
+                    return;
+                }
+
+                donorsList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const donor = doc.data();
+                    const id = doc.id;
+
+                    const date = donor.date ? new Date(donor.date) : new Date();
+                    const formattedDate = date.toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+
+                    const item = document.createElement('div');
+                    item.className = 'donor-item';
+                    item.innerHTML = `
+                        <div class="info">
+                            <div class="name">${donor.name}</div>
+                            <div class="meta">
+                                ${donor.donation || ''}
+                                ${donor.description ? `| ${donor.description}` : ''}
+                                | 📅 ${formattedDate}
+                                ${donor.photoUrl ? '| 📸 Photo' : ''}
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-delete" onclick="deleteDonor('${id}')">🗑️ Delete</button>
+                        </div>
+                    `;
+                    donorsList.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error('Error loading donors:', error);
+                donorsList.innerHTML = '<div class="empty-state">❌ Error loading donors</div>';
+            }
+        }
+
+        // ===== DELETE DONOR =====
+        async function deleteDonor(id) {
+            if (!confirm('Delete this donor?')) return;
+
+            try {
+                await db.collection('donors').doc(id).delete();
+                showToast('🗑️ Donor deleted!', 'success');
+                loadDonors();
+            } catch (error) {
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ===== CLEAR FORM =====
+        function clearForm() {
+            document.getElementById('donorForm').reset();
+            document.getElementById('donorPhoto').value = '';
+            showToast('Form cleared.', 'success');
+            setTimeout(() => { toast.style.display = 'none'; }, 1000);
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type) {
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+        }
+
+        // ===== LOGOUT =====
+        function logout() {
+            auth.signOut();
+            window.location.href = 'admin.html';
+        }
+
+        // ===== COMPRESS IMAGE =====
+        function compressImage(file, maxWidth, maxHeight, quality) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // Resize only if larger than max
+                        if (width > maxWidth || height > maxHeight) {
+                            const ratio = Math.min(maxWidth / width, maxHeight / height);
+                            width = Math.round(width * ratio);
+                            height = Math.round(height * ratio);
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        canvas.toBlob((blob) => {
+                            resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                        }, 'image/jpeg', quality);
+                    };
+                };
+            });
+        }
+
+    </script>
+
+</body>
+</html>

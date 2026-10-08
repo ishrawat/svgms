@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Student Zone</title>
+    <link rel="stylesheet" href="assets/student-style.css">
+    <link rel="stylesheet" href="assets/quiz-style.css">
+    <style>
+        .student-body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d0d2b 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .shooting-stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+        }
+        .shooting-star {
+            position: absolute;
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.7));
+            border-radius: 1px;
+            animation: shoot var(--duration) linear infinite;
+            opacity: 0;
+        }
+        @keyframes twinkle { 0%,100% { opacity: 0.2; } 50% { opacity: 1; } }
+        @keyframes shoot {
+            0% { transform: translate(0,0) rotate(45deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 0.8; }
+            100% { transform: translate(800px,600px) rotate(45deg); opacity: 0; }
+        }
+        .streak-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            z-index: 9999;
+            font-size: 1rem;
+            animation: slideIn 0.5s ease;
+            max-width: 350px;
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+        }
+        .streak-notification.hide { animation: slideOut 0.5s ease forwards; }
+        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100px); opacity: 0; } }
+
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 1;
+        }
+        .quiz-container h2 { color: #fff; font-weight: 400; letter-spacing: 1px; }
+        .quiz-container p { color: rgba(255,255,255,0.6); }
+
+        .mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .mode-card {
+            padding: 1.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.08);
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.7);
+        }
+        .mode-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+        .mode-card.selected { border-color: #667eea; background: rgba(102,126,234,0.15); box-shadow: 0 0 30px rgba(102,126,234,0.1); color: #fff; }
+        .mode-card .icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+        .mode-card .name { font-weight: bold; font-size: 1.1rem; color: #fff; }
+        .mode-card .desc { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 0.3rem; }
+
+        .mode-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .mode-badge.solo { background: rgba(102,126,234,0.3); color: #667eea; }
+        .mode-badge.dual { background: rgba(244,67,54,0.3); color: #ef5350; }
+        .mode-badge.multi { background: rgba(76,175,80,0.3); color: #66bb6a; }
+        .mode-badge.festival { background: rgba(255,152,0,0.3); color: #ffa726; }
+
+        .quiz-controls { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+        .quiz-controls label { color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-bottom: 0.3rem; }
+        .quiz-controls select {
+            padding: 0.6rem 1rem;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            min-width: 140px;
+            cursor: pointer;
+        }
+        .quiz-controls select:focus { outline: none; border-color: #667eea; }
+        .quiz-controls select option { background: #1a1a3e; color: #fff; }
+        .quiz-controls input {
+            padding: 0.6rem 1rem;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+        .quiz-controls input:focus { outline: none; border-color: #667eea; }
+        .quiz-controls input::placeholder { color: rgba(255,255,255,0.3); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(102,126,234,0.3); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2); }
+        .btn-back { background: none; border: none; color: #667eea; cursor: pointer; font-size: 0.95rem; padding: 0.5rem 0; transition: color 0.3s; }
+        .btn-back:hover { color: #8b9cf7; text-decoration: underline; }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .quiz-title { font-size: 1.3rem; font-weight: 500; color: #fff; }
+        .quiz-stats { display: flex; gap: 0.8rem; font-size: 0.85rem; flex-wrap: wrap; }
+        .quiz-stats span { background: rgba(255,255,255,0.06); padding: 0.3rem 0.8rem; border-radius: 8px; color: rgba(255,255,255,0.8); }
+        .quiz-stats span .stat-value { color: #fff; font-weight: bold; }
+
+        .duel-info {
+            background: rgba(255,255,255,0.05);
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 3px solid #667eea;
+        }
+        .duel-info .duel-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .duel-info .label { color: rgba(255,255,255,0.6); }
+        .duel-info .value { color: #fff; font-weight: 500; }
+        .duel-info .opponent-score { color: #ffa726; font-weight: bold; }
+        .duel-info .opponent-progress { color: #66bb6a; font-weight: bold; }
+        .duel-info .opponent-status { color: rgba(255,255,255,0.3); font-size: 0.8rem; margin-left: 0.5rem; }
+
+        .question-area { margin: 2rem 0; }
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            padding: 1.2rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            color: #fff;
+            border-left: 3px solid #667eea;
+        }
+        .options-grid { display: grid; gap: 0.8rem; }
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1.2rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-align: left;
+            width: 100%;
+            color: rgba(255,255,255,0.85);
+        }
+        .option-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateX(5px); }
+        .option-btn .label { font-weight: bold; color: #667eea; min-width: 25px; }
+        .option-btn.correct { border-color: #66bb6a; background: rgba(76,175,80,0.15); }
+        .option-btn.correct .label { color: #66bb6a; }
+        .option-btn.wrong { border-color: #ef5350; background: rgba(244,67,54,0.15); }
+        .option-btn.wrong .label { color: #ef5350; }
+        .option-btn.disabled { cursor: not-allowed; opacity: 0.6; }
+
+        .feedback-area { margin: 1.5rem 0; padding: 1rem 1.2rem; border-radius: 10px; display: none; }
+        .feedback-area.show { display: block; }
+        .feedback-area.correct { background: rgba(76,175,80,0.15); border: 1px solid rgba(76,175,80,0.3); color: #81c784; }
+        .feedback-area.wrong { background: rgba(244,67,54,0.15); border: 1px solid rgba(244,67,54,0.3); color: #ef9a9a; }
+
+        .progress-container { margin: 1.5rem 0; }
+        .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s ease; border-radius: 2px; }
+        .progress-text { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+
+        .results-area { display: none; text-align: center; padding: 2rem 0; }
+        .results-area.show { display: block; }
+        .results-score { font-size: 4rem; font-weight: bold; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin: 0.5rem 0; }
+        .results-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin: 2rem 0; }
+        .results-stat { padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .results-stat .number { font-size: 1.8rem; font-weight: bold; color: #fff; }
+        .results-stat .label { font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+
+        .hidden { display: none !important; }
+        .selection-stats { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 0.8rem; padding: 0.5rem; background: rgba(255,255,255,0.04); border-radius: 8px; }
+        .storage-info { font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-top: 0.8rem; padding: 0.5rem; background: rgba(76,175,80,0.08); border-radius: 8px; border-left: 2px solid rgba(76,175,80,0.3); }
+        .error-msg { background: rgba(244,67,54,0.15); color: #ef9a9a; padding: 1rem; border-radius: 10px; margin: 1rem 0; border: 1px solid rgba(244,67,54,0.2); }
+        .mode-info { text-align: center; margin-top: 1rem; color: rgba(255,255,255,0.4); font-size: 0.9rem; }
+        .mode-options-box { margin: 1rem 0; padding: 1rem; background: rgba(255,255,255,0.04); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); }
+        .mode-options-box h4 { color: rgba(255,255,255,0.6); margin: 0 0 0.8rem 0; font-weight: 400; font-size: 0.95rem; }
+        .result-message { color: rgba(255,255,255,0.7); font-size: 1.1rem; }
+        .achievements-unlocked { margin: 1rem 0; padding: 0.8rem; background: rgba(255,215,0,0.08); border-radius: 10px; border: 1px solid rgba(255,215,0,0.15); }
+        .achievements-unlocked h4 { color: #ffd54f; margin: 0 0 0.5rem 0; font-weight: 400; }
+        .achievements-unlocked p { color: rgba(255,255,255,0.7); font-size: 0.95rem; margin: 0; }
+        .btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+        .streak-result { margin: 1rem 0; padding: 0.8rem; background: rgba(255,152,0,0.1); border-radius: 10px; border: 1px solid rgba(255,152,0,0.2); }
+        .streak-result .icon { font-size: 1.5rem; margin-right: 0.5rem; }
+        .streak-result .text { color: rgba(255,255,255,0.8); font-size: 0.95rem; }
+        .streak-result .highlight { color: #ffa726; font-weight: bold; }
+
+        @media (max-width:600px) {
+            .quiz-container { padding: 1.2rem; margin: 1rem; }
+            .quiz-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .quiz-stats { flex-wrap: wrap; }
+            .results-stats { grid-template-columns: repeat(2,1fr); }
+            .mode-grid { grid-template-columns: repeat(2,1fr); }
+            .quiz-controls { flex-direction: column; }
+            .quiz-controls select, .quiz-controls input { width: 100%; min-width: unset; }
+            .quiz-title { font-size: 1.1rem; }
+            .streak-notification { bottom: 15px; right: 15px; left: 15px; max-width: unset; padding: 14px 18px; }
+            .duel-info .duel-row { flex-direction: column; gap: 0.3rem; }
+        }
+    </style>
+</head>
+<body class="student-body">
+
+    <div class="shooting-stars" id="shootingStars"></div>
+
+    <div class="quiz-container" id="app">
+        <div id="student-header"></div>
+
+        <!-- MODE SELECTION -->
+        <div id="modeSelection">
+            <h2>🎯 Select Quiz Mode</h2>
+            <p>Choose how you want to play!</p>
+            <div class="mode-grid">
+                <div class="mode-card" data-mode="solo" onclick="selectMode('solo')">
+                    <span class="icon">🧑</span>
+                    <div class="name">Solo</div>
+                    <div class="desc">Practice by yourself</div>
+                </div>
+                <div class="mode-card" data-mode="dual" onclick="selectMode('dual')">
+                    <span class="icon">⚔️</span>
+                    <div class="name">Dual</div>
+                    <div class="desc">Challenge a friend</div>
+                </div>
+                <div class="mode-card" data-mode="multi" onclick="window.location.href='multiplayer.html'">
+                    <span class="icon">👥</span>
+                    <div class="name">Multiplayer</div>
+                    <div class="desc">Join a lobby</div>
+                </div>
+                <div class="mode-card" data-mode="festival" onclick="selectMode('festival')">
+                    <span class="icon">🎉</span>
+                    <div class="name">Festival</div>
+                    <div class="desc">Special events</div>
+                </div>
+            </div>
+            <div id="modeInfo" class="mode-info">👆 Select a mode to continue</div>
+        </div>
+
+        <!-- QUIZ SETUP -->
+        <div id="setupPhase" class="hidden">
+            <button class="btn-back" onclick="goBackToModeSelection()">← Back to modes</button>
+            <div style="display:flex; align-items:center; gap:0.8rem; margin-top:0.5rem; flex-wrap:wrap;">
+                <h2 style="margin:0; color:#fff;">📝 Quiz Setup</h2>
+                <span id="modeBadge" class="mode-badge solo">SOLO</span>
+            </div>
+            <p id="modeDescription" style="color:rgba(255,255,255,0.5); margin-top:0.2rem;">Practice by yourself</p>
+            
+            <div class="quiz-controls">
+                <div>
+                    <label>📚 Subject</label>
+                    <select id="subjectSelect"><option value="all">All Subjects</option></select>
+                </div>
+                <div>
+                    <label>📝 Questions</label>
+                    <select id="countSelect">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <div>
+                    <label>⏱️ Time Limit</label>
+                    <select id="timeSelect">
+                        <option value="60">1 min</option>
+                        <option value="120">2 min</option>
+                        <option value="180" selected>3 min</option>
+                        <option value="300">5 min</option>
+                        <option value="600">10 min</option>
+                        <option value="0">No limit</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="dualOptions" class="mode-options-box hidden">
+                <h4>⚔️ Challenge Someone</h4>
+                <div class="quiz-controls">
+                    <div><label>👤 Opponent</label><input type="text" id="opponentEmail" placeholder="Enter opponent's email"></div>
+                    <div><label>🔗 Challenge ID</label><input type="text" id="challengeId" placeholder="Or enter challenge ID"></div>
+                </div>
+            </div>
+
+            <div id="multiOptions" class="mode-options-box hidden">
+                <h4>👥 Multiplayer Lobby</h4>
+                <div class="quiz-controls">
+                    <div><label>🆔 Lobby ID</label><input type="text" id="lobbyId" placeholder="Enter lobby ID"></div>
+                    <div><label>👥 Max Players</label><select id="maxPlayers"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="startBtn" onclick="startQuiz()">🚀 Start Quiz</button>
+            <div id="selectionStats" class="selection-stats"></div>
+            <div id="storageInfo" class="storage-info"></div>
+            <div id="errorDisplay" class="error-msg hidden"></div>
+            <p id="questionCountDisplay" style="margin-top:0.5rem; font-size:0.8rem; color:rgba(255,255,255,0.3);"></p>
+        </div>
+
+        <!-- QUIZ PHASE -->
+        <div id="quizPhase" class="hidden">
+            <div class="quiz-header">
+                <div class="quiz-title" id="quizTitle">Quiz</div>
+                <div class="quiz-stats">
+                    <span>⭐ <span class="stat-value" id="scoreDisplay">0</span></span>
+                    <span>📝 <span class="stat-value" id="progressDisplay">0/0</span></span>
+                    <span>⏱️ <span class="stat-value" id="timerDisplay">0</span>s</span>
+                    <span>🔥 <span class="stat-value" id="streakDisplay">0</span></span>
+                </div>
+            </div>
+
+            <!-- DUEL INFO -->
+            <div id="duelInfo" class="duel-info hidden">
+                <div class="duel-row">
+                    <div>
+                        <span class="label">⚔️ Duel:</span>
+                        <span class="value">You vs <span id="opponentNameDisplay">Opponent</span></span>
+                    </div>
+                    <div>
+                        <span class="label">Opponent:</span>
+                        <span class="opponent-score">⭐ <span id="opponentScore">0</span></span>
+                        <span style="color:rgba(255,255,255,0.3); margin:0 0.5rem;">|</span>
+                        <span class="label">Progress:</span>
+                        <span class="opponent-progress"><span id="opponentProgress">0</span>%</span>
+                        <span class="opponent-status" id="opponentStatus"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-area">
+                <div class="question-text" id="questionText">Loading question...</div>
+                <div class="options-grid" id="optionsContainer"></div>
+            </div>
+            <div class="feedback-area" id="feedbackArea"><div id="feedbackText"></div></div>
+            <div class="progress-container">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+                <div class="progress-text"><span id="progressLabel">0%</span><span id="wrongStreakLabel">Wrong streak: 0</span></div>
+            </div>
+        </div>
+
+        <!-- RESULTS PHASE -->
+        <div id="resultsPhase" class="hidden">
+            <div class="results-area show">
+                <h2 style="color:#fff;">🎉 Quiz Complete!</h2>
+                <div class="results-score" id="finalScore">0%</div>
+                <p class="result-message" id="resultMessage">Great job!</p>
+                <div class="results-stats">
+                    <div class="results-stat"><div class="number" id="correctCount">0</div><div class="label">✅ Correct</div></div>
+                    <div class="results-stat"><div class="number" id="wrongCount">0</div><div class="label">❌ Wrong</div></div>
+                    <div class="results-stat"><div class="number" id="pointsEarned">0</div><div class="label">⭐ Points</div></div>
+                    <div class="results-stat"><div class="number" id="timeTaken">0s</div><div class="label">⏱️ Time</div></div>
+                </div>
+                <div id="streakResult" class="streak-result hidden">
+                    <span class="icon" id="streakResultIcon">🔥</span>
+                    <span class="text" id="streakResultText">Streak: 0 days</span>
+                </div>
+                <div id="achievementsUnlocked" class="achievements-unlocked hidden"></div>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="resetQuiz()">🔄 Try Again</button>
+                    <button class="btn-secondary" onclick="window.location.href='dashboard.html'">🏠 Dashboard</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="student-footer"></div>
+    </div>
+
+    <!-- FIREBASE SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+    // ============================================================
+    // FIREBASE CONFIG
+    // ============================================================
+    var firebaseConfig = {
+        apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+        authDomain: "svgms-backend.firebaseapp.com",
+        projectId: "svgms-backend",
+        storageBucket: "svgms-backend.firebasestorage.app",
+        messagingSenderId: "1065359559935",
+        appId: "1:1065359559935:web:977cea73a68e05813750ca"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var auth = firebase.auth();
+    var db = firebase.firestore();
+
+    // ============================================================
+    // URL PARAMETERS
+    // ============================================================
+    var urlParams = new URLSearchParams(window.location.search);
+    var mode = urlParams.get('mode');
+    var challengeId = urlParams.get('challenge');
+    var autostart = urlParams.get('autostart') === '1';
+    var isDuelMode = (mode === 'duel' && challengeId);
+
+    // ============================================================
+    // DUEL STATE
+    // ============================================================
+    var duelData = {
+        isActive: false,
+        challengeId: null,
+        challengeData: null,
+        isCreator: false,
+        opponentName: '',
+        opponentScore: 0,
+        opponentAnswers: [],
+        opponentFinished: false,
+        myFinished: false
+    };
+
+    // ============================================================
+    // SHEET CONFIG
+    // ============================================================
+    var SHEET_CONFIG = {
+        sheetId: '1ApjcYT5Srnd1NkGkjIhuirSWQkSvsnLdZiiEl_wnREY',
+        apiKey: 'AIzaSyCnt4iYKeO-Y1b-OlY3jdZUntwHuWQBQls',
+        range: 'A2:K'
+    };
+
+    var questionCache = null;
+    var totalQuestions = 0;
+    var isQuestionsLoaded = false;
+    var selectedMode = 'solo';
+
+    // ============================================================
+    // STREAK MANAGER CLASS
+    // ============================================================
+    class StreakManager {
+        constructor(uid) {
+            this.uid = uid;
+            this.streak = 0;
+            this.lastActive = null;
+            this.loaded = false;
+        }
+
+        async loadStreak() {
+            try {
+                var doc = await db.collection('students').doc(this.uid).get();
+                if (doc.exists) {
+                    var data = doc.data();
+                    this.streak = data.streak || 0;
+                    this.lastActive = data.lastActive?.toDate?.() || null;
+                    this.loaded = true;
+                    return { streak: this.streak, lastActive: this.lastActive };
+                }
+                return { streak: 0, lastActive: null };
+            } catch (e) {
+                console.error('Error loading streak:', e);
+                return { streak: 0, lastActive: null };
+            }
+        }
+
+        async updateStreak() {
+            try {
+                if (!this.loaded) await this.loadStreak();
+                var today = new Date();
+                var todayStr = today.toDateString();
+                if (!this.lastActive) {
+                    this.streak = 1;
+                    await this.saveStreak();
+                    return { streak: 1, bonus: 0, milestone: null, message: 'Started your streak! 🔥' };
+                }
+                var lastActiveStr = this.lastActive.toDateString();
+                if (todayStr === lastActiveStr) {
+                    return { streak: this.streak, bonus: 0, milestone: null, message: null };
+                }
+                var yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                var yesterdayStr = yesterday.toDateString();
+                if (lastActiveStr === yesterdayStr) {
+                    this.streak += 1;
+                    return await this.saveStreak();
+                } else {
+                    this.streak = 1;
+                    return await this.saveStreak();
+                }
+            } catch (e) {
+                console.error('Error updating streak:', e);
+                return { streak: this.streak, bonus: 0, milestone: null, message: null };
+            }
+        }
+
+        async saveStreak() {
+            try {
+                await db.collection('students').doc(this.uid).update({
+                    streak: this.streak,
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                var bonus = this.calculateBonus();
+                var milestone = this.getMilestone();
+                var message = null;
+                if (bonus > 0 && milestone) message = '🏆 ' + milestone.name + '! +' + bonus + ' bonus points!';
+                else if (bonus > 0) message = '🔥 ' + this.streak + '-day streak! +' + bonus + ' bonus points!';
+                else if (this.streak === 1) message = '🔥 Started your streak!';
+                else message = '🔥 ' + this.streak + '-day streak!';
+                if (bonus > 0) {
+                    await db.collection('students').doc(this.uid).update({
+                        totalPoints: firebase.firestore.FieldValue.increment(bonus)
+                    });
+                }
+                return { streak: this.streak, bonus: bonus, milestone: milestone, message: message };
+            } catch (e) {
+                console.error('Error saving streak:', e);
+                return { streak: this.streak, bonus: 0, milestone: null, message: null };
+            }
+        }
+
+        calculateBonus() {
+            var milestones = { 3: 5, 7: 15, 14: 30, 30: 50, 60: 100, 100: 200 };
+            var bonus = 0;
+            for (var days in milestones) {
+                if (this.streak >= parseInt(days)) bonus = milestones[days];
+            }
+            return bonus;
+        }
+
+        getMilestone() {
+            var milestones = {
+                3: { name: '3-Day Streak' },
+                7: { name: '7-Day Streak' },
+                14: { name: '14-Day Streak' },
+                30: { name: '30-Day Streak' },
+                60: { name: '60-Day Streak' },
+                100: { name: '100-Day Streak' }
+            };
+            return milestones[this.streak] || null;
+        }
+
+        getStreakIcon() {
+            if (this.streak >= 100) return '💎';
+            if (this.streak >= 60) return '👑';
+            if (this.streak >= 30) return '🏆';
+            if (this.streak >= 14) return '🌟';
+            if (this.streak >= 7) return '⚡';
+            if (this.streak >= 3) return '🔥';
+            return '📅';
+        }
+    }
+
+    // ============================================================
+    // PROGRESS TRACKER CLASS
+    // ============================================================
+    class ProgressTracker {
+        constructor(uid) {
+            this.uid = uid;
+            this.progress = null;
+            this.stats = null;
+            this.loaded = false;
+        }
+
+        async loadProgress() {
+            if (this.loaded) return { progress: this.progress, stats: this.stats };
+            try {
+                var doc = await db.collection('students').doc(this.uid).get();
+                if (doc.exists) {
+                    var data = doc.data();
+                    this.progress = data.pr || {};
+                    this.stats = data.st || { ta: 0, tc: 0, tw: 0, seen: 0 };
+                    this.loaded = true;
+                    this.showStorageInfo();
+                    return { progress: this.progress, stats: this.stats };
+                } else {
+                    this.progress = {};
+                    this.stats = { ta: 0, tc: 0, tw: 0, seen: 0 };
+                    this.loaded = true;
+                    return { progress: {}, stats: { ta: 0, tc: 0, tw: 0, seen: 0 } };
+                }
+            } catch (e) {
+                console.error('Error loading progress:', e);
+                return { progress: {}, stats: { ta: 0, tc: 0, tw: 0, seen: 0 } };
+            }
+        }
+
+        getQuestionProgress(questionId) {
+            if (!this.progress) return null;
+            var p = this.progress[questionId];
+            if (!p) return null;
+            return { attempted: p[0], correct: p[1], daysAgo: p[2], successRate: p[0] > 0 ? p[1] / p[0] : 0 };
+        }
+
+        async updateProgress(questionId, isCorrect) {
+            try {
+                if (!this.loaded) await this.loadProgress();
+                var p = this.progress[questionId];
+                if (!p) p = [0, 0, 0];
+                p[0] += 1;
+                if (isCorrect) { p[1] += 1; this.stats.tc += 1; } else { this.stats.tw += 1; }
+                p[2] = 0;
+                this.stats.ta += 1;
+                this.stats.seen = totalQuestions > 0 
+                    ? Math.round((Object.keys(this.progress).length / totalQuestions) * 100) 
+                    : 0;
+                await this.saveProgress(questionId, p);
+                return { attempted: p[0], correct: p[1], daysAgo: p[2] };
+            } catch (e) {
+                console.error('Error updating progress:', e);
+                throw e;
+            }
+        }
+
+        async saveProgress(questionId, data) {
+            try {
+                await db.collection('students').doc(this.uid).update({
+                    ['pr.' + questionId]: data,
+                    'st.ta': this.stats.ta,
+                    'st.tc': this.stats.tc,
+                    'st.tw': this.stats.tw,
+                    'st.seen': this.stats.seen
+                });
+            } catch (e) {
+                if (e.code === 'not-found') {
+                    await db.collection('students').doc(this.uid).set({
+                        pr: { [questionId]: data },
+                        st: this.stats
+                    });
+                }
+                throw e;
+            }
+        }
+
+        getTotalAttempted() { return Object.keys(this.progress).length; }
+        getStats() { return this.stats; }
+
+        showStorageInfo() {
+            var totalSeen = Object.keys(this.progress).length;
+            var info = document.getElementById('storageInfo');
+            if (info) {
+                info.innerHTML = '💾 Storage Efficient | ' + totalSeen + ' tracked | ' + this.stats.ta + ' attempts | ' + (this.stats.seen || 0) + '% seen';
+            }
+        }
+
+        async updateDaysAgo() {
+            if (!this.loaded || !this.progress) return;
+            try {
+                var updates = {};
+                for (var qId in this.progress) {
+                    var p = this.progress[qId];
+                    if (p[2] < 30) updates['pr.' + qId] = [p[0], p[1], p[2] + 1];
+                }
+                if (Object.keys(updates).length > 0) {
+                    await db.collection('students').doc(this.uid).update(updates);
+                }
+            } catch (e) { /* ignore */ }
+        }
+    }
+
+    // ============================================================
+    // QUESTION SELECTOR CLASS
+    // ============================================================
+    class QuestionSelector {
+        constructor(progressTracker) {
+            this.progressTracker = progressTracker;
+            this.allQuestions = [];
+            this.selectedQuestions = [];
+        }
+
+        async initialize(questions) {
+            this.allQuestions = questions;
+            totalQuestions = questions.length;
+            if (this.progressTracker && !this.progressTracker.loaded) {
+                await this.progressTracker.loadProgress();
+            }
+        }
+
+        selectQuestions(count, subject) {
+            var available = subject && subject !== 'all' 
+                ? this.allQuestions.filter(function(q) { return q.subject === subject; })
+                : this.allQuestions;
+            if (available.length === 0) return [];
+
+            var prioritized = available.map(function(q) {
+                return { ...q, priority: this.calculatePriority(q.id) };
+            }.bind(this));
+            prioritized.sort(function(a, b) { return b.priority - a.priority; });
+            this.selectedQuestions = prioritized.slice(0, Math.min(count, prioritized.length));
+            return this.selectedQuestions;
+        }
+
+        calculatePriority(questionId) {
+            var priority = 0;
+            var progress = this.progressTracker ? this.progressTracker.getQuestionProgress(questionId) : null;
+            var totalAttempted = this.progressTracker ? this.progressTracker.getTotalAttempted() : 0;
+            var totalQ = this.allQuestions.length;
+            var percentageSeen = totalQ > 0 ? (totalAttempted / totalQ) * 100 : 0;
+
+            if (!progress) { priority += 50; return priority; }
+            var successRate = progress.attempted > 0 ? progress.correct / progress.attempted : 0;
+            if (successRate < 0.5) priority += 30;
+            else if (successRate < 0.7) priority += 15;
+            var daysAgo = progress.daysAgo || 0;
+            if (daysAgo > 30) priority += 50;
+            else if (daysAgo > 14) priority += 30;
+            else if (daysAgo > 7) priority += 20;
+            if (percentageSeen >= 90) priority += 5;
+            return priority;
+        }
+
+        getSelectedQuestions() { return this.selectedQuestions; }
+
+        getSelectionStats() {
+            var total = this.allQuestions.length;
+            var attempted = this.progressTracker ? this.progressTracker.getTotalAttempted() : 0;
+            var percentage = total > 0 ? (attempted / total) * 100 : 0;
+            return {
+                totalQuestions: total,
+                attemptedQuestions: attempted,
+                percentageSeen: Math.round(percentage),
+                selectedCount: this.selectedQuestions.length,
+                isRepeating: percentage >= 90
+            };
+        }
+    }
+
+    // ============================================================
+    // ACHIEVEMENT MANAGER CLASS
+    // ============================================================
+    class AchievementManager {
+        constructor() {
+            this.definitions = this.getDefinitions();
+            this.studentAchievements = [];
+            this.loaded = false;
+        }
+
+        getDefinitions() {
+            return {
+                first_quiz: {
+                    id: 'first_quiz', name: 'First Steps', icon: '🎯',
+                    description: 'Complete your first quiz', points: 10,
+                    check: function(data) { return data.totalQuizzes === 1; }
+                },
+                perfect_score: {
+                    id: 'perfect_score', name: 'Perfect Score', icon: '💯',
+                    description: 'Score 100% on any quiz', points: 50,
+                    check: function(data) { return data.percentage === 100 && data.total >= 5; }
+                },
+                quiz_warrior: {
+                    id: 'quiz_warrior', name: 'Quiz Warrior', icon: '⚔️',
+                    description: 'Complete 10 quizzes', points: 50,
+                    check: function(data) { return data.totalQuizzes >= 10; }
+                },
+                quiz_master: {
+                    id: 'quiz_master', name: 'Quiz Master', icon: '🏆',
+                    description: 'Complete 50 quizzes', points: 200,
+                    check: function(data) { return data.totalQuizzes >= 50; }
+                },
+                streak_7: {
+                    id: 'streak_7', name: '7-Day Streak', icon: '🔥',
+                    description: 'Maintain a 7-day streak', points: 50,
+                    check: function(data) { return data.streak >= 7; }
+                },
+                streak_30: {
+                    id: 'streak_30', name: '30-Day Streak', icon: '🌟',
+                    description: 'Maintain a 30-day streak', points: 100,
+                    check: function(data) { return data.streak >= 30; }
+                }
+            };
+        }
+
+        async loadStudentAchievements(uid) {
+            try {
+                var doc = await db.collection('students').doc(uid).get();
+                if (doc.exists) {
+                    this.studentAchievements = doc.data().achievements || [];
+                    this.loaded = true;
+                    return this.studentAchievements;
+                }
+                this.studentAchievements = [];
+                this.loaded = true;
+                return [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        async checkAchievements(uid, quizData) {
+            try {
+                if (!this.loaded) await this.loadStudentAchievements(uid);
+                var unlocked = new Set(this.studentAchievements);
+                var newAchievements = [];
+
+                for (var id in this.definitions) {
+                    if (unlocked.has(id)) continue;
+                    var def = this.definitions[id];
+                    try {
+                        if (def.check(quizData)) {
+                            newAchievements.push(id);
+                            unlocked.add(id);
+                        }
+                    } catch (err) { /* ignore */ }
+                }
+
+                if (newAchievements.length > 0) {
+                    await this.unlockAchievements(uid, newAchievements);
+                }
+                return newAchievements;
+            } catch (e) {
+                return [];
+            }
+        }
+
+        async unlockAchievements(uid, achievementIds) {
+            try {
+                if (achievementIds.length === 0) return [];
+                
+                await db.collection('students').doc(uid).update({
+                    achievements: firebase.firestore.FieldValue.arrayUnion(...achievementIds)
+                });
+                
+                var totalBonus = 0;
+                for (var i = 0; i < achievementIds.length; i++) {
+                    var def = this.definitions[achievementIds[i]];
+                    if (def) totalBonus += def.points || 0;
+                }
+                if (totalBonus > 0) {
+                    await db.collection('students').doc(uid).update({
+                        totalPoints: firebase.firestore.FieldValue.increment(totalBonus)
+                    });
+                }
+                console.log('🏅 Achievements unlocked:', achievementIds.join(', '), '(+' + totalBonus + ' points)');
+                return achievementIds;
+            } catch (e) {
+                console.error('Error unlocking achievements:', e);
+                return [];
+            }
+        }
+
+        async getTotalQuizzes(uid) {
+            try {
+                var snapshot = await db.collection('quiz_scores')
+                    .where('studentId', '==', uid)
+                    .get();
+                return snapshot.size;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        async getSubjectStats(uid) {
+            try {
+                var snapshot = await db.collection('quiz_scores')
+                    .where('studentId', '==', uid)
+                    .get();
+                var stats = {};
+                snapshot.forEach(function(doc) {
+                    var data = doc.data();
+                    var subject = data.subject || 'general';
+                    if (!stats[subject]) stats[subject] = { count: 0, totalScore: 0, avgScore: 0 };
+                    stats[subject].count += 1;
+                    stats[subject].totalScore += data.percentage || 0;
+                    stats[subject].avgScore = Math.round(stats[subject].totalScore / stats[subject].count);
+                });
+                return stats;
+            } catch (e) {
+                return {};
+            }
+        }
+    }
+
+    // ============================================================
+    // STUDENT OF WEEK CLASS
+    // ============================================================
+    class StudentOfWeek {
+        constructor() {
+            this.loaded = false;
+            this.weekData = null;
+        }
+
+        async isStudentOfWeek(uid) {
+            try {
+                var now = new Date();
+                var weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                
+                var weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 7);
+                
+                var snapshot = await db.collection('students')
+                    .where('studentOfWeek', '==', true)
+                    .get();
+                
+                var found = false;
+                snapshot.forEach(function(doc) {
+                    if (doc.id === uid) found = true;
+                });
+                
+                return found;
+            } catch (e) {
+                console.error('Error checking student of week:', e);
+                return false;
+            }
+        }
+    }
+
+    // ============================================================
+    // DUEL FUNCTIONS
+    // ============================================================
+    async function loadChallengeData(challengeId) {
+        try {
+            var doc = await db.collection('challenges').doc(challengeId).get();
+            if (!doc.exists) {
+                showToast('Challenge not found!', 'error');
+                setTimeout(function() { window.location.href = 'multiplayer.html'; }, 2000);
+                return null;
+            }
+            var data = doc.data();
+            
+            var user = auth.currentUser;
+            
+            // FIX 1: Check if user is creator, opponent, OR in players list
+            var isCreator = data.creator === user.uid;
+            var isOpponent = data.opponent === user.uid;
+            var isInPlayers = data.players && data.players[user.uid] !== undefined;
+
+            if (!isCreator && !isOpponent && !isInPlayers) {
+                showToast('You are not part of this challenge!', 'error');
+                setTimeout(function() { window.location.href = 'multiplayer.html'; }, 2000);
+                return null;
+            }
+            
+            if (data.status === 'completed') {
+                showToast('This challenge has already been completed!', 'warning');
+                setTimeout(function() { window.location.href = 'multiplayer.html'; }, 2000);
+                return null;
+            }
+            
+            return data;
+        } catch (error) {
+            console.error('Error loading challenge:', error);
+            showToast('Error loading challenge', 'error');
+            return null;
+        }
+    }
+
+    function setupDuelUI(opponentName) {
+        var duelInfo = document.getElementById('duelInfo');
+        if (duelInfo) {
+            duelInfo.classList.remove('hidden');
+            document.getElementById('opponentNameDisplay').textContent = opponentName;
+        }
+        
+        // Hide mode selection and setup
+        document.getElementById('modeSelection').classList.add('hidden');
+        document.getElementById('setupPhase').classList.add('hidden');
+    }
+
+    function startDuelListener(challengeId) {
+        if (challengeListener) {
+            challengeListener();
+            challengeListener = null;
+        }
+        
+        challengeListener = db.collection('challenges').doc(challengeId)
+            .onSnapshot(function(doc) {
+                if (!doc.exists) return;
+                var data = doc.data();
+                
+                // Update opponent score
+                var isCreator = data.creator === auth.currentUser.uid;
+                var opponentScore = isCreator ? data.opponentScore : data.creatorScore;
+                var opponentAnswers = isCreator ? data.opponentAnswers : data.creatorAnswers;
+                
+                document.getElementById('opponentScore').textContent = opponentScore;
+                
+                var totalQuestions = quiz.questions.length || 1;
+                var progress = Math.round((opponentAnswers.length / totalQuestions) * 100);
+                document.getElementById('opponentProgress').textContent = progress + '%';
+                
+                // Check if opponent finished
+                var opponentFinished = isCreator ? data.opponentFinished : data.creatorFinished;
+                if (opponentFinished) {
+                    document.getElementById('opponentStatus').textContent = '✅ Opponent finished!';
+                }
+                
+                // Check if challenge completed
+                if (data.status === 'completed') {
+                    showDuelResult(data);
+                }
+                
+                // Update scores in UI
+                duelData.opponentScore = opponentScore;
+                duelData.opponentAnswers = opponentAnswers;
+            }, function(error) {
+                console.error('Duel listener error:', error);
+            });
+    }
+
+    function showDuelResult(data) {
+        var winner = data.winner;
+        var isCreator = data.creator === auth.currentUser.uid;
+        var myScore = isCreator ? data.creatorScore : data.opponentScore;
+        var oppScore = isCreator ? data.opponentScore : data.creatorScore;
+        var oppName = isCreator ? data.opponentName : data.creatorName;
+        
+        var msg = '';
+        if (winner === auth.currentUser.uid) {
+            msg = '🏆 You won the duel! +50 bonus points!';
+            showToast(msg, 'success');
+        } else if (winner) {
+            msg = '👏 ' + oppName + ' won the duel!';
+            showToast(msg, 'info');
+        } else {
+            msg = '🤝 It\'s a tie!';
+            showToast(msg, 'info');
+        }
+        
+        // Show in results
+        document.getElementById('resultMessage').textContent = msg + ' (Final: You ' + myScore + ' - ' + oppScore + ' ' + oppName + ')';
+    }
+
+    // ============================================================
+    // GLOBAL VARIABLES
+    // ============================================================
+    var progressTracker = null;
+    var questionSelector = null;
+    var streakManager = null;
+    var achievementManager = null;
+    var studentOfWeek = null;
+    var isQuizStarting = false;
+
+    var quiz = {
+        questions: [],
+        current: 0,
+        correct: 0,
+        wrong: 0,
+        wrongStreak: 0,
+        score: 0,
+        answers: [],
+        timer: null,
+        timeLeft: 0,
+        startTime: null,
+        isComplete: false
+    };
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+        return array;
+    }
+
+    function showToast(message, icon) {
+        icon = icon || '🔥';
+        var existing = document.querySelector('.streak-notification');
+        if (existing) existing.remove();
+        var notification = document.createElement('div');
+        notification.className = 'streak-notification';
+        notification.innerHTML = '<span class="icon">' + icon + '</span> <span>' + message + '</span>';
+        document.body.appendChild(notification);
+        setTimeout(function() {
+            notification.classList.add('hide');
+            setTimeout(function() { notification.remove(); }, 500);
+        }, 5000);
+    }
+
+    function updateStreakDisplay(streak) {
+        var el = document.getElementById('streakDisplay');
+        if (el) el.textContent = streak || 0;
+    }
+
+    // ============================================================
+    // SHOOTING STARS
+    // ============================================================
+    function createShootingStars() {
+        var container = document.getElementById('shootingStars');
+        for (var i = 0; i < 120; i++) {
+            var star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = (Math.random() * 2 + 1) + 'px';
+            star.style.height = star.style.width;
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            container.appendChild(star);
+        }
+        var shootingStars = [{ top: 5, left: 5, delay: 2 }, { top: 15, left: 20, delay: 6 }, { top: 25, left: 35, delay: 10 }];
+        shootingStars.forEach(function(pos) {
+            var star = document.createElement('div');
+            star.className = 'shooting-star';
+            star.style.left = pos.left + '%';
+            star.style.top = pos.top + '%';
+            star.style.setProperty('--angle', '45deg');
+            star.style.setProperty('--distance', '600');
+            star.style.setProperty('--duration', '4s');
+            star.style.animationDelay = pos.delay + 's';
+            container.appendChild(star);
+        });
+    }
+
+    // ============================================================
+    // MODE SELECTION
+    // ============================================================
+    function selectMode(mode) {
+        selectedMode = mode;
+        document.querySelectorAll('.mode-card').forEach(function(card) {
+            card.classList.toggle('selected', card.dataset.mode === mode);
+        });
+        document.getElementById('dualOptions').classList.toggle('hidden', mode !== 'dual');
+        document.getElementById('multiOptions').classList.toggle('hidden', mode !== 'multi');
+
+        var badge = document.getElementById('modeBadge');
+        var desc = document.getElementById('modeDescription');
+        var modeNames = {
+            solo: { label: 'SOLO', class: 'solo', desc: 'Practice by yourself' },
+            dual: { label: 'DUAL', class: 'dual', desc: 'Challenge a friend to a duel!' },
+            multi: { label: 'MULTI', class: 'multi', desc: 'Join a lobby with multiple players' },
+            festival: { label: 'FESTIVAL', class: 'festival', desc: 'Special festival quizzes with bonus points!' }
+        };
+        var info = modeNames[mode];
+        badge.textContent = info.label;
+        badge.className = 'mode-badge ' + info.class;
+        desc.textContent = info.desc;
+        document.getElementById('modeInfo').innerHTML = '✅ Selected: <strong style="color:#fff;">' + info.label + '</strong> - ' + info.desc;
+        document.getElementById('modeSelection').classList.add('hidden');
+        document.getElementById('setupPhase').classList.remove('hidden');
+        document.getElementById('startBtn').disabled = false;
+    }
+
+    function goBackToModeSelection() {
+        document.getElementById('setupPhase').classList.add('hidden');
+        document.getElementById('modeSelection').classList.remove('hidden');
+        document.getElementById('quizPhase').classList.add('hidden');
+        document.getElementById('resultsPhase').classList.add('hidden');
+    }
+
+    // ============================================================
+    // FETCH QUESTIONS
+    // ============================================================
+    async function fetchQuestions() {
+        if (questionCache && questionCache.length > 0) return questionCache;
+        try {
+            console.log('📡 Fetching questions...');
+            var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + SHEET_CONFIG.sheetId + '/values/' + SHEET_CONFIG.range + '?key=' + SHEET_CONFIG.apiKey;
+            var response = await fetch(url);
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            var data = await response.json();
+            if (!data.values || data.values.length === 0) throw new Error('No questions found');
+            var questions = data.values.map(function(row, i) {
+                var id = row[0];
+                return {
+                    id: (id !== undefined && id !== '') ? parseInt(id) : i + 1,
+                    question: row[1] || '',
+                    options: [row[2] || '', row[3] || '', row[4] || '', row[5] || ''],
+                    correct: row[6] || 'A',
+                    type: row[7] || 'MCQ',
+                    explanation: row[8] || '',
+                    pageRef: row[9] || '',
+                    subject: row[10] || 'ancient'
+                };
+            }).filter(function(q) { return q.question && q.question.trim() !== ''; });
+            questionCache = questions;
+            totalQuestions = questions.length;
+            isQuestionsLoaded = true;
+            console.log('✅ Loaded ' + questions.length + ' questions');
+            return questions;
+        } catch (error) {
+            console.error('❌ Error:', error);
+            document.getElementById('errorDisplay').innerHTML = '⚠️ Failed to load questions: ' + error.message + '<br><button onclick="location.reload()" style="margin-top:10px; padding:5px 15px; cursor:pointer; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.1); border-radius:5px; color:#fff;">🔄 Retry</button>';
+            document.getElementById('errorDisplay').classList.remove('hidden');
+            throw error;
+        }
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    async function initProgress() {
+        var user = auth.currentUser;
+        if (!user) return;
+        progressTracker = new ProgressTracker(user.uid);
+        await progressTracker.loadProgress();
+        await progressTracker.updateDaysAgo();
+    }
+
+    async function initStreak() {
+        var user = auth.currentUser;
+        if (!user) return;
+        streakManager = new StreakManager(user.uid);
+        await streakManager.loadStreak();
+        updateStreakDisplay(streakManager.streak);
+    }
+
+    // ============================================================
+    // START QUIZ - FIXED VERSION
+    // ============================================================
+    async function startQuiz() {
+        if (isQuizStarting) return;
+        isQuizStarting = true;
+
+        // ✅ FIX: Load questions FIRST for ALL modes
+        if (!isQuestionsLoaded || !questionCache) await fetchQuestions();
+        if (!questionCache || questionCache.length === 0) throw new Error('No questions available');
+
+        // ============================================================
+        // DUEL MODE CHECK
+        // ============================================================
+        if (isDuelMode && challengeId) {
+            // Load challenge data
+            currentChallenge = await loadChallengeData(challengeId);
+            if (!currentChallenge) {
+                isQuizStarting = false;
+                return;
+            }
+            
+            duelData.challengeId = challengeId;
+            duelData.challengeData = currentChallenge;
+            
+            duelData.isCreator = (currentChallenge.creator === auth.currentUser.uid);
+            
+            if (duelData.isCreator) {
+                duelData.opponentName = currentChallenge.opponentName || 'Opponent';
+            } else {
+                duelData.opponentName = currentChallenge.creatorName || 'Opponent';
+            }
+            
+            if (!duelData.opponentName || duelData.opponentName === 'Opponent') {
+                var players = currentChallenge.players || {};
+                Object.keys(players).forEach(function(uid) {
+                    if (uid !== auth.currentUser.uid && players[uid].name) {
+                        duelData.opponentName = players[uid].name;
+                    }
+                });
+            }
+            
+            duelData.isActive = true;
+            
+            setupDuelUI(duelData.opponentName);
+            
+            var subject = currentChallenge.subject;
+            var count = currentChallenge.count;
+            var timeLimit = currentChallenge.timeLimit;
+            
+            if (!progressTracker) await initProgress();
+            if (!questionSelector) {
+                questionSelector = new QuestionSelector(progressTracker);
+                await questionSelector.initialize(questionCache);
+            }
+            
+            var selected;
+            if (currentChallenge.questionIds && currentChallenge.questionIds.length > 0) {
+                selected = questionCache.filter(function(q) {
+                    return currentChallenge.questionIds.indexOf(q.id) !== -1;
+                });
+            } else {
+                selected = questionSelector.selectQuestions(count, subject);
+                var questionIds = selected.map(function(q) { return q.id; });
+                await db.collection('challenges').doc(challengeId).update({
+                    questionIds: questionIds
+                });
+            }
+            
+            if (selected.length === 0) {
+                alert('No questions available for this subject!');
+                isQuizStarting = false;
+                return;
+            }
+            
+            quiz.questions = shuffleArray(selected);
+            document.getElementById('selectionStats').innerHTML = '⚔️ Duel Mode: ' + quiz.questions.length + ' questions';
+            
+            startDuelListener(challengeId);
+            
+            quiz.current = 0;
+            quiz.correct = 0;
+            quiz.wrong = 0;
+            quiz.wrongStreak = 0;
+            quiz.score = 0;
+            quiz.answers = [];
+            quiz.isComplete = false;
+            quiz.timeLeft = timeLimit;
+            quiz.startTime = Date.now();
+
+            document.getElementById('setupPhase').classList.add('hidden');
+            document.getElementById('quizPhase').classList.remove('hidden');
+            document.getElementById('resultsPhase').classList.add('hidden');
+
+            document.getElementById('quizTitle').textContent = '⚔️ DUEL - You vs ' + duelData.opponentName;
+            document.getElementById('questionCountDisplay').textContent = quiz.questions.length + ' questions loaded';
+            document.getElementById('timerDisplay').textContent = timeLimit > 0 ? timeLimit : '∞';
+
+            if (timeLimit > 0) {
+                if (quiz.timer) clearInterval(quiz.timer);
+                quiz.timer = setInterval(updateTimer, 1000);
+            }
+
+            showQuestion();
+            isQuizStarting = false;
+            return;
+        }
+
+        // ============================================================
+        // ORIGINAL SOLO MODE
+        // ============================================================
+        var subject = document.getElementById('subjectSelect').value;
+        var count = parseInt(document.getElementById('countSelect').value);
+        var timeLimit = parseInt(document.getElementById('timeSelect').value);
+
+        try {
+            if (!progressTracker) await initProgress();
+            if (!questionSelector) {
+                questionSelector = new QuestionSelector(progressTracker);
+                await questionSelector.initialize(questionCache);
+            }
+
+            var selected = questionSelector.selectQuestions(count, subject);
+            if (selected.length === 0) {
+                alert('No questions available for this subject!');
+                isQuizStarting = false;
+                return;
+            }
+
+            quiz.questions = shuffleArray(selected);
+            var stats = questionSelector.getSelectionStats();
+            document.getElementById('selectionStats').innerHTML = '📊 Selected ' + stats.selectedCount + ' questions | ' + stats.percentageSeen + '% seen | ' + (stats.isRepeating ? '🔄 90% rule active' : '✅ New questions');
+
+            quiz.current = 0;
+            quiz.correct = 0;
+            quiz.wrong = 0;
+            quiz.wrongStreak = 0;
+            quiz.score = 0;
+            quiz.answers = [];
+            quiz.isComplete = false;
+            quiz.timeLeft = timeLimit;
+            quiz.startTime = Date.now();
+
+            document.getElementById('setupPhase').classList.add('hidden');
+            document.getElementById('quizPhase').classList.remove('hidden');
+            document.getElementById('resultsPhase').classList.add('hidden');
+
+            document.getElementById('quizTitle').textContent = selectedMode.toUpperCase() + ' - ' + subject.charAt(0).toUpperCase() + subject.slice(1);
+            document.getElementById('questionCountDisplay').textContent = quiz.questions.length + ' questions loaded';
+            document.getElementById('timerDisplay').textContent = timeLimit > 0 ? timeLimit : '∞';
+
+            if (timeLimit > 0) {
+                if (quiz.timer) clearInterval(quiz.timer);
+                quiz.timer = setInterval(updateTimer, 1000);
+            }
+
+            showQuestion();
+        } catch (error) {
+            console.error('❌ Start quiz error:', error);
+            alert('❌ Failed to start quiz: ' + error.message);
+        } finally {
+            isQuizStarting = false;
+        }
+    }
+
+    // ============================================================
+    // SHOW QUESTION
+    // ============================================================
+    function showQuestion() {
+        if (quiz.current >= quiz.questions.length) { completeQuiz(); return; }
+
+        var q = quiz.questions[quiz.current];
+        var total = quiz.questions.length;
+        var progress = ((quiz.current) / total) * 100;
+
+        document.getElementById('progressDisplay').textContent = (quiz.current + 1) + '/' + total;
+        document.getElementById('progressFill').style.width = progress + '%';
+        document.getElementById('progressLabel').textContent = Math.round(progress) + '%';
+        document.getElementById('wrongStreakLabel').textContent = 'Wrong streak: ' + quiz.wrongStreak;
+        document.getElementById('scoreDisplay').textContent = quiz.score;
+        document.getElementById('questionText').textContent = q.question;
+
+        var labels = ['A', 'B', 'C', 'D'];
+        var optionsWithLabels = q.options.map(function(opt, idx) { return { text: opt, label: labels[idx] }; });
+        var shuffledOptions = shuffleArray(optionsWithLabels);
+
+        var container = document.getElementById('optionsContainer');
+        container.innerHTML = shuffledOptions.map(function(opt) {
+            return '<button class="option-btn" data-label="' + opt.label + '" onclick="selectAnswer(\'' + opt.label + '\')"><span class="label">' + opt.label + '.</span><span>' + opt.text + '</span></button>';
+        }).join('');
+
+        var feedback = document.getElementById('feedbackArea');
+        feedback.classList.remove('show', 'correct', 'wrong');
+    }
+
+    // ============================================================
+    // SELECT ANSWER
+    // ============================================================
+    async function selectAnswer(selectedLabel) {
+        if (quiz.isComplete) return;
+
+        var q = quiz.questions[quiz.current];
+        var isCorrect = selectedLabel === q.correct;
+
+        document.querySelectorAll('.option-btn').forEach(function(btn) { btn.classList.add('disabled'); });
+
+        var btns = document.querySelectorAll('.option-btn');
+        btns.forEach(function(btn) {
+            var label = btn.dataset.label;
+            if (label === q.correct) btn.classList.add('correct');
+            if (label === selectedLabel && !isCorrect) btn.classList.add('wrong');
+        });
+
+        var feedback = document.getElementById('feedbackArea');
+        var feedbackText = document.getElementById('feedbackText');
+
+        if (isCorrect) {
+            quiz.correct++;
+            quiz.wrongStreak = 0;
+            quiz.score += 1;
+            feedback.className = 'feedback-area show correct';
+            feedbackText.textContent = '✅ Correct! ' + (q.explanation || '');
+        } else {
+            quiz.wrong++;
+            quiz.wrongStreak++;
+            if (quiz.wrongStreak >= 3) {
+                quiz.score -= 1;
+                feedbackText.textContent = '❌ Wrong! -1 point (3 wrong in a row). ' + (q.explanation || '');
+            } else {
+                feedbackText.textContent = '❌ Wrong! ' + (q.explanation || '');
+            }
+            feedback.className = 'feedback-area show wrong';
+        }
+
+        document.getElementById('scoreDisplay').textContent = quiz.score;
+        document.getElementById('wrongStreakLabel').textContent = 'Wrong streak: ' + quiz.wrongStreak;
+
+        // ============================================================
+        // DUEL MODE - SAVE ANSWER TO FIRESTORE
+        // ============================================================
+        if (isDuelMode && challengeId && duelData.isActive) {
+            var answerData = {
+                questionIndex: quiz.current,
+                selected: selectedLabel,
+                correct: isCorrect
+            };
+            
+            var updateData = {};
+            if (duelData.isCreator) {
+                updateData.creatorAnswers = firebase.firestore.FieldValue.arrayUnion(answerData);
+                updateData.creatorScore = firebase.firestore.FieldValue.increment(isCorrect ? 1 : 0);
+            } else {
+                updateData.opponentAnswers = firebase.firestore.FieldValue.arrayUnion(answerData);
+                updateData.opponentScore = firebase.firestore.FieldValue.increment(isCorrect ? 1 : 0);
+            }
+            
+            try {
+                await db.collection('challenges').doc(challengeId).update(updateData);
+            } catch (error) {
+                console.error('Error saving duel answer:', error);
+            }
+        }
+
+        if (progressTracker) {
+            progressTracker.updateProgress(q.id, isCorrect).catch(function(err) { 
+                console.warn('Failed to update progress:', err); 
+            });
+        }
+
+        quiz.answers.push({ question: q.id, selected: selectedLabel, correct: isCorrect });
+        quiz.current++;
+        setTimeout(function() { showQuestion(); }, 2500);
+    }
+
+    // ============================================================
+    // TIMER
+    // ============================================================
+    function updateTimer() {
+        quiz.timeLeft--;
+        document.getElementById('timerDisplay').textContent = quiz.timeLeft;
+        if (quiz.timeLeft <= 0) {
+            clearInterval(quiz.timer);
+            completeQuiz();
+        }
+    }
+
+    // ============================================================
+    // COMPLETE QUIZ
+    // ============================================================
+    async function completeQuiz() {
+        if (quiz.isComplete) return;
+        quiz.isComplete = true;
+        if (quiz.timer) clearInterval(quiz.timer);
+
+        var total = quiz.questions.length;
+        var percentage = total > 0 ? Math.round((quiz.correct / total) * 100) : 0;
+        var timeTaken = Math.round((Date.now() - quiz.startTime) / 1000);
+
+        var streakResult = null;
+        var newAchievements = [];
+        var isStudentOfWeek = false;
+
+        // ============================================================
+        // DUEL MODE - FINISH DUEL
+        // ============================================================
+        if (isDuelMode && challengeId && duelData.isActive) {
+            try {
+                var user = auth.currentUser;
+                var isCreator = duelData.isCreator;
+                
+                var updateData = {};
+                if (isCreator) {
+                    updateData.creatorFinished = true;
+                } else {
+                    updateData.opponentFinished = true;
+                }
+                
+                await db.collection('challenges').doc(challengeId).update(updateData);
+                duelData.myFinished = true;
+                
+                var doc = await db.collection('challenges').doc(challengeId).get();
+                var data = doc.data();
+                
+                if (data.creatorFinished && data.opponentFinished) {
+                    var winner = null;
+                    if (data.creatorScore > data.opponentScore) {
+                        winner = data.creator;
+                    } else if (data.opponentScore > data.creatorScore) {
+                        winner = data.opponent;
+                    }
+                    
+                    await db.collection('challenges').doc(challengeId).update({
+                        status: 'completed',
+                        winner: winner,
+                        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    if (winner === user.uid) {
+                        await db.collection('students').doc(user.uid).update({
+                            totalPoints: firebase.firestore.FieldValue.increment(50)
+                        });
+                        showToast('🏆 You won the duel! +50 bonus points!', 'success');
+                    } else if (winner) {
+                        showToast('👏 ' + (data.creator === winner ? data.creatorName : data.opponentName) + ' won the duel!', 'info');
+                    } else {
+                        showToast('🤝 It\'s a tie!', 'info');
+                    }
+                    
+                    var myScore = isCreator ? data.creatorScore : data.opponentScore;
+                    var oppScore = isCreator ? data.opponentScore : data.creatorScore;
+                    var oppName = isCreator ? data.opponentName : data.creatorName;
+                    document.getElementById('resultMessage').textContent = 'Final: You ' + myScore + ' - ' + oppScore + ' ' + oppName;
+                } else {
+                    document.getElementById('resultMessage').textContent = '⏳ Waiting for opponent to finish...';
+                }
+            } catch (error) {
+                console.error('Error finishing duel:', error);
+            }
+        }
+
+        // ============================================================
+        // SOLO MODE - STREAK + ACHIEVEMENTS
+        // ============================================================
+        try {
+            var user = auth.currentUser;
+            if (user && !isDuelMode) {
+                if (!streakManager) {
+                    streakManager = new StreakManager(user.uid);
+                    await streakManager.loadStreak();
+                }
+                streakResult = await streakManager.updateStreak();
+                if (streakResult) updateStreakDisplay(streakResult.streak);
+
+                if (!studentOfWeek) {
+                    studentOfWeek = new StudentOfWeek();
+                }
+                isStudentOfWeek = await studentOfWeek.isStudentOfWeek(user.uid);
+
+                if (!achievementManager) {
+                    achievementManager = new AchievementManager();
+                    await achievementManager.loadStudentAchievements(user.uid);
+                }
+
+                var quizData = {
+                    percentage: percentage,
+                    total: total,
+                    correct: quiz.correct,
+                    wrong: quiz.wrong,
+                    timeTaken: timeTaken,
+                    streak: streakResult ? streakResult.streak : 0,
+                    isStudentOfWeek: isStudentOfWeek,
+                    totalQuizzes: await achievementManager.getTotalQuizzes(user.uid),
+                    subjectStats: await achievementManager.getSubjectStats(user.uid)
+                };
+
+                newAchievements = await achievementManager.checkAchievements(user.uid, quizData);
+                if (newAchievements.length > 0) {
+                    console.log('🏅 New achievements unlocked:', newAchievements);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Post-quiz error:', error);
+        }
+
+        // Show results
+        document.getElementById('quizPhase').classList.add('hidden');
+        document.getElementById('resultsPhase').classList.remove('hidden');
+        document.getElementById('resultsPhase').querySelector('.results-area').classList.add('show');
+
+        document.getElementById('finalScore').textContent = percentage + '%';
+        document.getElementById('correctCount').textContent = quiz.correct;
+        document.getElementById('wrongCount').textContent = quiz.wrong;
+        document.getElementById('pointsEarned').textContent = quiz.score > 0 ? quiz.score : 0;
+        document.getElementById('timeTaken').textContent = timeTaken + 's';
+
+        var msg = '💪 Keep practicing!';
+        if (percentage >= 90) msg = '🌟 Excellent! You\'re a genius!';
+        else if (percentage >= 70) msg = '👏 Great job! Keep it up!';
+        else if (percentage >= 50) msg = '📚 Good effort! Practice more!';
+        
+        if (!isDuelMode) {
+            document.getElementById('resultMessage').textContent = msg;
+        }
+
+        if (!isDuelMode) {
+            var streakResultDiv = document.getElementById('streakResult');
+            if (streakResult && streakResult.message) {
+                streakResultDiv.classList.remove('hidden');
+                document.getElementById('streakResultIcon').textContent = streakResult.streak >= 3 ? '🔥' : '📅';
+                document.getElementById('streakResultText').innerHTML = streakResult.message + (streakResult.bonus > 0 ? ' <span class="highlight">+' + streakResult.bonus + ' bonus points!</span>' : '');
+                if (streakResult.bonus > 0 || streakResult.streak === 1) {
+                    showToast(streakResult.message, streakResult.streak >= 3 ? '🔥' : '📅');
+                }
+            } else {
+                streakResultDiv.classList.add('hidden');
+            }
+
+            var achDiv = document.getElementById('achievementsUnlocked');
+            if (newAchievements && newAchievements.length > 0) {
+                var achievementNames = newAchievements.map(function(id) {
+                    var def = achievementManager.definitions[id];
+                    return def ? def.icon + ' ' + def.name : id;
+                });
+                achDiv.innerHTML = '<h4>🏅 Achievements Unlocked!</h4><p>' + achievementNames.join(' • ') + '</p>';
+                achDiv.classList.remove('hidden');
+            } else {
+                achDiv.classList.add('hidden');
+            }
+        }
+
+        if (!isDuelMode) {
+            await saveQuizResults(percentage);
+        }
+    }
+
+    // ============================================================
+    // SAVE RESULTS
+    // ============================================================
+    async function saveQuizResults(percentage) {
+        var user = auth.currentUser;
+        if (!user) return;
+        try {
+            await db.collection('quiz_scores').add({
+                studentId: user.uid,
+                mode: selectedMode || 'solo',
+                subject: document.getElementById('subjectSelect').value,
+                total: quiz.questions.length,
+                correct: quiz.correct,
+                wrong: quiz.wrong,
+                score: quiz.score > 0 ? quiz.score : 0,
+                percentage: percentage,
+                timeTaken: Math.round((Date.now() - quiz.startTime) / 1000),
+                attemptedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('✅ Quiz results saved');
+        } catch (error) {
+            console.error('❌ Failed to save:', error);
+        }
+    }
+
+    // ============================================================
+    // RESET
+    // ============================================================
+    function resetQuiz() {
+        document.getElementById('setupPhase').classList.remove('hidden');
+        document.getElementById('quizPhase').classList.add('hidden');
+        document.getElementById('resultsPhase').classList.add('hidden');
+        document.getElementById('timerDisplay').textContent = '0';
+        document.getElementById('scoreDisplay').textContent = '0';
+        document.getElementById('progressDisplay').textContent = '0/0';
+        document.getElementById('progressFill').style.width = '0%';
+        document.getElementById('selectionStats').innerHTML = '';
+        document.getElementById('streakResult').classList.add('hidden');
+        
+        if (challengeListener) {
+            challengeListener();
+            challengeListener = null;
+        }
+        duelData.isActive = false;
+        document.getElementById('duelInfo').classList.add('hidden');
+    }
+
+    // ============================================================
+    // TIMER CLEANUP
+    // ============================================================
+    window.addEventListener('beforeunload', function() {
+        if (quiz.timer) {
+            clearInterval(quiz.timer);
+            quiz.timer = null;
+        }
+        if (challengeListener) {
+            challengeListener();
+            challengeListener = null;
+        }
+    });
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && streakManager) {
+            streakManager.loadStreak().then(function() {
+                updateStreakDisplay(streakManager.streak);
+            }).catch(function() {});
+        }
+    });
+
+    // ============================================================
+    // LOAD HEADER & FOOTER
+    // ============================================================
+    fetch('components/header.html')
+        .then(function(res) { return res.text(); })
+        .then(function(data) { document.getElementById('student-header').innerHTML = data; })
+        .catch(function() { console.error('Failed to load header'); });
+
+    fetch('components/footer.html')
+        .then(function(res) { return res.text(); })
+        .then(function(data) { document.getElementById('student-footer').innerHTML = data; })
+        .catch(function() { console.error('Failed to load footer'); });
+
+    // ============================================================
+    // AUTH & INIT
+    // ============================================================
+    auth.onAuthStateChanged(async function(user) {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            await user.reload();
+        } catch (error) {
+            console.warn('Token refresh failed:', error);
+        }
+        
+        if (!user.emailVerified) {
+            await auth.signOut();
+            window.location.href = 'login.html?error=not-verified';
+            return;
+        }
+
+        try {
+            await fetchQuestions();
+            await initProgress();
+            await initStreak();
+
+            var subjects = new Set();
+            questionCache.forEach(function(q) { subjects.add(q.subject); });
+            var select = document.getElementById('subjectSelect');
+            subjects.forEach(function(s) {
+                var opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+                select.appendChild(opt);
+            });
+
+            createShootingStars();
+            
+            // If duel mode with autostart, auto-start the quiz
+            if (isDuelMode && challengeId) {
+                setTimeout(function() {
+                    document.getElementById('modeSelection').classList.add('hidden');
+                    document.getElementById('setupPhase').classList.remove('hidden');
+                    startQuiz();
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('❌ Init error:', error);
+        }
+    });
+
+    console.log('✅ Quiz page loaded - DUAL MODE FULLY SUPPORTED!');
+    </script>
+
+</body>
+</html>

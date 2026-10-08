@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Awards, achievements, class toppers, and proud alumni of Swami Vivekanand Govt. Model School, Bhim.">
+<title>Awards &amp; Achievements — SVGMS Bhim</title>
+<link rel="icon" href="imgs/logo1.png" type="image/png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Awards &amp; Achievements — SVGMS Bhim">
+<meta property="og:description" content="Recognizing excellence in academics, competitions, and beyond.">
+<meta property="og:image" content="https://raw.githubusercontent.com/ishrawat/imagess/refs/heads/main/logo.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-nav-active="news">
+
+<div id="site-chrome"></div>
+
+<section class="page-hero">
+    <h1>Awards &amp; Achievements <small>excellence recognized</small></h1>
+</section>
+
+<main class="awards-page">
+
+    <div class="awards-tabs" role="tablist">
+        <button class="awards-tab active" data-category="competition" role="tab" aria-selected="true">🏅 Competition Winners</button>
+        <button class="awards-tab" data-category="topper" role="tab" aria-selected="false">📚 Class Toppers</button>
+        <button class="awards-tab" data-category="alumni" role="tab" aria-selected="false">🎓 Proud Alumni</button>
+    </div>
+
+    <div id="tab-competition" class="awards-tab-content active">
+        <div id="competitionContainer" class="awards-grid">
+            <div class="awards-loading"><span class="big-icon">🏅</span>Loading competition winners…</div>
+        </div>
+    </div>
+
+    <div id="tab-topper" class="awards-tab-content">
+        <div id="topperContainer" class="awards-grid">
+            <div class="awards-loading"><span class="big-icon">📚</span>Loading class toppers…</div>
+        </div>
+    </div>
+
+    <div id="tab-alumni" class="awards-tab-content">
+        <div id="alumniContainer" class="alumni-grid">
+            <div class="awards-loading"><span class="big-icon">🎓</span>Loading proud alumni…</div>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <p>&copy; 2026 Swami Vivekanand Govt. Model School, Bhim. All Rights Reserved.</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script src="site.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    var db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+
+    var PLACEHOLDER_AWARD = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">' +
+        '<rect width="300" height="200" fill="#f2e9d7"/>' +
+        '<text x="150" y="105" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#738290">No Image</text>' +
+        '</svg>'
+    );
+
+    var PLACEHOLDER_ALUMNI = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">' +
+        '<circle cx="60" cy="60" r="60" fill="#f2e9d7"/>' +
+        '<text x="60" y="68" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#738290">Alumni</text>' +
+        '</svg>'
+    );
+
+    function escapeHtml(text) {
+        if (text == null) return '';
+        var div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
+
+    function renderLoading(container, icon) {
+        container.innerHTML = '<div class="awards-loading"><span class="big-icon">' + icon + '</span>Loading…</div>';
+    }
+
+    function renderEmpty(container) {
+        container.innerHTML = '<div class="awards-empty"><span class="big-icon">📭</span>No records in this category yet.</div>';
+    }
+
+    function renderError(container) {
+        container.innerHTML = '<div class="awards-error"><span class="big-icon">⚠️</span>Could not load records. Please refresh.</div>';
+    }
+
+    function renderAwardCard(data, isTopper) {
+        return '<article class="award-card">' +
+            '<img class="award-photo" src="' + escapeHtml(data.photoUrl || PLACEHOLDER_AWARD) + '" alt="' + escapeHtml(data.name || '') + '" loading="lazy">' +
+            '<h2 class="award-name">' + escapeHtml(data.name || '') + '</h2>' +
+            (data.class ? '<div class="award-detail">' + escapeHtml(data.class) + '</div>' : '') +
+            (isTopper
+                ? (data.rank ? '<div class="award-highlight">🏆 Rank ' + escapeHtml(data.rank) + '</div>' : '') +
+                  (data.marks ? '<div class="award-detail">📊 ' + escapeHtml(data.marks) + '</div>' : '')
+                : (data.position ? '<div class="award-highlight">' + escapeHtml(data.position) + '</div>' : '') +
+                  (data.achievement ? '<div class="award-detail">' + escapeHtml(data.achievement) + '</div>' : '')) +
+            (data.year ? '<div class="award-meta">📅 ' + escapeHtml(data.year) + '</div>' : '') +
+        '</article>';
+    }
+
+    function renderAlumniCard(data) {
+        return '<article class="alumni-card">' +
+            '<img class="alumni-photo" src="' + escapeHtml(data.photoUrl || PLACEHOLDER_ALUMNI) + '" alt="' + escapeHtml(data.name || '') + '" loading="lazy">' +
+            '<h2 class="alumni-name">' + escapeHtml(data.name || '') + '</h2>' +
+            (data.batch ? '<div class="alumni-batch">🎓 Batch ' + escapeHtml(data.batch) + '</div>' : '') +
+            (data.profession ? '<div class="alumni-profession">' + escapeHtml(data.profession) + '</div>' : '') +
+            (data.achievement ? '<div class="alumni-achievement">' + escapeHtml(data.achievement) + '</div>' : '') +
+            (data.message ? '<div class="alumni-message">"' + escapeHtml(data.message) + '"</div>' : '') +
+        '</article>';
+    }
+
+    function loadAwards(category, containerId) {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (!db) { renderError(container); return; }
+
+        renderLoading(container, category === 'alumni' ? '🎓' : category === 'topper' ? '📚' : '🏅');
+
+        db.collection('awards')
+            .where('category', '==', category)
+            .orderBy('year', 'desc')
+            .get()
+            .then(function (snapshot) {
+                if (snapshot.empty) { renderEmpty(container); return; }
+
+                var items = [];
+                snapshot.forEach(function (doc) { items.push(doc.data()); });
+
+                container.innerHTML = items.map(function (data) {
+                    return category === 'alumni'
+                        ? renderAlumniCard(data)
+                        : renderAwardCard(data, category === 'topper');
+                }).join('');
+            })
+            .catch(function (err) {
+                console.warn('Awards unavailable:', err);
+                renderError(container);
+            });
+    }
+
+    var tabs = document.querySelectorAll('.awards-tab');
+    var tabContents = {
+        competition: document.getElementById('tab-competition'),
+        topper:      document.getElementById('tab-topper'),
+        alumni:      document.getElementById('tab-alumni')
+    };
+    var containerMap = {
+        competition: 'competitionContainer',
+        topper:      'topperContainer',
+        alumni:      'alumniContainer'
+    };
+
+    tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            tabs.forEach(function (t) {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+
+            Object.keys(tabContents).forEach(function (k) {
+                tabContents[k].classList.remove('active');
+            });
+
+            var cat = tab.dataset.category;
+            tabContents[cat].classList.add('active');
+            loadAwards(cat, containerMap[cat]);
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadAwards('competition', 'competitionContainer');
+    });
+})();
+</script>
+
+</body>
+</html>

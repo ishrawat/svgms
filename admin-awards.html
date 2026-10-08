@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Awards - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imgs/logo1.png" type="image/png" />
+
+    <style>
+        .admin-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .admin-header .links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .admin-header .links a:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .form-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--accent);
+        }
+
+        .form-section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .form-section label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-section .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-section input,
+        .form-section select,
+        .form-section textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--bg-light);
+            transition: var(--transition);
+        }
+
+        .form-section input:focus,
+        .form-section select:focus,
+        .form-section textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .form-section textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        .form-section select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23666'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            cursor: pointer;
+        }
+
+        .form-section .file-input {
+            margin-bottom: 1rem;
+        }
+
+        .form-section .file-input label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-section .file-input input[type="file"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: var(--bg-light);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .form-section .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-section .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .form-section .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .form-section .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .toast {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .toast.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .toast.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .toast.loading {
+            display: block;
+            background: #e2e3e5;
+            color: #383d41;
+            border-left: 4px solid #6c757d;
+        }
+
+        /* List Section */
+        .list-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .list-section .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .list-section .list-header h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .list-section .list-header select {
+            padding: 0.4rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: var(--bg-light);
+            cursor: pointer;
+        }
+
+        .award-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 0.6rem;
+            border-left: 4px solid var(--accent);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .award-item .info {
+            flex: 1;
+        }
+
+        .award-item .info .name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .award-item .info .meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .award-item .info .badge {
+            display: inline-block;
+            padding: 0.1rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: var(--accent);
+            color: var(--primary);
+            margin-left: 0.3rem;
+        }
+
+        .award-item .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .award-item .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .award-item .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .category-badge.competition {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .category-badge.topper {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .category-badge.alumni {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .category-badge {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .admin-wrapper {
+                padding: 1rem;
+            }
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .form-section .form-row {
+                grid-template-columns: 1fr;
+            }
+            .award-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .list-section .list-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-section .btn-row {
+                justify-content: center;
+            }
+            .form-section .btn-primary {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <header class="admin-header">
+            <h1>🏆 Manage Awards</h1>
+            <div class="links">
+                <a href="admin.html">← Dashboard</a>
+                <a href="index.html">Website</a>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- Add Award Form -->
+        <div class="form-section">
+            <h2 id="formTitle">➕ Add Competition Winner</h2>
+            <div id="toast" class="toast"></div>
+
+            <form id="awardForm" onsubmit="addAward(event)">
+                <!-- Category Selection -->
+                <label for="awardCategory">Category</label>
+                <select id="awardCategory" onchange="updateFormFields()">
+                    <option value="competition">🏅 Competition Winners</option>
+                    <option value="topper">📚 Class Toppers</option>
+                    <option value="alumni">🎓 Proud Alumni</option>
+                </select>
+
+                <!-- Common Fields -->
+                <label for="awardName">Name *</label>
+                <input type="text" id="awardName" placeholder="Full name" required>
+
+                <div id="dynamicFields">
+                    <!-- Competition Fields (default) -->
+                    <div id="competitionFields">
+                        <label for="awardClass">Class</label>
+                        <input type="text" id="awardClass" placeholder="e.g., 10-A">
+
+                        <label for="awardAchievement">Achievement / Competition *</label>
+                        <input type="text" id="awardAchievement" placeholder="e.g., Maths Olympiad" required>
+
+                        <label for="awardPosition">Position</label>
+                        <select id="awardPosition">
+                            <option value="1st Prize">🥇 1st Prize</option>
+                            <option value="2nd Prize">🥈 2nd Prize</option>
+                            <option value="3rd Prize">🥉 3rd Prize</option>
+                            <option value="Winner">🏆 Winner</option>
+                            <option value="Runner Up">🏅 Runner Up</option>
+                            <option value="Participant">✅ Participant</option>
+                        </select>
+                    </div>
+
+                    <!-- Topper Fields (hidden by default) -->
+                    <div id="topperFields" style="display:none;">
+                        <label for="topperClass">Class</label>
+                        <input type="text" id="topperClass" placeholder="e.g., 10-A">
+
+                        <label for="topperRank">Rank *</label>
+                        <select id="topperRank">
+                            <option value="1st">🥇 1st</option>
+                            <option value="2nd">🥈 2nd</option>
+                            <option value="3rd">🥉 3rd</option>
+                        </select>
+
+                        <label for="topperMarks">Marks / Percentage</label>
+                        <input type="text" id="topperMarks" placeholder="e.g., 95.6%">
+                    </div>
+
+                    <!-- Alumni Fields (hidden by default) -->
+                    <div id="alumniFields" style="display:none;">
+                        <label for="alumniBatch">Batch (Passing Year) *</label>
+                        <input type="text" id="alumniBatch" placeholder="e.g., 2015">
+
+                        <label for="alumniProfession">Profession *</label>
+                        <input type="text" id="alumniProfession" placeholder="e.g., Doctor">
+
+                        <label for="alumniAchievement">Achievement</label>
+                        <input type="text" id="alumniAchievement" placeholder="e.g., MBBS from AIIMS">
+
+                        <label for="alumniMessage">Message to Students</label>
+                        <textarea id="alumniMessage" placeholder="Write a message for current students..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Year (common) -->
+                <label for="awardYear">Year *</label>
+                <input type="text" id="awardYear" placeholder="e.g., 2026" required>
+
+                <!-- Photo Upload -->
+                <div class="file-input">
+                    <label for="awardPhoto">Photo</label>
+                    <input type="file" id="awardPhoto" accept="image/*">
+                    <small style="color:var(--text-muted); font-size:0.8rem;">Recommended: Square image, JPG or PNG</small>
+                </div>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn-primary" id="addBtn">➕ Add Award</button>
+                    <button type="reset" class="btn-primary" style="background:#6c757d;" onclick="clearForm()">Clear</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Awards List -->
+        <div class="list-section">
+            <div class="list-header">
+                <h2>📋 All Awards</h2>
+                <select id="filterCategory" onchange="loadAwards(this.value)">
+                    <option value="all">All Categories</option>
+                    <option value="competition">🏅 Competition Winners</option>
+                    <option value="topper">📚 Class Toppers</option>
+                    <option value="alumni">🎓 Proud Alumni</option>
+                </select>
+            </div>
+            <div id="awardsList">
+                <div class="empty-state">Loading awards...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ===== CLOUDINARY CONFIG =====
+        const CLOUDINARY = {
+            cloudName: "zh3vg8mi",
+            uploadPreset: "school_notices"
+        };
+
+        // ===== DOM REFS =====
+        const awardsList = document.getElementById('awardsList');
+        const toast = document.getElementById('toast');
+        const addBtn = document.getElementById('addBtn');
+
+        // ===== CHECK LOGIN =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) window.location.href = 'admin.html';
+            else loadAwards('all');
+        });
+
+        // ===== UPDATE FORM FIELDS =====
+        function updateFormFields() {
+            const category = document.getElementById('awardCategory').value;
+            const formTitle = document.getElementById('formTitle');
+
+            // Hide all
+            document.getElementById('competitionFields').style.display = 'none';
+            document.getElementById('topperFields').style.display = 'none';
+            document.getElementById('alumniFields').style.display = 'none';
+
+            // Show selected
+            if (category === 'competition') {
+                document.getElementById('competitionFields').style.display = 'block';
+                formTitle.textContent = '➕ Add Competition Winner';
+                // Make competition fields required
+                document.getElementById('awardAchievement').required = true;
+                document.getElementById('awardClass').required = false;
+            } else if (category === 'topper') {
+                document.getElementById('topperFields').style.display = 'block';
+                formTitle.textContent = '➕ Add Class Topper';
+                document.getElementById('awardAchievement').required = false;
+                document.getElementById('awardClass').required = false;
+            } else if (category === 'alumni') {
+                document.getElementById('alumniFields').style.display = 'block';
+                formTitle.textContent = '➕ Add Proud Alumni';
+                document.getElementById('awardAchievement').required = false;
+                document.getElementById('awardClass').required = false;
+            }
+        }
+
+        // ===== ADD AWARD =====
+        async function addAward(event) {
+            event.preventDefault();
+
+            const category = document.getElementById('awardCategory').value;
+            const name = document.getElementById('awardName').value.trim();
+            const year = document.getElementById('awardYear').value.trim();
+            let file = document.getElementById('awardPhoto').files[0];
+
+            if (!name || !year) {
+                showToast('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            addBtn.disabled = true;
+            addBtn.textContent = 'Adding...';
+            showToast('Adding award...', 'loading');
+
+            try {
+                let photoUrl = '';
+
+                // Upload photo if selected
+                // Upload photo if selected
+            if (file) {
+                // 🔥 COMPRESS IMAGE BEFORE UPLOAD
+                showToast('Compressing image...', 'loading');
+                file = await compressImage(file, 400, 400, 0.7);
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', CLOUDINARY.uploadPreset);
+                formData.append('resource_type', 'auto');
+
+                const response = await fetch(
+                    `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/upload`,
+                    { method: 'POST', body: formData }
+                );
+
+                const data = await response.json();
+                if (data.secure_url) {
+                    photoUrl = data.secure_url;
+                }
+            }
+
+                let awardData = {
+                    category: category,
+                    name: name,
+                    year: year,
+                    photoUrl: photoUrl
+                };
+
+                // Add category-specific fields
+                if (category === 'competition') {
+                    awardData.class = document.getElementById('awardClass').value.trim() || '';
+                    awardData.achievement = document.getElementById('awardAchievement').value.trim();
+                    awardData.position = document.getElementById('awardPosition').value;
+                } else if (category === 'topper') {
+                    awardData.class = document.getElementById('topperClass').value.trim() || '';
+                    awardData.rank = document.getElementById('topperRank').value;
+                    awardData.marks = document.getElementById('topperMarks').value.trim() || '';
+                } else if (category === 'alumni') {
+                    awardData.batch = document.getElementById('alumniBatch').value.trim();
+                    awardData.profession = document.getElementById('alumniProfession').value.trim();
+                    awardData.achievement = document.getElementById('alumniAchievement').value.trim() || '';
+                    awardData.message = document.getElementById('alumniMessage').value.trim() || '';
+                    
+                    // Validate alumni fields
+                    if (!awardData.batch) {
+                        showToast('Please enter the batch year.', 'error');
+                        addBtn.disabled = false;
+                        addBtn.textContent = '➕ Add Award';
+                        return;
+                    }
+                    if (!awardData.profession) {
+                        showToast('Please enter the profession.', 'error');
+                        addBtn.disabled = false;
+                        addBtn.textContent = '➕ Add Award';
+                        return;
+                    }
+                }
+
+                await db.collection('awards').add(awardData);
+
+                showToast('✅ Award added successfully!', 'success');
+                document.getElementById('awardForm').reset();
+                document.getElementById('awardPhoto').value = '';
+                loadAwards(document.getElementById('filterCategory').value);
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+
+            addBtn.disabled = false;
+            addBtn.textContent = '➕ Add Award';
+        }
+
+        // ===== LOAD AWARDS =====
+        async function loadAwards(category) {
+            awardsList.innerHTML = '<div class="empty-state">Loading awards...</div>';
+
+            try {
+                let query = db.collection('awards').orderBy('year', 'desc');
+
+                if (category !== 'all') {
+                    query = query.where('category', '==', category);
+                }
+
+                const snapshot = await query.get();
+
+                if (snapshot.empty) {
+                    awardsList.innerHTML = '<div class="empty-state">No awards added yet.</div>';
+                    return;
+                }
+
+                const categoryLabels = {
+                    competition: '🏅 Competition',
+                    topper: '📚 Topper',
+                    alumni: '🎓 Alumni'
+                };
+
+                awardsList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+
+                    let details = '';
+                    if (data.category === 'competition') {
+                        details = `${data.achievement || ''} | ${data.position || ''} | ${data.class || ''}`;
+                    } else if (data.category === 'topper') {
+                        details = `Rank ${data.rank || ''} | ${data.marks || ''} | ${data.class || ''}`;
+                    } else if (data.category === 'alumni') {
+                        details = `Batch ${data.batch || ''} | ${data.profession || ''}`;
+                    }
+
+                    const item = document.createElement('div');
+                    item.className = 'award-item';
+                    item.innerHTML = `
+                        <div class="info">
+                            <div class="name">
+                                ${data.name}
+                                <span class="category-badge ${data.category}">${categoryLabels[data.category] || data.category}</span>
+                            </div>
+                            <div class="meta">
+                                📅 ${data.year || ''}
+                                ${details ? `| ${details}` : ''}
+                                ${data.photoUrl ? '| 📸 Photo' : ''}
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-delete" onclick="deleteAward('${id}')">🗑️ Delete</button>
+                        </div>
+                    `;
+                    awardsList.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error('Error loading awards:', error);
+                awardsList.innerHTML = '<div class="empty-state">❌ Error loading awards</div>';
+            }
+        }
+
+        // ===== DELETE AWARD =====
+        async function deleteAward(id) {
+            if (!confirm('Delete this award?')) return;
+
+            try {
+                await db.collection('awards').doc(id).delete();
+                showToast('🗑️ Award deleted!', 'success');
+                loadAwards(document.getElementById('filterCategory').value);
+            } catch (error) {
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ===== CLEAR FORM =====
+        function clearForm() {
+            document.getElementById('awardForm').reset();
+            document.getElementById('awardPhoto').value = '';
+            showToast('Form cleared.', 'success');
+            setTimeout(() => { toast.style.display = 'none'; }, 1000);
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type) {
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+        }
+
+        // ===== LOGOUT =====
+        function logout() {
+            auth.signOut();
+            window.location.href = 'admin.html';
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            updateFormFields();
+        });
+
+        // ===== IMAGE COMPRESSION FUNCTION =====
+        function compressImage(file, maxWidth, maxHeight, quality) {
+            return new Promise((resolve, reject) => {
+                // Check if file is an image
+                if (!file || !file.type.startsWith('image/')) {
+                    resolve(file); // Return original if not an image
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // Only resize if image is larger than max dimensions
+                        if (width > maxWidth || height > maxHeight) {
+                            const ratio = Math.min(maxWidth / width, maxHeight / height);
+                            width = Math.round(width * ratio);
+                            height = Math.round(height * ratio);
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Convert to JPEG with quality setting
+                        canvas.toBlob(function(blob) {
+                            // Create a new File object from the compressed blob
+                            const compressedFile = new File(
+                                [blob], 
+                                file.name.replace(/\.[^.]+$/, '.jpg'), 
+                                { type: 'image/jpeg' }
+                            );
+                            resolve(compressedFile);
+                        }, 'image/jpeg', quality);
+                    };
+                    img.onerror = function() {
+                        resolve(file); // If error, return original
+                    };
+                };
+                reader.onerror = function() {
+                    resolve(file); // If error, return original
+                };
+            });
+        }
+
+    </script>
+
+</body>
+</html>

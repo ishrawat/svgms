@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="All school messages, notices, and announcements from Swami Vivekanand Govt. Model School, Bhim.">
+<title>All Messages — SVGMS Bhim</title>
+<link rel="icon" href="imgs/logo1.png" type="image/png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="All Messages — SVGMS Bhim">
+<meta property="og:description" content="All school messages and announcements from SVGMS Bhim.">
+<meta property="og:image" content="https://raw.githubusercontent.com/ishrawat/imagess/refs/heads/main/logo.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-nav-active="news">
+
+<div id="site-chrome"></div>
+
+<section class="page-hero">
+    <h1>All Messages <small>notices, updates &amp; announcements</small></h1>
+</section>
+
+<main class="messages-page">
+
+    <div class="messages-header">
+        <h1>Message Archive</h1>
+        <span class="message-count" id="messageCount">Loading…</span>
+    </div>
+
+    <div class="filter-bar">
+        <input type="text" class="search-box" id="searchInput" placeholder="Search messages…" aria-label="Search messages">
+
+        <div class="filter-group">
+            <select id="yearFilter" aria-label="Filter by year">
+                <option value="all">All Years</option>
+            </select>
+            <select id="monthFilter" aria-label="Filter by month">
+                <option value="all">All Months</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <select id="categoryFilter" aria-label="Filter by category">
+                <option value="all">All Categories</option>
+                <option value="notice">Notice</option>
+                <option value="event">Event</option>
+                <option value="exam">Exam</option>
+                <option value="general">General</option>
+            </select>
+        </div>
+
+        <div class="filter-actions">
+            <button class="btn-apply" id="applyBtn" type="button">Apply</button>
+            <button class="btn-clear" id="clearBtn" type="button">Clear</button>
+        </div>
+    </div>
+
+    <div class="active-filters" id="activeFilters"></div>
+
+    <div id="messagesList">
+        <div class="messages-loading">
+            <span class="big-icon">📭</span>
+            Loading messages…
+        </div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+
+</main>
+
+<footer>
+    <p>&copy; 2026 Swami Vivekanand Govt. Model School, Bhim. All Rights Reserved.</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script src="site.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    var db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+
+    var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var CATEGORY_LABELS = { notice: 'Notice', event: 'Event', exam: 'Exam', general: 'General' };
+    var PER_PAGE = 10;
+
+    var allMessages = [];
+    var filteredMessages = [];
+    var currentPage = 1;
+    var activeFilters = { year: 'all', month: 'all', category: 'all', search: '' };
+
+    var listEl, countEl, paginationEl, activeFiltersEl;
+    var searchInput, yearFilter, monthFilter, categoryFilter;
+
+    function escapeHtml(text) {
+        if (text == null) return '';
+        var div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
+
+    function formatDate(value) {
+        try {
+            return new Date(value).toLocaleDateString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        } catch (e) { return ''; }
+    }
+
+    function formatTime(value) {
+        try {
+            return new Date(value).toLocaleTimeString('en-IN', {
+                hour: '2-digit', minute: '2-digit'
+            });
+        } catch (e) { return ''; }
+    }
+
+    /* ---------- Loading / empty / error ---------- */
+    function renderLoading() {
+        listEl.innerHTML =
+            '<div class="messages-loading"><span class="big-icon">📭</span>Loading messages…</div>';
+        paginationEl.innerHTML = '';
+    }
+
+    function renderEmpty(message) {
+        listEl.innerHTML =
+            '<div class="messages-empty"><span class="big-icon">📭</span>' +
+            escapeHtml(message || 'No messages found.') + '</div>';
+        paginationEl.innerHTML = '';
+    }
+
+    function renderError() {
+        listEl.innerHTML =
+            '<div class="messages-error"><span class="big-icon">⚠️</span>' +
+            'Could not load messages. Please refresh.</div>';
+        paginationEl.innerHTML = '';
+    }
+
+    /* ---------- Load from Firebase ---------- */
+    function loadMessages() {
+        if (!db) { renderError(); return; }
+        renderLoading();
+
+        db.collection('ticker').orderBy('createdAt', 'desc').get()
+            .then(function (snapshot) {
+                allMessages = [];
+                var years = new Set();
+
+                snapshot.forEach(function (doc) {
+                    var data = doc.data();
+                    data.id = doc.id;
+                    allMessages.push(data);
+                    if (data.createdAt) {
+                        try {
+                            years.add(new Date(data.createdAt).getFullYear());
+                        } catch (e) {}
+                    }
+                });
+
+                /* Populate year filter */
+                yearFilter.innerHTML = '<option value="all">All Years</option>';
+                Array.from(years).sort(function (a, b) { return b - a; }).forEach(function (y) {
+                    var opt = document.createElement('option');
+                    opt.value = y;
+                    opt.textContent = y;
+                    yearFilter.appendChild(opt);
+                });
+
+                countEl.textContent = allMessages.length + ' message' + (allMessages.length === 1 ? '' : 's');
+                applyFilters();
+            })
+            .catch(function (err) {
+                console.warn('Messages unavailable:', err);
+                renderError();
+            });
+    }
+
+    /* ---------- Filters ---------- */
+    function applyFilters() {
+        var searchTerm = (searchInput.value || '').toLowerCase().trim();
+        var year = yearFilter.value;
+        var month = monthFilter.value;
+        var category = categoryFilter.value;
+
+        activeFilters = { year: year, month: month, category: category, search: searchTerm };
+
+        filteredMessages = allMessages.filter(function (msg) {
+            if (searchTerm && (msg.message || '').toLowerCase().indexOf(searchTerm) === -1) return false;
+
+            if (year !== 'all' && msg.createdAt) {
+                if (new Date(msg.createdAt).getFullYear() !== parseInt(year, 10)) return false;
+            }
+
+            if (month !== 'all' && msg.createdAt) {
+                if (new Date(msg.createdAt).getMonth() + 1 !== parseInt(month, 10)) return false;
+            }
+
+            if (category !== 'all') {
+                var msgCat = (msg.category || 'general').toLowerCase();
+                if (msgCat !== category.toLowerCase()) return false;
+            }
+
+            return true;
+        });
+
+        currentPage = 1;
+        renderActiveFilters();
+        renderMessages();
+    }
+
+    function renderActiveFilters() {
+        var filters = [];
+
+        if (activeFilters.search) {
+            filters.push({ label: '"' + activeFilters.search + '"', key: 'search' });
+        }
+        if (activeFilters.year !== 'all') {
+            filters.push({ label: 'Year: ' + activeFilters.year, key: 'year' });
+        }
+        if (activeFilters.month !== 'all') {
+            filters.push({ label: MONTHS[parseInt(activeFilters.month, 10) - 1], key: 'month' });
+        }
+        if (activeFilters.category !== 'all') {
+            filters.push({
+                label: CATEGORY_LABELS[activeFilters.category] || activeFilters.category,
+                key: 'category'
+            });
+        }
+
+        if (!filters.length) { activeFiltersEl.innerHTML = ''; return; }
+
+        activeFiltersEl.innerHTML = filters.map(function (f) {
+            return '<span class="filter-tag">' +
+                escapeHtml(f.label) +
+                '<span class="remove" data-filter-key="' + escapeHtml(f.key) + '" role="button" tabindex="0" aria-label="Remove filter">×</span>' +
+            '</span>';
+        }).join('');
+    }
+
+    function removeFilter(key) {
+        if (key === 'search')        searchInput.value = '';
+        else if (key === 'year')     yearFilter.value = 'all';
+        else if (key === 'month')    monthFilter.value = 'all';
+        else if (key === 'category') categoryFilter.value = 'all';
+        applyFilters();
+    }
+
+    function clearFilters() {
+        searchInput.value = '';
+        yearFilter.value = 'all';
+        monthFilter.value = 'all';
+        categoryFilter.value = 'all';
+        applyFilters();
+    }
+
+    /* ---------- Render ---------- */
+    function renderMessages() {
+        var total = filteredMessages.length;
+
+        if (!total) {
+            renderEmpty('No messages match your filters.');
+            return;
+        }
+
+        var start = (currentPage - 1) * PER_PAGE;
+        var end = Math.min(start + PER_PAGE, total);
+        var pageMessages = filteredMessages.slice(start, end);
+
+        listEl.innerHTML = '';
+        pageMessages.forEach(function (msg) {
+            var dateStr = msg.createdAt ? formatDate(msg.createdAt) : '';
+            var timeStr = msg.createdAt ? formatTime(msg.createdAt) : '';
+
+            var source = msg.source || 'admin';
+            var sourceLabel = source === 'telegram' ? 'Telegram' : 'Admin';
+            var sourceClass = source === 'telegram' ? 'telegram' : 'admin';
+
+            var catRaw = msg.category || 'general';
+            var catLabel = catRaw.charAt(0).toUpperCase() + catRaw.slice(1);
+
+            var pdfHtml = '';
+            if (msg.pdfUrl) {
+                var href = String(msg.pdfUrl);
+                var withAttach = href + (href.indexOf('?') === -1 ? '?' : '&') + 'fl_attachment=true';
+                pdfHtml = '<a href="' + escapeHtml(withAttach) + '" target="_blank" rel="noopener" class="pdf-link">📄 PDF</a>';
+            }
+
+            var item = document.createElement('article');
+            item.className = 'message-item';
+            item.innerHTML =
+                '<div class="msg-header">' +
+                    '<div class="msg-date">' + escapeHtml(dateStr) + ' · ' + escapeHtml(timeStr) + '</div>' +
+                    '<div class="msg-badges">' +
+                        '<span class="badge badge-source ' + sourceClass + '">' + escapeHtml(sourceLabel) + '</span>' +
+                        '<span class="badge badge-category">' + escapeHtml(catLabel) + '</span>' +
+                        (msg.pdfUrl ? '<span class="badge badge-pdf">PDF</span>' : '') +
+                    '</div>' +
+                '</div>' +
+                '<div class="msg-text">' + escapeHtml(msg.message || '') + '</div>' +
+                '<div class="msg-footer">' +
+                    '<span class="msg-author">' + escapeHtml(msg.createdBy || 'Anonymous') + '</span>' +
+                    '<div class="msg-actions">' + pdfHtml + '</div>' +
+                '</div>';
+
+            listEl.appendChild(item);
+        });
+
+        renderPagination(total);
+    }
+
+    function renderPagination(total) {
+        var totalPages = Math.ceil(total / PER_PAGE);
+
+        if (totalPages <= 1) {
+            paginationEl.innerHTML = '';
+            return;
+        }
+
+        var html = '';
+        html += '<button data-page="' + (currentPage - 1) + '"' + (currentPage === 1 ? ' disabled' : '') + ' aria-label="Previous page">←</button>';
+
+        var startPage = Math.max(1, currentPage - 2);
+        var endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+            html += '<button data-page="1">1</button>';
+            if (startPage > 2) html += '<span class="page-ellipsis">…</span>';
+        }
+
+        for (var i = startPage; i <= endPage; i++) {
+            html += '<button data-page="' + i + '"' + (i === currentPage ? ' class="active"' : '') + '>' + i + '</button>';
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += '<span class="page-ellipsis">…</span>';
+            html += '<button data-page="' + totalPages + '">' + totalPages + '</button>';
+        }
+
+        html += '<button data-page="' + (currentPage + 1) + '"' + (currentPage === totalPages ? ' disabled' : '') + ' aria-label="Next page">→</button>';
+
+        paginationEl.innerHTML = html;
+    }
+
+    function goToPage(page) {
+        var totalPages = Math.ceil(filteredMessages.length / PER_PAGE);
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        renderMessages();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ---------- Boot ---------- */
+    document.addEventListener('DOMContentLoaded', function () {
+        listEl = document.getElementById('messagesList');
+        countEl = document.getElementById('messageCount');
+        paginationEl = document.getElementById('pagination');
+        activeFiltersEl = document.getElementById('activeFilters');
+
+        searchInput = document.getElementById('searchInput');
+        yearFilter = document.getElementById('yearFilter');
+        monthFilter = document.getElementById('monthFilter');
+        categoryFilter = document.getElementById('categoryFilter');
+
+        if (!listEl) return;
+
+        /* Apply / Clear */
+        var applyBtn = document.getElementById('applyBtn');
+        var clearBtn = document.getElementById('clearBtn');
+        if (applyBtn) applyBtn.addEventListener('click', applyFilters);
+        if (clearBtn) clearBtn.addEventListener('click', clearFilters);
+
+        /* Search on Enter */
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function (e) {
+                if (e.key === 'Enter') applyFilters();
+            });
+        }
+
+        /* Remove-filter tags — delegated */
+        if (activeFiltersEl) {
+            activeFiltersEl.addEventListener('click', function (e) {
+                var remove = e.target.closest('.remove');
+                if (!remove) return;
+                removeFilter(remove.dataset.filterKey);
+            });
+            activeFiltersEl.addEventListener('keydown', function (e) {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                var remove = e.target.closest('.remove');
+                if (!remove) return;
+                e.preventDefault();
+                removeFilter(remove.dataset.filterKey);
+            });
+        }
+
+        /* Pagination — delegated */
+        if (paginationEl) {
+            paginationEl.addEventListener('click', function (e) {
+                var btn = e.target.closest('button[data-page]');
+                if (!btn || btn.disabled) return;
+                goToPage(parseInt(btn.dataset.page, 10));
+            });
+        }
+
+        loadMessages();
+    });
+})();
+</script>
+
+</body>
+</html>

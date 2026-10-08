@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Notices - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imgs/logo1.png" type="image/png" />
+
+    <style>
+        .admin-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .admin-header .links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .admin-header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .admin-header .links a:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .upload-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--accent);
+        }
+
+        .upload-section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-section input,
+        .upload-section textarea {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .upload-section textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .upload-section .file-input {
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .upload-section button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .upload-section button:hover {
+            background: var(--primary-light);
+        }
+
+        .upload-section button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .notice-list {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .notice-list h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .notice-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .notice-item .info {
+            flex: 1;
+        }
+
+        .notice-item .info .title {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .notice-item .info .meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .notice-item .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .notice-item .actions button {
+            padding: 0.3rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .btn-download {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        .btn-download:hover {
+            background: #c4a020;
+        }
+
+        .message {
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.loading {
+            display: block;
+            background: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .admin-wrapper {
+                padding: 1rem;
+            }
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .notice-item {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <!-- ===== HEADER ===== -->
+        <header class="admin-header">
+            <h1>📄 Manage Notices</h1>
+            <div class="links">
+                <a href="admin.html">← Dashboard</a>
+                <a href="index.html">Website</a>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- ===== UPLOAD SECTION ===== -->
+        <div class="upload-section">
+            <h2>📤 Upload New Notice</h2>
+            <div id="uploadMessage" class="message"></div>
+            <form id="uploadForm" onsubmit="uploadNotice(event)">
+                <input type="text" id="noticeTitle" placeholder="Notice Title" required>
+                <textarea id="noticeDescription" placeholder="Brief description of the notice"></textarea>
+                <div class="file-input">
+                    <label style="display:block; margin-bottom:0.3rem; font-weight:500;">Select PDF File:</label>
+                    <input type="file" id="pdfFile" accept=".pdf" required>
+                </div>
+                <button type="submit" id="uploadBtn">📤 Upload Notice</button>
+            </form>
+        </div>
+
+        <!-- ===== NOTICE LIST ===== -->
+        <div class="notice-list">
+            <h2>📋 All Notices</h2>
+            <div id="noticesList">
+                <div class="empty-state">Loading notices...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ===== CLOUDINARY CONFIG =====
+        const CLOUDINARY = {
+            cloudName: "zh3vg8mi",  // ← REPLACE WITH YOUR CLOUD NAME
+            uploadPreset: "school_notices"  // ← WE'LL CREATE THIS
+        };
+
+        // ===== DOM REFS =====
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadMessage = document.getElementById('uploadMessage');
+        const noticesList = document.getElementById('noticesList');
+
+        // ===== CHECK LOGIN =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'admin.html';
+            } else {
+                loadNotices();
+            }
+        });
+
+        // ===== UPLOAD NOTICE =====
+        async function uploadNotice(event) {
+                event.preventDefault();
+            
+                const title = document.getElementById('noticeTitle').value;
+                const description = document.getElementById('noticeDescription').value;
+                const file = document.getElementById('pdfFile').files[0];
+            
+                if (!file) {
+                    showMessage('Please select a PDF file.', 'error');
+                    return;
+                }
+            
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = 'Uploading...';
+                showMessage('Uploading to Cloudinary...', 'loading');
+            
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', CLOUDINARY.uploadPreset);
+                    formData.append('resource_type', 'auto');
+            
+                    const response = await fetch(
+                        `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/upload`,
+                        { method: 'POST', body: formData }
+                    );
+            
+                    const data = await response.json();
+                    
+                    // ===== ADD THESE DEBUG LINES =====
+                    console.log('✅ Full Cloudinary Response:', data);
+                    console.log('✅ PDF URL:', data.secure_url);
+                    console.log('✅ Public ID:', data.public_id);
+
+            
+                    if (!data.secure_url) {
+                        console.error('❌ Upload failed. Response:', data);
+                        throw new Error(data.error?.message || 'Upload failed');
+                    }
+            
+                    // Save to Firestore
+                    const user = auth.currentUser;
+                    await db.collection('notices').add({
+                        title: title,
+                        description: description,
+                        pdfUrl: data.secure_url,
+                        pdfName: file.name,
+                        author: user.email,
+                        date: new Date().toISOString()
+                    });
+            
+                    showMessage('✅ Notice uploaded successfully!', 'success');
+                    uploadForm.reset();
+                    loadNotices();
+            
+                } catch (error) {
+                    console.error('❌ Upload error:', error);
+                    showMessage('❌ Error uploading notice: ' + error.message, 'error');
+                }
+            
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '📤 Upload Notice';
+            }
+
+        // ===== LOAD NOTICES =====
+        async function loadNotices() {
+                noticesList.innerHTML = '<div class="empty-state">Loading notices...</div>';
+            
+                try {
+                    const snapshot = await db.collection('notices')
+                        .orderBy('date', 'desc')
+                        .get();
+            
+                    if (snapshot.empty) {
+                        noticesList.innerHTML = '<div class="empty-state">No notices uploaded yet.</div>';
+                        return;
+                    }
+            
+                    noticesList.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const notice = doc.data();
+                        const id = doc.id;
+            
+                        const date = notice.date ? new Date(notice.date) : new Date();
+                        const formattedDate = date.toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+            
+                        const item = document.createElement('div');
+                        item.className = 'notice-item';
+                        item.innerHTML = `
+                            <div class="info">
+                                <div class="title">${notice.title}</div>
+                                <div class="meta">
+                                    📅 ${formattedDate} | 👤 ${notice.author || 'Admin'}
+                                    ${notice.pdfName ? `| 📄 ${notice.pdfName}` : ''}
+                                </div>
+                                ${notice.description ? `<div style="margin-top:0.3rem; font-size:0.9rem; color:var(--text-muted);">${notice.description}</div>` : ''}
+                            </div>
+                            <div class="actions">
+                                ${notice.pdfUrl ? `<a href="${notice.pdfUrl}?fl_attachment=true&resource_type=auto" target="_blank" class="btn-download" style="padding:0.3rem 0.8rem; border:none; border-radius:4px; background:var(--accent); color:var(--primary); text-decoration:none; cursor:pointer;">📥 PDF</a>` : ''}
+                                <button class="btn-delete" onclick="deleteNotice('${id}')">🗑️ Delete</button>
+                            </div>
+                        `;
+                        noticesList.appendChild(item);
+                    });
+            
+                } catch (error) {
+                    console.error('Error loading notices:', error);
+                    noticesList.innerHTML = '<div class="empty-state">❌ Error loading notices</div>';
+                }
+            }
+
+        // ===== DELETE NOTICE =====
+        async function deleteNotice(id) {
+            if (!confirm('Are you sure you want to delete this notice?')) return;
+
+            try {
+                await db.collection('notices').doc(id).delete();
+                showMessage('✅ Notice deleted successfully!', 'success');
+                loadNotices();
+            } catch (error) {
+                showMessage('❌ Error deleting notice: ' + error.message, 'error');
+            }
+        }
+
+        // ===== LOGOUT =====
+        function logout() {
+            auth.signOut();
+            window.location.href = 'admin.html';
+        }
+
+        // ===== SHOW MESSAGE =====
+        function showMessage(text, type) {
+            uploadMessage.textContent = text;
+            uploadMessage.className = 'message ' + type;
+        }
+
+        // ===== CREATE UPLOAD PRESET IN CLOUDINARY =====
+        console.log('⚠️ IMPORTANT: Create an upload preset in Cloudinary:');
+        console.log('1. Go to Cloudinary Dashboard → Settings → Upload');
+        console.log('2. Scroll to "Upload presets" → Click "Add upload preset"');
+        console.log('3. Name it: "school_notices"');
+        console.log('4. Set: "Signing Mode" to "Unsigned"');
+        console.log('5. Click "Save"');
+        console.log('6. Then set CLOUDINARY.uploadPreset = "school_notices" in this code');
+    </script>
+
+</body>
+</html>

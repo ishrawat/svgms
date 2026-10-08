@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Ticker - SVGMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imgs/logo1.png" type="image/png" />
+
+    <style>
+        /* ===== ADMIN TICKER STYLES ===== */
+        .admin-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .admin-header .links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .admin-header .links a:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .add-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--accent);
+        }
+
+        .add-section h2 {
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            font-size: 1.3rem;
+        }
+
+        .add-section textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--bg-light);
+            min-height: 70px;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .add-section textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .add-section .file-input {
+            margin-bottom: 1rem;
+        }
+
+        .add-section .file-input label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .add-section .file-input input[type="file"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: var(--bg-light);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .add-section .file-input input[type="file"]:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .add-section .file-input small {
+            display: block;
+            margin-top: 0.3rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        #progressContainer {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            display: none;
+        }
+
+        #progressContainer .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        #progressContainer .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #progressContainer .progress-bar .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        #progressContainer .progress-status {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        .add-section .btn-row {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .add-section .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .add-section .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .add-section .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .list-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .list-section h2 {
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            font-size: 1.3rem;
+        }
+
+        .list-section .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .ticker-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 0.6rem;
+            border-left: 4px solid var(--accent);
+            transition: var(--transition);
+        }
+
+        .ticker-item:hover {
+            background: #eef0f2;
+        }
+
+        .ticker-item .msg-text {
+            flex: 1;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            padding-right: 1rem;
+        }
+
+        .ticker-item .msg-text .pdf-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--primary);
+            font-size: 0.6rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+            font-weight: bold;
+        }
+
+        .ticker-item .msg-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        .ticker-item .msg-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .ticker-item .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .ticker-item .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .ticker-item .btn-toggle {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .ticker-item .btn-toggle:hover {
+            background: #c4a020;
+        }
+
+        .ticker-item .btn-pdf {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .ticker-item .btn-pdf:hover {
+            background: #218838;
+        }
+
+        .ticker-item.inactive {
+            opacity: 0.5;
+            border-left-color: #999;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .toast {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .toast.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .toast.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .toast.loading {
+            display: block;
+            background: #e2e3e5;
+            color: #383d41;
+            border-left: 4px solid #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .admin-wrapper {
+                padding: 1rem;
+            }
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .admin-header .links {
+                justify-content: center;
+            }
+            .ticker-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            .ticker-item .msg-text {
+                padding-right: 0;
+            }
+            .add-section .btn-row {
+                justify-content: center;
+            }
+            .add-section .btn-primary {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <!-- ===== HEADER ===== -->
+        <header class="admin-header">
+            <h1>📢 Manage Ticker</h1>
+            <div class="links">
+                <a href="admin.html">← Dashboard</a>
+                <a href="index.html">Website</a>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- ===== ADD MESSAGE ===== -->
+        <div class="add-section">
+            <h2>✏️ Add New Message</h2>
+            <div id="toast" class="toast"></div>
+            <form id="tickerForm" onsubmit="addMessage(event)">
+                <textarea id="tickerMessage" placeholder="Enter your message here... (e.g., Parent-Teacher Meeting on Dec 20)" required></textarea>
+                
+                <!-- PDF Upload -->
+                <div class="file-input">
+                    <label for="pdfFile">📎 Attach PDF (Optional)</label>
+                    <input type="file" id="pdfFile" accept=".pdf">
+                    <small>Upload a PDF to link with this message. Clicking the PDF link on the ticker will open it.</small>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="progressContainer">
+                    <div class="progress-label">
+                        <span id="progressText">Uploading PDF...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-status" id="progressStatus">Preparing upload...</div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn-primary" id="addBtn">➕ Add Message</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ===== MESSAGES LIST ===== -->
+        <div class="list-section">
+            <h2>📋 All Messages</h2>
+            <div class="subtitle">Active messages appear on the website ticker</div>
+            <div id="tickerList">
+                <div class="empty-state">
+                    <span class="icon">📭</span>
+                    <p>Loading messages...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ===== CLOUDINARY CONFIG =====
+        const CLOUDINARY = {
+            cloudName: "zh3vg8mi",
+            uploadPreset: "school_notices"
+        };
+
+        // ===== DOM REFS =====
+        const tickerList = document.getElementById('tickerList');
+        const toast = document.getElementById('toast');
+        const addBtn = document.getElementById('addBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressStatus = document.getElementById('progressStatus');
+
+        // ===== CHECK LOGIN =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'admin.html';
+            } else {
+                loadMessages();
+            }
+        });
+
+        // ===== UPDATE PROGRESS =====
+        function updateProgress(percent, text, status) {
+            progressContainer.style.display = 'block';
+            progressFill.style.width = percent + '%';
+            progressPercent.textContent = percent + '%';
+            if (text) progressText.textContent = text;
+            if (status) progressStatus.textContent = status;
+        }
+
+        function hideProgress() {
+            progressContainer.style.display = 'none';
+            progressFill.style.width = '0%';
+            progressPercent.textContent = '0%';
+        }
+
+        // ===== ADD MESSAGE =====
+        async function addMessage(event) {
+            event.preventDefault();
+
+            const message = document.getElementById('tickerMessage').value;
+            const file = document.getElementById('pdfFile').files[0];
+            const btn = document.getElementById('addBtn');
+
+            if (!message.trim()) {
+                showToast('Please enter a message.', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Adding...';
+            showToast('Adding message...', 'loading');
+
+            try {
+                let pdfUrl = null;
+                let pdfName = null;
+
+                // Upload PDF if selected
+                if (file) {
+                    updateProgress(0, 'Uploading PDF...', 'Preparing upload...');
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', CLOUDINARY.uploadPreset);
+                    formData.append('resource_type', 'raw');
+
+                    // Use XMLHttpRequest for progress tracking
+                    const uploadResult = await new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        
+                        xhr.upload.addEventListener('progress', function(e) {
+                            if (e.lengthComputable) {
+                                const percent = Math.round((e.loaded / e.total) * 100);
+                                updateProgress(percent, 'Uploading PDF...', `Uploaded ${percent}%`);
+                            }
+                        });
+
+                        xhr.onload = function() {
+                            if (xhr.status === 200) {
+                                resolve(JSON.parse(xhr.responseText));
+                            } else {
+                                reject(new Error('Upload failed'));
+                            }
+                        };
+
+                        xhr.onerror = function() {
+                            reject(new Error('Network error'));
+                        };
+
+                        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/raw/upload`);
+                        xhr.send(formData);
+                    });
+
+                    if (uploadResult.secure_url) {
+                        pdfUrl = uploadResult.secure_url;
+                        pdfName = file.name;
+                        updateProgress(100, '✅ PDF Upload Complete!', 'PDF uploaded successfully');
+                        console.log('📄 PDF uploaded:', pdfUrl);
+                    } else {
+                        throw new Error('PDF upload failed');
+                    }
+                }
+
+                const user = auth.currentUser;
+                await db.collection('ticker').add({
+                    message: message.trim(),
+                    pdfUrl: pdfUrl,
+                    pdfName: pdfName,
+                    isActive: true,
+                    createdAt: new Date().toISOString(),
+                    createdBy: user.email || 'Admin'
+                });
+
+                showToast('✅ Message added successfully!', 'success');
+                document.getElementById('tickerForm').reset();
+                document.getElementById('pdfFile').value = '';
+                hideProgress();
+                loadMessages();
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+                hideProgress();
+            }
+
+            btn.disabled = false;
+            btn.textContent = '➕ Add Message';
+        }
+
+        // ===== LOAD MESSAGES =====
+        async function loadMessages() {
+            tickerList.innerHTML = '<div class="empty-state"><span class="icon">📭</span><p>Loading messages...</p></div>';
+
+            try {
+                const snapshot = await db.collection('ticker')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                if (snapshot.empty) {
+                    tickerList.innerHTML = `
+                        <div class="empty-state">
+                            <span class="icon">📭</span>
+                            <p>No messages yet. Add one above!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                tickerList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+
+                    const item = document.createElement('div');
+                    item.className = 'ticker-item';
+                    if (!data.isActive) item.classList.add('inactive');
+
+                    const date = data.createdAt ? new Date(data.createdAt) : new Date();
+                    const formattedDate = date.toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    const pdfBadge = data.pdfUrl ? '<span class="pdf-badge">📄 PDF</span>' : '';
+
+                    item.innerHTML = `
+                        <div>
+                            <div class="msg-text">
+                                ${data.message}
+                                ${pdfBadge}
+                            </div>
+                            <div class="msg-meta">
+                                📅 ${formattedDate}
+                                ${data.createdBy ? `| 👤 ${data.createdBy}` : ''}
+                                ${data.isActive ? '🟢 Active' : '🔴 Inactive'}
+                            </div>
+                        </div>
+                        <div class="msg-actions">
+                            ${data.pdfUrl ? `<a href="${data.pdfUrl}" target="_blank" class="btn-pdf" style="padding:0.3rem 0.8rem; border:none; border-radius:4px; background:#28a745; color:white; text-decoration:none; font-size:0.85rem; cursor:pointer;">📄 PDF</a>` : ''}
+                            <button class="btn-toggle" onclick="toggleMessage('${id}')">
+                                ${data.isActive ? 'Hide' : 'Show'}
+                            </button>
+                            <button class="btn-delete" onclick="deleteMessage('${id}')">🗑️ Delete</button>
+                        </div>
+                    `;
+                    tickerList.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error('Error:', error);
+                tickerList.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">❌</span>
+                        <p>Error loading messages. Please refresh.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ===== DELETE MESSAGE =====
+        async function deleteMessage(id) {
+            if (!confirm('Delete this message?')) return;
+
+            try {
+                await db.collection('ticker').doc(id).delete();
+                showToast('🗑️ Message deleted!', 'success');
+                loadMessages();
+            } catch (error) {
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ===== TOGGLE MESSAGE =====
+        async function toggleMessage(id) {
+            try {
+                const doc = await db.collection('ticker').doc(id).get();
+                const currentStatus = doc.data().isActive;
+                await db.collection('ticker').doc(id).update({
+                    isActive: !currentStatus
+                });
+                showToast(`✅ Message ${!currentStatus ? 'shown' : 'hidden'}!`, 'success');
+                loadMessages();
+            } catch (error) {
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type) {
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // ===== LOGOUT =====
+        function logout() {
+            auth.signOut();
+            window.location.href = 'admin.html';
+        }
+    </script>
+
+</body>
+</html>

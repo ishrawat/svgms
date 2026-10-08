@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Free Skills - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imgs/logo1.png" type="image/png" />
+
+    <style>
+        .admin-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .admin-header .links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .admin-header .links a:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .form-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--accent);
+        }
+
+        .form-section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .form-section label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-section input,
+        .form-section select,
+        .form-section textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--bg-light);
+            transition: var(--transition);
+        }
+
+        .form-section input:focus,
+        .form-section select:focus,
+        .form-section textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .form-section textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        .form-section select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23666'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            cursor: pointer;
+        }
+
+        .form-section .platform-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .form-section .platform-row input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-section .platform-row .btn-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .form-section .platform-row .btn-remove:hover {
+            background: #c82333;
+        }
+
+        .form-section .btn-add-platform {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 0.3rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-section .btn-add-platform:hover {
+            background: #c4a020;
+        }
+
+        .form-section .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+        }
+
+        .form-section .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .form-section .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .form-section .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            margin-left: 0.5rem;
+        }
+
+        .form-section .btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        .form-section .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .toast {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .toast.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .toast.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .toast.loading {
+            display: block;
+            background: #e2e3e5;
+            color: #383d41;
+            border-left: 4px solid #6c757d;
+        }
+
+        .list-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .list-section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .skill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 0.6rem;
+            border-left: 4px solid var(--accent);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-item .info {
+            flex: 1;
+        }
+
+        .skill-item .info .name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .skill-item .info .meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .skill-item .info .platforms-list {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .skill-item .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .skill-item .btn-edit {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .skill-item .btn-edit:hover {
+            background: #c4a020;
+        }
+
+        .skill-item .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .skill-item .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .edit-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--primary);
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .admin-wrapper {
+                padding: 1rem;
+            }
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .platform-row {
+                flex-direction: column;
+            }
+            .platform-row input {
+                width: 100%;
+            }
+            .skill-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .form-section .btn-row {
+                flex-direction: column;
+            }
+            .form-section .btn-primary,
+            .form-section .btn-cancel {
+                width: 100%;
+                margin-left: 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <header class="admin-header">
+            <h1>🎓 Manage Free Skills</h1>
+            <div class="links">
+                <a href="admin.html">← Dashboard</a>
+                <a href="library.html">Library</a>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- Add/Edit Skill Form -->
+        <div class="form-section">
+            <h2 id="formTitle">➕ Add New Skill</h2>
+            <div id="toast" class="toast"></div>
+            <form id="skillForm" onsubmit="saveSkill(event)">
+                <input type="hidden" id="editId" value="">
+
+                <label for="skillIcon">Icon</label>
+                <input type="text" id="skillIcon" placeholder="e.g., 💻, 📊, 🎨" maxlength="2">
+
+                <label for="skillName">Skill Name *</label>
+                <input type="text" id="skillName" placeholder="e.g., Python Programming" required>
+
+                <label for="skillCategory">Category *</label>
+                <select id="skillCategory" required>
+                    <option value="Coding">💻 Coding</option>
+                    <option value="Data Science">📊 Data Science</option>
+                    <option value="Design">🎨 Design</option>
+                    <option value="Digital Marketing">🌐 Digital Marketing</option>
+                    <option value="Languages">🗣️ Languages</option>
+                    <option value="Soft Skills">💼 Soft Skills</option>
+                    <option value="Other">📌 Other</option>
+                </select>
+
+                <label for="skillDescription">Description</label>
+                <textarea id="skillDescription" placeholder="Brief description of the skill..."></textarea>
+
+                <label>Platforms (Course Providers)</label>
+                <div id="platformsContainer">
+                    <div class="platform-row">
+                        <input type="text" class="platform-name" placeholder="Platform name (e.g., Codecademy)" style="flex:1;">
+                        <input type="text" class="platform-url" placeholder="URL (e.g., https://...)" style="flex:2;">
+                    </div>
+                </div>
+                <button type="button" class="btn-add-platform" onclick="addPlatformRow()">+ Add Platform</button>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn-primary" id="saveBtn">➕ Add Skill</button>
+                    <button type="button" class="btn-cancel" onclick="cancelEdit()" id="cancelBtn" style="display:none;">Cancel Edit</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Skills List -->
+        <div class="list-section">
+            <h2>📋 All Skills</h2>
+            <div id="skillsList">
+                <div class="empty-state">Loading skills...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const skillsList = document.getElementById('skillsList');
+        const toast = document.getElementById('toast');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const formTitle = document.getElementById('formTitle');
+        const editId = document.getElementById('editId');
+
+        let isEditing = false;
+
+        // ===== CHECK LOGIN =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) window.location.href = 'admin.html';
+            else loadSkills();
+        });
+
+        // ===== ADD PLATFORM ROW =====
+        function addPlatformRow(name, url) {
+            const container = document.getElementById('platformsContainer');
+            const row = document.createElement('div');
+            row.className = 'platform-row';
+            row.innerHTML = `
+                <input type="text" class="platform-name" placeholder="Platform name" value="${name || ''}" style="flex:1;">
+                <input type="text" class="platform-url" placeholder="URL" value="${url || ''}" style="flex:2;">
+                <button type="button" class="btn-remove" onclick="removePlatformRow(this)">✕</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function removePlatformRow(btn) {
+            const row = btn.closest('.platform-row');
+            if (document.querySelectorAll('.platform-row').length > 1) {
+                row.remove();
+            } else {
+                showToast('Keep at least one platform row.', 'error');
+            }
+        }
+
+        // ===== LOAD PLATFORMS FOR EDIT =====
+        function loadPlatformsForEdit(platforms) {
+            const container = document.getElementById('platformsContainer');
+            container.innerHTML = '';
+            if (platforms && platforms.length > 0) {
+                platforms.forEach(p => {
+                    addPlatformRow(p.name, p.url);
+                });
+            } else {
+                addPlatformRow('', '');
+            }
+        }
+
+        // ===== SAVE SKILL (Add or Update) =====
+        async function saveSkill(event) {
+            event.preventDefault();
+
+            const icon = document.getElementById('skillIcon').value.trim() || '📌';
+            const name = document.getElementById('skillName').value.trim();
+            const category = document.getElementById('skillCategory').value;
+            const description = document.getElementById('skillDescription').value.trim();
+            const id = document.getElementById('editId').value;
+
+            // Collect platforms
+            const platformRows = document.querySelectorAll('.platform-row');
+            const platforms = [];
+            platformRows.forEach(row => {
+                const nameInput = row.querySelector('.platform-name');
+                const urlInput = row.querySelector('.platform-url');
+                const platformName = nameInput.value.trim();
+                const platformUrl = urlInput.value.trim();
+                if (platformName && platformUrl) {
+                    platforms.push({ name: platformName, url: platformUrl });
+                }
+            });
+
+            if (!name) {
+                showToast('Please enter a skill name.', 'error');
+                return;
+            }
+
+            if (platforms.length === 0) {
+                showToast('Please add at least one platform.', 'error');
+                return;
+            }
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = isEditing ? 'Updating...' : 'Adding...';
+            showToast(isEditing ? 'Updating skill...' : 'Adding skill...', 'loading');
+
+            try {
+                const skillData = {
+                    icon: icon,
+                    name: name,
+                    category: category,
+                    description: description,
+                    platforms: platforms,
+                    isActive: true,
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (isEditing && id) {
+                    await db.collection('skills').doc(id).update(skillData);
+                    showToast('✅ Skill updated successfully!', 'success');
+                } else {
+                    skillData.createdAt = new Date().toISOString();
+                    await db.collection('skills').add(skillData);
+                    showToast('✅ Skill added successfully!', 'success');
+                }
+
+                resetForm();
+                loadSkills();
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+
+            saveBtn.disabled = false;
+            saveBtn.textContent = isEditing ? '💾 Update Skill' : '➕ Add Skill';
+        }
+
+        // ===== EDIT SKILL =====
+        async function editSkill(id) {
+            try {
+                const doc = await db.collection('skills').doc(id).get();
+                if (!doc.exists) {
+                    showToast('Skill not found.', 'error');
+                    return;
+                }
+
+                const data = doc.data();
+                isEditing = true;
+                editId.value = id;
+
+                // Fill form
+                document.getElementById('skillIcon').value = data.icon || '📌';
+                document.getElementById('skillName').value = data.name || '';
+                document.getElementById('skillCategory').value = data.category || 'Other';
+                document.getElementById('skillDescription').value = data.description || '';
+
+                // Load platforms
+                loadPlatformsForEdit(data.platforms || []);
+
+                // Update UI
+                formTitle.textContent = '✏️ Edit Skill';
+                saveBtn.textContent = '💾 Update Skill';
+                cancelBtn.style.display = 'inline-block';
+
+                // Scroll to form
+                document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error loading skill for edit:', error);
+                showToast('❌ Error loading skill: ' + error.message, 'error');
+            }
+        }
+
+        // ===== CANCEL EDIT =====
+        function cancelEdit() {
+            resetForm();
+            showToast('Edit cancelled.', 'success');
+            setTimeout(() => { toast.style.display = 'none'; }, 1000);
+        }
+
+        // ===== RESET FORM =====
+        function resetForm() {
+            isEditing = false;
+            editId.value = '';
+            document.getElementById('skillForm').reset();
+            document.getElementById('platformsContainer').innerHTML = '';
+            addPlatformRow('', '');
+            formTitle.textContent = '➕ Add New Skill';
+            saveBtn.textContent = '➕ Add Skill';
+            cancelBtn.style.display = 'none';
+        }
+
+        // ===== LOAD SKILLS =====
+        async function loadSkills() {
+            skillsList.innerHTML = '<div class="empty-state">Loading skills...</div>';
+
+            try {
+                const snapshot = await db.collection('skills')
+                    .orderBy('category', 'asc')
+                    .get();
+
+                if (snapshot.empty) {
+                    skillsList.innerHTML = '<div class="empty-state">No skills added yet.</div>';
+                    return;
+                }
+
+                skillsList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+
+                    const platformsHtml = data.platforms && data.platforms.length > 0
+                        ? data.platforms.map(p => `${p.name}`).join(' | ')
+                        : 'No platforms';
+
+                    const item = document.createElement('div');
+                    item.className = 'skill-item';
+                    item.innerHTML = `
+                        <div class="info">
+                            <div class="name">
+                                ${data.icon || '📌'} ${data.name}
+                                <span style="font-size:0.7rem; color:var(--text-muted); font-weight:400; margin-left:0.5rem;">${data.category}</span>
+                            </div>
+                            <div class="meta">${data.description || ''}</div>
+                            <div class="platforms-list">📚 ${platformsHtml}</div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-edit" onclick="editSkill('${id}')">✏️ Edit</button>
+                            <button class="btn-delete" onclick="deleteSkill('${id}')">🗑️ Delete</button>
+                        </div>
+                    `;
+                    skillsList.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error('Error loading skills:', error);
+                skillsList.innerHTML = '<div class="empty-state">❌ Error loading skills</div>';
+            }
+        }
+
+        // ===== DELETE SKILL =====
+        async function deleteSkill(id) {
+            if (!confirm('Delete this skill?')) return;
+
+            try {
+                await db.collection('skills').doc(id).delete();
+                showToast('🗑️ Skill deleted!', 'success');
+                if (isEditing && editId.value === id) {
+                    resetForm();
+                }
+                loadSkills();
+            } catch (error) {
+                showToast('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type) {
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+        }
+
+        // ===== LOGOUT =====
+        function logout() {
+            auth.signOut();
+            window.location.href = 'admin.html';
+        }
+    </script>
+
+</body>
+</html>

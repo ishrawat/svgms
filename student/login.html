@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Student Zone</title>
+    <link rel="stylesheet" href="assets/student-style.css">
+    <style>
+        /* Only minimal styles for NEW elements not in existing CSS */
+        .password-wrapper {
+            position: relative;
+        }
+        .password-wrapper input {
+            padding-right: 45px;
+        }
+        .toggle-eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            opacity: 0.6;
+        }
+        .toggle-eye:hover {
+            opacity: 1;
+        }
+        .password-strength {
+            margin-top: 6px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        .password-strength-text {
+            font-size: 0.8rem;
+            margin-top: 4px;
+            min-height: 20px;
+            color: #666;
+        }
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .forgot-password-link {
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #4a90e2;
+        }
+        .forgot-password-link:hover {
+            text-decoration: underline;
+        }
+        .student-message {
+            position: relative;
+            padding-right: 35px !important;
+        }
+        .dismiss-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.5;
+        }
+        .dismiss-btn:hover {
+            opacity: 1;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 20px;
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* 👇 NEW: Verification pending styles */
+        .verification-pending {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+        .verification-pending h4 {
+            color: #856404;
+            margin: 0 0 8px 0;
+        }
+        .verification-pending .actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .verification-pending button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .btn-resend {
+            background: #28a745;
+            color: white;
+        }
+        .btn-resend:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+        .btn-refresh {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-refresh:hover {
+            background: #138496;
+            transform: scale(1.05);
+        }
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-logout:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="student-body">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">🔐 Loading Student Portal...</div>
+    </div>
+
+    <div class="student-container">
+
+        <!-- ===== HEADER ===== -->
+        <div id="student-header"></div>
+
+        <!-- ===== LOGIN CARD ===== -->
+        <div class="student-card">
+
+            <div class="student-header">
+                <span class="icon">🔐</span>
+                <span class="mission-badge">✦ Mission Login ✦</span>
+                <h1>Access Granted</h1>
+                <p class="subtitle">Enter your credentials to launch</p>
+            </div>
+
+            <div id="message" class="student-message">
+                <button class="dismiss-btn" onclick="dismissMessage()">✕</button>
+            </div>
+
+            <!-- 👇 NEW: Verification Pending Message -->
+            <div id="verificationPending" class="verification-pending">
+                <h4>📧 Email Not Verified</h4>
+                <p>Please verify your email address before logging in.</p>
+                <div class="actions">
+                    <button class="btn-resend" onclick="resendVerificationEmail()">
+                        🔄 Resend Verification Email
+                    </button>
+                    <button class="btn-refresh" onclick="checkVerificationStatus()">
+                        🔄 Check Status
+                    </button>
+                    <button class="btn-logout" onclick="logoutUser()">
+                        🚪 Logout
+                    </button>
+                </div>
+            </div>
+
+            <form id="loginForm" class="student-form" onsubmit="loginUser(event)">
+                <label for="email">📧 Email</label>
+                <input type="email" id="email" placeholder="student@email.com" required>
+                <div id="emailError" style="color:#c00;font-size:0.85rem;margin-top:-5px;margin-bottom:10px;display:none;"></div>
+
+                <label for="password">🔒 Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="••••••••" required oninput="checkPasswordStrength(this.value)">
+                    <button type="button" class="toggle-eye" onclick="togglePasswordVisibility()">👁️</button>
+                </div>
+                <div class="password-strength">
+                    <div id="strengthBar" class="password-strength-bar"></div>
+                </div>
+                <div id="strengthText" class="password-strength-text"></div>
+
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    <div class="forgot-password-link">
+                        <a onclick="forgotPassword()">Forgot Password?</a>
+                    </div>
+                </div>
+
+                <button type="submit" class="student-btn" id="loginBtn">🚀 Launch</button>
+            </form>
+
+            <div class="student-links">
+                New explorer? <a href="register.html">🚀 Register</a>
+                <br>
+                <a href="../index.html" class="student-back">← Back to School</a>
+            </div>
+
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div id="student-footer"></div>
+
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ============================================================
+        // PRODUCTION MODE
+        // ============================================================
+        const isProduction = window.location.hostname !== 'localhost' && 
+                           window.location.hostname !== '127.0.0.1';
+        if (isProduction) {
+            console.log = function() {};
+            console.info = function() {};
+            console.debug = function() {};
+        }
+
+        // ============================================================
+        // FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ============================================================
+        // VARIABLES
+        // ============================================================
+        let messageTimeout = null;
+        let isLoggingIn = false;
+        let loginAttempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+        let lastAttemptTime = parseInt(localStorage.getItem('lastAttemptTime') || '0');
+
+        // ============================================================
+        // LOAD HEADER & FOOTER
+        // ============================================================
+        fetch('components/header.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-header').innerHTML = data)
+            .catch(() => console.error('Failed to load header'));
+
+        fetch('components/footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-footer').innerHTML = data)
+            .catch(() => console.error('Failed to load footer'));
+
+        // ============================================================
+        // UTILITY FUNCTIONS
+        // ============================================================
+        
+        function sanitizeInput(input) {
+            if (!input) return '';
+            const element = document.createElement('div');
+            element.textContent = input;
+            return element.innerHTML;
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePassword(password) {
+            return {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+        }
+
+        // ============================================================
+        // PASSWORD STRENGTH
+        // ============================================================
+        function checkPasswordStrength(password) {
+            const requirements = validatePassword(password);
+            const metCount = Object.values(requirements).filter(v => v === true).length;
+            const total = Object.keys(requirements).length;
+            const percentage = (metCount / total) * 100;
+            
+            const bar = document.getElementById('strengthBar');
+            const text = document.getElementById('strengthText');
+            
+            if (password.length === 0) {
+                bar.style.width = '0%';
+                bar.style.background = '#e0e0e0';
+                text.textContent = '';
+                return;
+            }
+            
+            bar.style.width = percentage + '%';
+            
+            if (percentage <= 20) {
+                bar.style.background = '#f44336';
+                text.textContent = 'Weak - Add uppercase, numbers, special characters';
+                text.style.color = '#f44336';
+            } else if (percentage <= 40) {
+                bar.style.background = '#ff9800';
+                text.textContent = 'Fair - Add more variety';
+                text.style.color = '#ff9800';
+            } else if (percentage <= 60) {
+                bar.style.background = '#ffc107';
+                text.textContent = 'Good - Almost there!';
+                text.style.color = '#ffc107';
+            } else if (percentage <= 80) {
+                bar.style.background = '#8bc34a';
+                text.textContent = 'Strong - Great password!';
+                text.style.color = '#8bc34a';
+            } else {
+                bar.style.background = '#4caf50';
+                text.textContent = 'Very Strong - Excellent!';
+                text.style.color = '#4caf50';
+            }
+        }
+
+        // ============================================================
+        // PASSWORD VISIBILITY TOGGLE
+        // ============================================================
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = event.target;
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        // ============================================================
+        // FORGOT PASSWORD
+        // ============================================================
+        function forgotPassword() {
+            const email = document.getElementById('email').value;
+            if (!email || !validateEmail(email)) {
+                showMessage('Please enter a valid email address first.', 'error');
+                return;
+            }
+            
+            if (confirm(`Send password reset email to ${email}?`)) {
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        showMessage('✅ Password reset email sent! Check your inbox (please check Spam folders too).', 'success', 6000);
+                    })
+                    .catch((error) => {
+                        let msg = error.message;
+                        if (error.code === 'auth/user-not-found') {
+                            msg = 'No account found with this email.';
+                        }
+                        showMessage('❌ ' + msg, 'error');
+                    });
+            }
+        }
+
+        // ============================================================
+        // MESSAGE SYSTEM
+        // ============================================================
+        function showMessage(text, type = 'info', duration = 5000) {
+            const message = document.getElementById('message');
+            
+            // Clear existing timeout
+            if (messageTimeout) {
+                clearTimeout(messageTimeout);
+                messageTimeout = null;
+            }
+            
+            message.className = 'student-message show ' + type;
+            message.innerHTML = text + ' <button class="dismiss-btn" onclick="dismissMessage()">✕</button>';
+            
+            // Auto dismiss
+            if (duration > 0) {
+                messageTimeout = setTimeout(() => {
+                    dismissMessage();
+                }, duration);
+            }
+        }
+
+        function dismissMessage() {
+            const message = document.getElementById('message');
+            message.className = 'student-message';
+            message.innerHTML = '<button class="dismiss-btn" onclick="dismissMessage()">✕</button>';
+            if (messageTimeout) {
+                clearTimeout(messageTimeout);
+                messageTimeout = null;
+            }
+        }
+
+        // ============================================================
+        // 👇 NEW: EMAIL VERIFICATION FUNCTIONS
+        // ============================================================
+
+        // Resend verification email
+        async function resendVerificationEmail() {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    showMessage('⚠️ Please login first to resend verification email.', 'warning');
+                    return;
+                }
+
+                // Check if already verified
+                await user.reload();
+                if (user.emailVerified) {
+                    showMessage('✅ Your email is already verified! You can login now.', 'success');
+                    document.getElementById('verificationPending').style.display = 'none';
+                    return;
+                }
+
+                // Resend verification
+                await user.sendEmailVerification();
+                showMessage(`
+                    ✅ New verification email sent to <strong>${user.email}</strong>!
+                    <br>Please check your inbox and spam folder.
+                `, 'success');
+            } catch (error) {
+                console.error('❌ Resend error:', error);
+                let errorMsg = 'Failed to resend verification email. ';
+                if (error.code === 'auth/too-many-requests') {
+                    errorMsg += 'Too many attempts. Please wait a moment.';
+                } else {
+                    errorMsg += error.message;
+                }
+                showMessage(`❌ ${errorMsg}`, 'error');
+            }
+        }
+
+        // Check verification status manually
+        async function checkVerificationStatus() {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    showMessage('⚠️ Please login first.', 'warning');
+                    return;
+                }
+
+                await user.reload();
+                const currentUser = auth.currentUser;
+                
+                if (currentUser.emailVerified) {
+                    showMessage('✅ Email verified! Redirecting to dashboard...', 'success');
+                    document.getElementById('verificationPending').style.display = 'none';
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    showMessage('❌ Email still not verified. Please check your inbox or resend the email.', 'warning');
+                }
+            } catch (error) {
+                console.error('❌ Status check error:', error);
+                showMessage(`❌ Error checking status: ${error.message}`, 'error');
+            }
+        }
+
+        // Logout function
+        async function logoutUser() {
+            try {
+                await auth.signOut();
+                showMessage('✅ Logged out successfully.', 'success');
+                document.getElementById('verificationPending').style.display = 'none';
+                document.getElementById('loginForm').reset();
+            } catch (error) {
+                console.error('❌ Logout error:', error);
+                showMessage(`❌ Error logging out: ${error.message}`, 'error');
+            }
+        }
+
+        // ============================================================
+        // LOG ACTIVITY WITH RETRY
+        // ============================================================
+        async function logActivity(studentId, studentName, className, activityType, details) {
+            try {
+                await db.collection('student_activities').add({
+                    studentId: studentId,
+                    studentName: studentName || 'Unknown',
+                    class: className || '',
+                    activityType: activityType,
+                    details: details || {},
+                    timestamp: new Date().toISOString()
+                });
+                console.log('✅ Activity logged:', activityType, studentName);
+            } catch (error) {
+                console.error('❌ Error logging activity:', error);
+                const failedLogs = JSON.parse(localStorage.getItem('failedLogs') || '[]');
+                failedLogs.push({
+                    studentId, studentName, className, activityType, details,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('failedLogs', JSON.stringify(failedLogs));
+            }
+        }
+
+        // ============================================================
+        // 👇 UPDATED: LOGIN USER WITH EMAIL VERIFICATION CHECK
+        // ============================================================
+        async function loginUser(event) {
+            event.preventDefault();
+
+            // Check if already logging in
+            if (isLoggingIn) return;
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+
+            // ===== INPUT VALIDATION =====
+            if (!email) {
+                showMessage('❌ Please enter your email address.', 'error');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showMessage('❌ Please enter a valid email address.', 'error');
+                return;
+            }
+            
+            if (!password || password.length < 6) {
+                showMessage('❌ Password must be at least 6 characters.', 'error');
+                return;
+            }
+
+            // ===== RATE LIMITING =====
+            const now = Date.now();
+            if (loginAttempts >= 5) {
+                if (now - lastAttemptTime < 900000) { // 15 minutes
+                    const remaining = Math.ceil((900000 - (now - lastAttemptTime)) / 60000);
+                    showMessage(`❌ Too many failed attempts. Please wait ${remaining} minutes.`, 'error');
+                    return;
+                } else {
+                    loginAttempts = 0;
+                    localStorage.setItem('loginAttempts', '0');
+                }
+            }
+
+            isLoggingIn = true;
+            showMessage('🔐 Authenticating...', 'info', 0);
+            btn.disabled = true;
+            btn.textContent = '⏳ Loading...';
+
+            try {
+                // ===== SET PERSISTENCE =====
+                const rememberMe = document.getElementById('rememberMe').checked;
+                const persistence = rememberMe ? 
+                    firebase.auth.Auth.Persistence.LOCAL : 
+                    firebase.auth.Auth.Persistence.SESSION;
+                await auth.setPersistence(persistence);
+
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                console.log('✅ Login successful:', user.email);
+
+                // ===== 👇 NEW: CHECK IF EMAIL IS VERIFIED =====
+                await user.reload();
+                const currentUser = auth.currentUser;
+                
+                if (!currentUser.emailVerified) {
+                    // Email not verified - show pending message
+                    showMessage(`
+                        ⚠️ Email not verified! 
+                        <br>
+                        📧 We've sent a new verification email to <strong>${email}</strong>
+                        <br>
+                        📬 Please check your inbox and click the verification link
+                        <br><br>
+                        <button onclick="resendVerificationEmail()" style="
+                            background: #28a745; 
+                            color: white; 
+                            border: none; 
+                            padding: 8px 16px; 
+                            border-radius: 4px; 
+                            cursor: pointer;
+                            margin-top: 10px;
+                        ">
+                            🔄 Resend Email
+                        </button>
+                    `, 'warning');
+                    
+                    document.getElementById('verificationPending').style.display = 'block';
+                    
+                    // Try to send verification email again
+                    try {
+                        await currentUser.sendEmailVerification();
+                    } catch (emailError) {
+                        console.error('Failed to send verification email:', emailError);
+                    }
+                    
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Launch';
+                    isLoggingIn = false;
+                    
+                    // Log out the unverified user
+                    await auth.signOut();
+                    return;
+                }
+
+                // ===== CHECK IF BANNED =====
+                const doc = await db.collection('students').doc(user.uid).get();
+                
+                if (doc.exists && doc.data().isBanned === true) {
+                    await auth.signOut();
+                    showMessage('❌ This account has been banned. Please contact the school.', 'error');
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Launch';
+                    isLoggingIn = false;
+                    return;
+                }
+
+                // ===== CHECK IF ROLE IS STUDENT =====
+                if (doc.exists) {
+                    const userData = doc.data();
+                    
+                    if (userData.role !== 'student') {
+                        await auth.signOut();
+                        showMessage('❌ This account is not a student account.', 'error');
+                        btn.disabled = false;
+                        btn.textContent = '🚀 Launch';
+                        isLoggingIn = false;
+                        return;
+                    }
+                    
+                    const studentData = doc.data();
+
+                    // ===== LOG LOGIN ACTIVITY =====
+                    await logActivity(
+                        user.uid,
+                        studentData.name || 'Unknown',
+                        studentData.class || '',
+                        'login',
+                        { ip: 'N/A', device: navigator.userAgent }
+                    );
+
+                    // ===== UPDATE LAST LOGIN =====
+                    await db.collection('students').doc(user.uid).update({
+                        lastLogin: new Date().toISOString()
+                    });
+
+                    // Reset login attempts on success
+                    loginAttempts = 0;
+                    localStorage.setItem('loginAttempts', '0');
+
+                    showMessage('✅ Login successful! Redirecting...', 'success', 2000);
+                    btn.textContent = '✅ Success!';
+
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                    
+                } else {
+                    await auth.signOut();
+                    showMessage('❌ No student profile found. Please register.', 'error');
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Launch';
+                    isLoggingIn = false;
+                }
+
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                
+                // Increment failed attempts
+                loginAttempts++;
+                localStorage.setItem('loginAttempts', loginAttempts.toString());
+                localStorage.setItem('lastAttemptTime', Date.now().toString());
+                
+                let errorMsg = error.message;
+                const errorCode = error.code;
+                
+                // Specific error messages
+                const errorMessages = {
+                    'auth/user-not-found': 'No account found with this email. Please register.',
+                    'auth/wrong-password': 'Incorrect password. Please try again.',
+                    'auth/invalid-email': 'Invalid email address format.',
+                    'auth/too-many-requests': 'Too many attempts. Please try again later.',
+                    'auth/user-disabled': 'This account has been disabled.',
+                    'auth/network-request-failed': 'Network error. Please check your connection.'
+                };
+                
+                errorMsg = errorMessages[errorCode] || error.message;
+                
+                showMessage('❌ ' + errorMsg, 'error');
+                btn.disabled = false;
+                btn.textContent = '🚀 Launch';
+                isLoggingIn = false;
+            }
+        }
+
+        // ============================================================
+        // AUTH STATE CHECK
+        // ============================================================
+        let authChecked = false;
+        
+        auth.onAuthStateChanged(function(user) {
+            console.log('🔍 Auth state changed (login page):', user);
+            authChecked = true;
+            
+            // Hide loading overlay
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            
+            if (user) {
+                // 👇 NEW: Check if verified before redirecting
+                if (!user.emailVerified) {
+                    // Show verification pending message
+                    document.getElementById('verificationPending').style.display = 'block';
+                    showMessage(`
+                        ⚠️ Your email (${user.email}) is not verified yet.
+                        <br>Please check your inbox or click "Resend Verification Email".
+                    `, 'warning');
+                } else {
+                    console.log('✅ User already logged in and verified, redirecting to dashboard');
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                console.log('👤 No user, showing login form');
+                document.getElementById('verificationPending').style.display = 'none';
+            }
+        });
+
+        // ============================================================
+        // CHECK URL PARAMETERS ON PAGE LOAD
+        // ============================================================
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('verify') === 'pending') {
+                showMessage(`
+                    📧 <strong>Verification email sent!</strong>
+                    <br>
+                    Please check your inbox and click the verification link.
+                    <br><br>
+                    <button onclick="resendVerificationEmail()" style="
+                        background: #4CAF50; 
+                        color: white; 
+                        border: none; 
+                        padding: 8px 16px; 
+                        border-radius: 4px; 
+                        cursor: pointer;
+                    ">
+                        🔄 Resend Email
+                    </button>
+                `, 'info');
+            }
+            
+            if (urlParams.get('verified') === 'true') {
+                showMessage('✅ Email verified! You can now login.', 'success');
+            }
+        });
+    </script>
+    <script src="particles.js"></script>
+
+</body>
+</html>

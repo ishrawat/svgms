@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Simulations - Student Zone</title>
+    <link rel="stylesheet" href="assets/student-style.css">
+    <style>
+        /* ===== SIM PAGE STYLES ===== */
+        .sim-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .sim-header {
+            margin-bottom: 2rem;
+        }
+
+        .sim-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+
+        .sim-header p {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        /* ===== SIMULATION GRID ===== */
+        .sim-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .sim-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .sim-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .sim-card .sim-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sim-card .sim-desc {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .sim-card .sim-embed {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #0a0e1a;
+            pointer-events: none;
+        }
+
+        .sim-card .sim-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none;
+        }
+
+        .sim-card .sim-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            transition: var(--transition);
+        }
+
+        .sim-card:hover .sim-hint {
+            opacity: 1;
+        }
+
+        /* ===== FULLSCREEN MODAL ===== */
+        .sim-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-dark);
+            z-index: 9999;
+            padding: 1.5rem;
+            overflow: hidden;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .sim-modal.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .sim-modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .sim-modal .modal-header .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .sim-modal .modal-header .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0 0.5rem;
+        }
+
+        .sim-modal .modal-header .modal-close:hover {
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .sim-modal .modal-body {
+            width: 100%;
+            height: calc(100% - 70px);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0a0e1a;
+        }
+
+        .sim-modal .modal-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .sim-modal .modal-hint {
+            text-align: center;
+            margin-top: 0.8rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        /* ===== BACK LINK ===== */
+        .back-link {
+            display: inline-block;
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .sim-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sim-wrapper {
+                padding: 1rem 0.8rem;
+            }
+            .sim-header h1 {
+                font-size: 1.5rem;
+            }
+            .sim-card {
+                padding: 1rem;
+            }
+            .sim-modal {
+                padding: 0.8rem;
+            }
+            .sim-modal .modal-header .modal-title {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sim-card .sim-title {
+                font-size: 1rem;
+            }
+            .sim-card .sim-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="student-body">
+
+    <div class="sim-wrapper">
+
+        <!-- ===== HEADER ===== -->
+        <div id="student-header"></div>
+
+        <!-- ===== BACK LINK ===== -->
+        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+
+        <!-- ===== PAGE HEADER ===== -->
+        <div class="sim-header">
+            <h1>📐 Mathematics Simulations</h1>
+            <p>Double-click or double-tap any simulation to expand it fullscreen</p>
+        </div>
+
+        <!-- ===== SIMULATIONS GRID ===== -->
+        <div class="sim-grid">
+
+            <!-- Sim 1: Graphing Quadratics -->
+            <div class="sim-card" data-title="Graphing Quadratics" data-url="https://phet.colorado.edu/sims/html/graphing-quadratics/latest/graphing-quadratics_en.html">
+                <div class="sim-title">📈 Graphing Quadratics</div>
+                <div class="sim-desc">Visualize quadratic functions, concavity, and key features [citation:1]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/graphing-quadratics/latest/graphing-quadratics_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 2: Function Builder -->
+            <div class="sim-card" data-title="Function Builder" data-url="https://phet.colorado.edu/sims/html/function-builder/latest/function-builder_en.html">
+                <div class="sim-title">🔧 Function Builder</div>
+                <div class="sim-desc">Build and explore different types of functions [citation:3]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/function-builder/latest/function-builder_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 3: Graphing Lines -->
+            <div class="sim-card" data-title="Graphing Lines" data-url="https://phet.colorado.edu/sims/html/graphing-lines/latest/graphing-lines_en.html">
+                <div class="sim-title">📊 Graphing Lines</div>
+                <div class="sim-desc">Practice graphing linear equations and understanding slope [citation:3]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/graphing-lines/latest/graphing-lines_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 4: Graphing Slope-Intercept -->
+            <div class="sim-card" data-title="Graphing Slope-Intercept" data-url="https://phet.colorado.edu/sims/html/graphing-slope-intercept/latest/graphing-slope-intercept_en.html">
+                <div class="sim-title">📏 Slope-Intercept</div>
+                <div class="sim-desc">Learn about slope and y-intercept in linear equations [citation:3]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/graphing-slope-intercept/latest/graphing-slope-intercept_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 5: Plinko Probability -->
+            <div class="sim-card" data-title="Plinko Probability" data-url="https://phet.colorado.edu/sims/html/plinko-probability/latest/plinko-probability_en.html">
+                <div class="sim-title">🎯 Plinko Probability</div>
+                <div class="sim-desc">Visualize binomial distribution and probability concepts [citation:4][citation:5]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/plinko-probability/latest/plinko-probability_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 6: Least-Squares Regression -->
+            <div class="sim-card" data-title="Least-Squares Regression" data-url="https://phet.colorado.edu/sims/html/least-squares-regression/latest/least-squares-regression_en.html">
+                <div class="sim-title">📉 Regression</div>
+                <div class="sim-desc">Explore linear regression and best-fit lines [citation:3]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/least-squares-regression/latest/least-squares-regression_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 7: Trig Tour -->
+            <div class="sim-card" data-title="Trig Tour" data-url="https://phet.colorado.edu/sims/html/trig-tour/latest/trig-tour_en.html">
+                <div class="sim-title">🔺 Trig Tour</div>
+                <div class="sim-desc">Visualize trigonometric functions on the unit circle [citation:3]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/trig-tour/latest/trig-tour_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 8: Area Model Algebra -->
+            <div class="sim-card" data-title="Area Model Algebra" data-url="https://phet.colorado.edu/sims/html/area-model-algebra/latest/area-model-algebra_en.html">
+                <div class="sim-title">📐 Area Model Algebra</div>
+                <div class="sim-desc">Explore algebraic expressions using area models [citation:9]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/area-model-algebra/latest/area-model-algebra_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 9: Arithmetic -->
+            <div class="sim-card" data-title="Arithmetic" data-url="https://phet.colorado.edu/sims/html/arithmetic/latest/arithmetic_en.html">
+                <div class="sim-title">🔢 Arithmetic</div>
+                <div class="sim-desc">Practice arithmetic operations and number sense [citation:3]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/arithmetic/latest/arithmetic_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 10: Proportion Playground -->
+            <div class="sim-card" data-title="Proportion Playground" data-url="https://phet.colorado.edu/sims/html/proportion-playground/latest/proportion-playground_en.html">
+                <div class="sim-title">⚖️ Proportion Playground</div>
+                <div class="sim-desc">Explore ratios and proportions with visual feedback [citation:3]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/proportion-playground/latest/proportion-playground_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 11: Number Line Operations -->
+            <div class="sim-card" data-title="Number Line Operations" data-url="https://phet.colorado.edu/sims/html/number-line-operations/latest/number-line-operations_en.html">
+                <div class="sim-title">🔢 Number Line</div>
+                <div class="sim-desc">Visualize number line operations and integer concepts [citation:3]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/number-line-operations/latest/number-line-operations_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 12: Calculus Grapher -->
+            <div class="sim-card" data-title="Calculus Grapher" data-url="https://phet.colorado.edu/sims/html/calculus-grapher/latest/calculus-grapher_en.html">
+                <div class="sim-title">📈 Calculus Grapher</div>
+                <div class="sim-desc">Visualize derivatives and integrals of functions [citation:6]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/calculus-grapher/latest/calculus-grapher_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 13: Vector Addition -->
+            <div class="sim-card" data-title="Vector Addition" data-url="https://phet.colorado.edu/sims/html/vector-addition/latest/vector-addition_en.html">
+                <div class="sim-title">➡️ Vector Addition</div>
+                <div class="sim-desc">Learn vector addition and components [citation:6]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/vector-addition/latest/vector-addition_en.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 13: Vector Addition -->
+            <div class="sim-card" data-title="Vector Addition" data-url="https://phet.colorado.edu/sims/html/vector-addition/latest/vector-addition_en.html">
+                <div class="sim-title">➡️ Vector Equation Addition</div>
+                <div class="sim-desc">Learn vector equation addition and components [citation:6]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/vector-addition-equations/latest/vector-addition-equations_all.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+            <!-- Sim 13: projectile motion -->
+            <div class="sim-card" data-title="Vector Addition" data-url="https://phet.colorado.edu/sims/html/vector-addition/latest/vector-addition_en.html">
+                <div class="sim-title">➡️ Projectile Motion</div>
+                <div class="sim-desc">Learn Projectile motion and components [citation:6]</div>
+                <div class="sim-embed">
+                    <iframe src="https://phet.colorado.edu/sims/html/projectile-motion/latest/projectile-motion_all.html" allowfullscreen></iframe>
+                </div>
+                <div class="sim-hint">🔍 Double click to expand</div>
+            </div>
+
+
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div id="student-footer"></div>
+
+    </div>
+
+    <!-- ===== FULLSCREEN MODAL ===== -->
+    <div class="sim-modal" id="simModal">
+        <div class="modal-header">
+            <span class="modal-title" id="modalTitle">Simulation</span>
+            <button class="modal-close" id="modalClose">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <iframe id="modalIframe" src="" allowfullscreen></iframe>
+        </div>
+        <div class="modal-hint">💡 Double click / tap again or press ESC to close</div>
+    </div>
+
+    <!-- ===== FIREBASE SDK ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+            authDomain: "svgms-backend.firebaseapp.com",
+            projectId: "svgms-backend",
+            storageBucket: "svgms-backend.firebasestorage.app",
+            messagingSenderId: "1065359559935",
+            appId: "1:1065359559935:web:977cea73a68e05813750ca"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // ===== LOAD HEADER =====
+        fetch('components/header.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-header').innerHTML = data);
+
+        // ===== LOAD FOOTER =====
+        fetch('components/footer.html')
+            .then(res => res.text())
+            .then(data => document.getElementById('student-footer').innerHTML = data);
+
+        // ===== CHECK AUTH =====
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // ===== LOGOUT =====
+        function studentLogout() {
+            if (confirm('Exit Student Zone?')) {
+                auth.signOut().then(() => {
+                    window.location.href = 'login.html';
+                });
+            }
+        }
+
+        // ============================================================
+        // FULLSCREEN MODAL
+        // ============================================================
+
+        const modal = document.getElementById('simModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalIframe = document.getElementById('modalIframe');
+        const modalClose = document.getElementById('modalClose');
+
+        function openModal(title, url) {
+            modalTitle.textContent = title;
+            modalIframe.src = url;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            modalIframe.src = '';
+            document.body.style.overflow = '';
+        }
+
+        modalClose.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // ===== DOUBLE CLICK / DOUBLE TAP ON CARDS =====
+        document.querySelectorAll('.sim-card').forEach(function(card) {
+            let clickTimer = null;
+
+            card.addEventListener('click', function(e) {
+                if (e.target.closest('.sim-embed')) return;
+
+                const title = this.dataset.title;
+                const url = this.dataset.url;
+
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                    openModal(title, url);
+                } else {
+                    clickTimer = setTimeout(() => {
+                        clickTimer = null;
+                    }, 300);
+                }
+            });
+
+            let lastTap = 0;
+            card.addEventListener('touchend', function(e) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+
+                if (tapLength < 300 && tapLength > 0) {
+                    e.preventDefault();
+                    const title = this.dataset.title;
+                    const url = this.dataset.url;
+                    openModal(title, url);
+                }
+
+                lastTap = currentTime;
+            });
+        });
+    </script>
+
+</body>
+</html>

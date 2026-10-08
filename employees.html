@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Faculty and staff of Swami Vivekanand Govt. Model School, Bhim.">
+<title>Our Faculty — SVGMS Bhim</title>
+<link rel="icon" href="imgs/logo1.png" type="image/png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Our Faculty — SVGMS Bhim">
+<meta property="og:description" content="Meet the educators of Swami Vivekanand Govt. Model School, Bhim.">
+<meta property="og:image" content="https://raw.githubusercontent.com/ishrawat/imagess/refs/heads/main/logo.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     TOP RIBBON
+     ═══════════════════════════════════════════════ -->
+<div class="top-ribbon">
+    <div class="ribbon-welcome">Welcome to SVGMS Bhim</div>
+    <div class="ribbon-info">
+        <span><strong>Region:</strong> Rajsamand</span>
+        <span><strong>Affiliation No:</strong> 0000000</span>
+        <span><strong>School Code:</strong> 0000</span>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════ -->
+<header class="main-header">
+    <div class="brand-container">
+        <a class="brand-link" href="index.html">
+            <img class="logo-image" src="https://raw.githubusercontent.com/ishrawat/imagess/refs/heads/main/logo.jpg" alt="School Logo">
+            <div class="brand-text">
+                <h1>Swami Vivekanand Govt. Model School</h1>
+                <p>Bhim, Rajasthan</p>
+            </div>
+        </a>
+    </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════
+     NAVIGATION
+     ═══════════════════════════════════════════════ -->
+<nav class="nav-container" aria-label="Main navigation">
+    <div class="nav-inner">
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+        <ul class="main-nav" id="navList">
+
+            <li class="nav-item">
+                <a href="index.html#home" class="nav-link" onclick="showPage('home');return false;">Home</a>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link active" aria-haspopup="true" onclick="toggleMenu(event, this)">School ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="index.html#about" onclick="showPage('about');return false;">About School</a></li>
+                    <li><a href="employees.html">Our Team</a></li>
+                    <li><a href="index.html#principal" onclick="showPage('principal');return false;">Principal's Message</a></li>
+                    <li><a href="#">School Infrastructure</a></li>
+                    <li><a href="#">Transport Facilities</a></li>
+                    <li><a href="#">Computer Lab</a></li>
+                    <li><a href="#">Games &amp; Sports</a></li>
+                    <li><a href="#">Library</a></li>
+                    <li><a href="#">Yoga &amp; Meditation</a></li>
+                    <li><a href="#">Art &amp; Craft</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link" aria-haspopup="true" onclick="toggleMenu(event, this)">Academics ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="methodology.html">Methodology</a></li>
+                    <li><a href="academic-planner.html">Academic Session Planner</a></li>
+                    <li><a href="cbse-corner.html">CBSE Corner</a></li>
+                    <li><a href="exams-cce.html">Exams &amp; CCE</a></li>
+                    <li><a href="result-lookup.html">Result Section</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link" aria-haspopup="true" onclick="toggleMenu(event, this)">Admission ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="shortlist.html">Shortlist of Admission Candidates</a></li>
+                    <li><a href="#">Rules &amp; Regulations</a></li>
+                    <li><a href="#">Parent's Involvement</a></li>
+                    <li><a href="#">School Timings</a></li>
+                    <li><a href="#">School Uniform</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a href="library.html" class="nav-link">Digital Library</a>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link" aria-haspopup="true" onclick="toggleMenu(event, this)">News ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="news.html">News &amp; Events</a></li>
+                    <li><a href="notices.html">Notices &amp; Downloads</a></li>
+                    <li><a href="bhamashah.html">Bhamashah</a></li>
+                    <li><a href="awards.html">Awards</a></li>
+                    <li><a href="shortlist.html">Shortlist of Admission Candidates</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <button type="button" class="nav-link" aria-haspopup="true" onclick="toggleMenu(event, this)">Gallery ▾</button>
+                <ul class="dropdown-menu">
+                    <li><a href="gallery.html">Photo Gallery</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a href="index.html#contact" class="nav-link" onclick="showPage('contact');return false;">Contact</a>
+            </li>
+
+            <li class="nav-item nav-right">
+                <a href="admin.html" class="nav-link">🔐 Staff Login</a>
+            </li>
+
+            <li class="nav-item">
+                <a href="student/login.html" class="nav-link student-zone" id="studentZoneLink">
+                    <span id="rocketSpan">🚀</span><span>Student Zone</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE HERO
+     ═══════════════════════════════════════════════ -->
+<section class="page-hero">
+    <h1>Our Faculty &amp; Staff <small>the people behind the school</small></h1>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     EMPLOYEES
+     ═══════════════════════════════════════════════ -->
+<main class="employees-page">
+
+    <!-- Stats -->
+    <div class="staff-stats">
+        <div class="staff-stat">
+            <span class="staff-stat-num" id="totalCount">0</span>
+            <span class="staff-stat-label">Total Members</span>
+        </div>
+        <div class="staff-stat">
+            <span class="staff-stat-num" id="activeCount">0</span>
+            <span class="staff-stat-label">Active Staff</span>
+        </div>
+        <div class="staff-stat">
+            <span class="staff-stat-num" id="legacyCount">0</span>
+            <span class="staff-stat-label">Legacy Members</span>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="staff-toolbar">
+        <input type="text" id="searchInput" placeholder="🔍 Search by name, post, or department…">
+        <select id="postFilter" aria-label="Filter by post">
+            <option value="all">All Posts</option>
+        </select>
+        <select id="sortFilter" aria-label="Sort">
+            <option value="seniority">📅 Seniority (Oldest First)</option>
+            <option value="newest">📅 Newest First</option>
+            <option value="name-asc">🔤 Name A-Z</option>
+            <option value="name-desc">🔤 Name Z-A</option>
+        </select>
+    </div>
+
+    <!-- Tabs -->
+    <div class="staff-tabs" role="tablist">
+        <button class="staff-tab active" data-tab="active" role="tab" aria-selected="true">
+            <span>Active Staff</span>
+            <span class="badge" id="activeTabBadge">0</span>
+        </button>
+        <button class="staff-tab legacy-tab" data-tab="legacy" role="tab" aria-selected="false">
+            <span>Legacy Members</span>
+            <span class="badge" id="legacyTabBadge">0</span>
+        </button>
+    </div>
+
+    <!-- Container -->
+    <div id="employeesContainer">
+        <div class="employees-loading">
+            <span class="big-icon">⏳</span>
+            Loading faculty…
+        </div>
+    </div>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════
+     QUICK VIEW MODAL
+     ═══════════════════════════════════════════════ -->
+<div class="staff-modal" id="quickViewModal" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <div class="staff-modal-inner">
+        <button class="staff-modal-close" aria-label="Close" onclick="closeQuickView()">✕</button>
+        <div class="staff-modal-header">
+            <img id="modalPhoto" class="staff-modal-photo" style="display:none;" alt="">
+            <div id="modalPhotoPlaceholder" class="staff-modal-photo placeholder">👤</div>
+            <div>
+                <h2 class="staff-modal-name" id="modalName">Name</h2>
+                <span class="staff-modal-role" id="modalPost">Post</span>
+            </div>
+        </div>
+        <div class="staff-modal-details" id="modalDetails"></div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════ -->
+<footer>
+    <p>&copy; 2026 Swami Vivekanand Govt. Model School, Bhim. All Rights Reserved.</p>
+</footer>
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ---------- Firebase ---------- */
+    var db = null;
+    if (typeof firebase !== 'undefined') {
+        try {
+            firebase.initializeApp({
+                apiKey: "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA",
+                authDomain: "svgms-backend.firebaseapp.com",
+                projectId: "svgms-backend",
+                storageBucket: "svgms-backend.firebasestorage.app",
+                messagingSenderId: "1065359559935",
+                appId: "1:1065359559935:web:977cea73a68e05813750ca"
+            });
+            db = firebase.firestore();
+        } catch (e) { console.warn('Firebase init skipped:', e); }
+    }
+
+    /* ---------- Navigation ---------- */
+    function closeAllMenus() {
+        document.querySelectorAll('.nav-item').forEach(function (item) {
+            item.classList.remove('active');
+            var menu = item.querySelector('.dropdown-menu');
+            if (menu) menu.style.display = 'none';
+        });
+    }
+
+    function toggleMenu(event, element) {
+        if (event) { event.preventDefault(); event.stopPropagation(); }
+        var parent = element.closest('.nav-item');
+        if (!parent) return;
+        var menu = parent.querySelector('.dropdown-menu');
+        if (!menu) return;
+        var wasOpen = parent.classList.contains('active');
+        closeAllMenus();
+        if (!wasOpen) {
+            parent.classList.add('active');
+            menu.style.display = 'block';
+        }
+    }
+
+    function showPage(pageName) {
+        window.location.href = 'index.html#' + pageName;
+    }
+
+    window.toggleMenu = toggleMenu;
+    window.showPage = showPage;
+
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.nav-item')) closeAllMenus();
+    });
+
+    var navToggle = document.getElementById('navToggle');
+    var navList = document.getElementById('navList');
+    if (navToggle && navList) {
+        navToggle.addEventListener('click', function () {
+            var open = navList.classList.toggle('open');
+            navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            navToggle.textContent = open ? '✕' : '☰';
+        });
+    }
+
+    /* ---------- Config ---------- */
+    var POST_ORDER = {
+        'Principal': 1,
+        'Vice Principal': 2,
+        'Sr. Teacher': 3,
+        'Sr. Lecturer': 4,
+        'Lecturer': 5,
+        'Teacher': 6,
+        'Staff': 7,
+        'Other': 8
+    };
+
+    /* ---------- State ---------- */
+    var allEmployees = [];
+    var currentTab = 'active';
+
+    /* ---------- Helpers ---------- */
+    function escapeHtml(text) {
+        if (text == null) return '';
+        var div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
+
+    function formatDate(value) {
+        if (!value) return '';
+        try {
+            return new Date(value).toLocaleDateString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        } catch (e) { return ''; }
+    }
+
+    function getPostOrder(post) {
+        return POST_ORDER[post] || 999;
+    }
+
+    function getInitials(name) {
+        if (!name) return '?';
+        var parts = String(name).trim().split(/\s+/);
+        if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+        return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    }
+
+    function calculateExperience(joiningDate, leavingDate) {
+        if (!joiningDate) return 0;
+        var start = new Date(joiningDate).getTime();
+        var end   = (leavingDate ? new Date(leavingDate) : new Date()).getTime();
+        return Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24 * 365)));
+    }
+
+    /* ---------- Load employees ---------- */
+    function loadEmployees() {
+        var container = document.getElementById('employeesContainer');
+        if (!container) return;
+
+        if (!db) {
+            container.innerHTML =
+                '<div class="employees-error"><span class="big-icon">⚠️</span>Faculty list loads when you are online.</div>';
+            return;
+        }
+
+        db.collection('employees').orderBy('name').get()
+            .then(function (snapshot) {
+                allEmployees = [];
+                var posts = new Set();
+
+                snapshot.forEach(function (doc) {
+                    var data = doc.data();
+                    var emp = Object.assign({ id: doc.id }, data);
+                    allEmployees.push(emp);
+                    if (data.post) posts.add(data.post);
+                });
+
+                /* Populate post filter */
+                var postFilter = document.getElementById('postFilter');
+                if (postFilter) {
+                    postFilter.innerHTML = '<option value="all">All Posts</option>';
+                    Array.from(posts).sort().forEach(function (p) {
+                        var opt = document.createElement('option');
+                        opt.value = p;
+                        opt.textContent = p;
+                        postFilter.appendChild(opt);
+                    });
+                }
+
+                applyFilters();
+            })
+            .catch(function (err) {
+                console.warn('Employees unavailable:', err);
+                container.innerHTML =
+                    '<div class="employees-error"><span class="big-icon">⚠️</span>Could not load faculty. Please refresh.</div>';
+            });
+    }
+
+    /* ---------- Filter + sort ---------- */
+    function applyFilters() {
+        var search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+        var postFilter = document.getElementById('postFilter').value;
+        var sort = document.getElementById('sortFilter').value;
+
+        var filtered = allEmployees.slice();
+
+        if (search) {
+            filtered = filtered.filter(function (emp) {
+                return (emp.name || '').toLowerCase().indexOf(search) !== -1 ||
+                       (emp.post || '').toLowerCase().indexOf(search) !== -1 ||
+                       (emp.department || '').toLowerCase().indexOf(search) !== -1 ||
+                       (emp.qualification || '').toLowerCase().indexOf(search) !== -1;
+            });
+        }
+
+        var active = filtered.filter(function (e) { return e.status !== 'left'; });
+        var legacy = filtered.filter(function (e) { return e.status === 'left'; });
+
+        if (postFilter !== 'all') {
+            active = active.filter(function (e) { return e.post === postFilter; });
+            legacy = legacy.filter(function (e) { return e.post === postFilter; });
+        }
+
+        active = sortEmployees(active, sort);
+        legacy = sortEmployees(legacy, sort);
+
+        updateStats();
+        renderEmployees(currentTab === 'active' ? active : legacy, currentTab === 'legacy');
+    }
+
+    function sortEmployees(employees, sortType) {
+        var sorted = employees.slice();
+        switch (sortType) {
+            case 'seniority':
+                return sorted.sort(function (a, b) {
+                    var da = a.joiningDate ? new Date(a.joiningDate).getTime() : 0;
+                    var db2 = b.joiningDate ? new Date(b.joiningDate).getTime() : 0;
+                    return da - db2;
+                });
+            case 'newest':
+                return sorted.sort(function (a, b) {
+                    var da = a.joiningDate ? new Date(a.joiningDate).getTime() : 0;
+                    var db2 = b.joiningDate ? new Date(b.joiningDate).getTime() : 0;
+                    return db2 - da;
+                });
+            case 'name-asc':
+                return sorted.sort(function (a, b) { return (a.name || '').localeCompare(b.name || ''); });
+            case 'name-desc':
+                return sorted.sort(function (a, b) { return (b.name || '').localeCompare(a.name || ''); });
+            default:
+                return sorted;
+        }
+    }
+
+    function updateStats() {
+        var active = allEmployees.filter(function (e) { return e.status !== 'left'; });
+        var legacy = allEmployees.filter(function (e) { return e.status === 'left'; });
+
+        var setText = function (id, value) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+
+        setText('totalCount', allEmployees.length);
+        setText('activeCount', active.length);
+        setText('legacyCount', legacy.length);
+        setText('activeTabBadge', active.length);
+        setText('legacyTabBadge', legacy.length);
+    }
+
+    /* ---------- Render ---------- */
+    function photoBlock(emp, sizeClass) {
+        if (emp.photoURL) {
+            return '<div class="' + sizeClass + '"><img src="' + escapeHtml(emp.photoURL) + '" alt="' + escapeHtml(emp.name) + '" loading="lazy"></div>';
+        }
+        return '<div class="' + sizeClass + '"><div class="staff-initials">' + escapeHtml(getInitials(emp.name)) + '</div></div>';
+    }
+
+    function renderCard(emp, isLegacy) {
+        var experience = calculateExperience(emp.joiningDate, emp.leavingDate);
+        var yearsText = experience > 0 ? experience + ' yr' + (experience === 1 ? '' : 's') : 'New';
+
+        var activePeriod = '';
+        if (isLegacy && emp.joiningDate && emp.leavingDate) {
+            activePeriod = new Date(emp.joiningDate).getFullYear() + ' – ' + new Date(emp.leavingDate).getFullYear();
+        }
+
+        var detailsHtml = '';
+        if (isLegacy) {
+            if (activePeriod) detailsHtml += '<div class="staff-detail"><strong>Period:</strong> ' + escapeHtml(activePeriod) + '</div>';
+            if (emp.department) detailsHtml += '<div class="staff-detail">' + escapeHtml(emp.department) + '</div>';
+        } else {
+            if (emp.joiningDate) detailsHtml += '<div class="staff-detail">Joined ' + escapeHtml(formatDate(emp.joiningDate)) + '</div>';
+            if (emp.department) detailsHtml += '<div class="staff-detail">' + escapeHtml(emp.department) + '</div>';
+            detailsHtml += '<div class="staff-detail">' + escapeHtml(yearsText) + ' of service</div>';
+        }
+
+        var quoteHtml = '';
+        if (isLegacy && emp.legacyMessage) {
+            quoteHtml = '<div class="staff-quote">❝ ' + escapeHtml(emp.legacyMessage) + '</div>';
+        }
+
+        var cardClass = isLegacy ? 'staff-card legacy' : 'staff-card';
+        var badgeText = isLegacy ? 'Legacy' : 'Active';
+        var postText = isLegacy ? 'Former ' + (emp.post || 'Staff') : (emp.post || 'Staff');
+
+        return '<button type="button" class="' + cardClass + '" data-id="' + escapeHtml(emp.id) + '">' +
+            '<span class="staff-badge">' + badgeText + '</span>' +
+            photoBlock(emp, 'staff-photo') +
+            '<div class="staff-name">' + escapeHtml(emp.name || 'Unknown') + '</div>' +
+            '<div class="staff-post">' + escapeHtml(postText) + '</div>' +
+            detailsHtml +
+            quoteHtml +
+        '</button>';
+    }
+
+    function renderEmployees(employees, isLegacy) {
+        var container = document.getElementById('employeesContainer');
+        if (!container) return;
+
+        if (!employees.length) {
+            container.innerHTML =
+                '<div class="employees-empty"><span class="big-icon">👀</span>No ' +
+                (isLegacy ? 'legacy members' : 'active staff') +
+                ' found.</div>';
+            return;
+        }
+
+        var groups = {};
+        employees.forEach(function (emp) {
+            var post = emp.post || 'Other';
+            if (!groups[post]) groups[post] = [];
+            groups[post].push(emp);
+        });
+
+        var sortedPosts = Object.keys(groups).sort(function (a, b) {
+            return getPostOrder(a) - getPostOrder(b);
+        });
+
+        var html = '';
+        sortedPosts.forEach(function (post) {
+            var emps = groups[post];
+            html += '<section class="staff-group">' +
+                '<header class="staff-group-header">' +
+                    '<h3>' + escapeHtml(post) + '</h3>' +
+                    '<span class="group-count">' + emps.length + ' member' + (emps.length === 1 ? '' : 's') + '</span>' +
+                '</header>' +
+                '<div class="staff-grid">' +
+                    emps.map(function (e) { return renderCard(e, isLegacy); }).join('') +
+                '</div>' +
+            '</section>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    /* ---------- Quick view modal ---------- */
+    var modal, modalPhoto, modalPhotoPlaceholder, modalName, modalPost, modalDetails;
+
+    function openQuickView(id) {
+        var emp = allEmployees.find(function (e) { return e.id === id; });
+        if (!emp) return;
+
+        var isLegacy = emp.status === 'left';
+        var experience = calculateExperience(emp.joiningDate, emp.leavingDate);
+
+        if (emp.photoURL) {
+            modalPhoto.src = emp.photoURL;
+            modalPhoto.alt = emp.name || '';
+            modalPhoto.style.display = 'block';
+            modalPhotoPlaceholder.style.display = 'none';
+        } else {
+            modalPhoto.style.display = 'none';
+            modalPhotoPlaceholder.style.display = 'grid';
+            modalPhotoPlaceholder.textContent = getInitials(emp.name);
+        }
+
+        modalName.textContent = emp.name || 'Unknown';
+
+        var postLabel = isLegacy ? 'Former ' + (emp.post || 'Staff') : (emp.post || 'Staff');
+        modalPost.textContent = postLabel;
+        modalPost.className = 'staff-modal-role' + (isLegacy ? ' legacy' : '');
+
+        var rows = [];
+
+        if (isLegacy) {
+            if (emp.joiningDate && emp.leavingDate) {
+                var jy = new Date(emp.joiningDate).getFullYear();
+                var ly = new Date(emp.leavingDate).getFullYear();
+                rows.push(['Active Period', jy + ' – ' + ly]);
+            }
+            if (emp.leavingDate) rows.push(['Left', formatDate(emp.leavingDate)]);
+        } else {
+            if (emp.joiningDate) rows.push(['Joined', formatDate(emp.joiningDate)]);
+            rows.push(['Experience', experience > 0 ? experience + ' year' + (experience === 1 ? '' : 's') : 'New']);
+        }
+
+        if (emp.department)   rows.push(['Department', emp.department]);
+        if (emp.qualification) rows.push(['Qualification', emp.qualification]);
+        if (emp.email)        rows.push(['Email', emp.email]);
+        if (emp.phone)        rows.push(['Phone', emp.phone]);
+
+        rows.push(['Status', isLegacy ? 'Legacy Member' : 'Active']);
+
+        var detailsHtml = rows.map(function (r) {
+            return '<div class="staff-detail-row">' +
+                '<span class="label">' + escapeHtml(r[0]) + '</span>' +
+                '<span class="value">' + escapeHtml(r[1]) + '</span>' +
+            '</div>';
+        }).join('');
+
+        if (isLegacy && emp.legacyMessage) {
+            detailsHtml += '<div class="staff-modal-quote">❝ ' +
+                escapeHtml(emp.legacyMessage) +
+                '<span class="author">— ' + escapeHtml(emp.name) + '</span></div>';
+        }
+
+        modalDetails.innerHTML = detailsHtml;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeQuickView() {
+        if (!modal) return;
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    window.openQuickView = openQuickView;
+    window.closeQuickView = closeQuickView;
+
+    /* ---------- Boot ---------- */
+    document.addEventListener('DOMContentLoaded', function () {
+        modal = document.getElementById('quickViewModal');
+        modalPhoto = document.getElementById('modalPhoto');
+        modalPhotoPlaceholder = document.getElementById('modalPhotoPlaceholder');
+        modalName = document.getElementById('modalName');
+        modalPost = document.getElementById('modalPost');
+        modalDetails = document.getElementById('modalDetails');
+
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeQuickView();
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeQuickView();
+        });
+
+        /* Tabs */
+        document.querySelectorAll('.staff-tab').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                currentTab = btn.dataset.tab;
+                document.querySelectorAll('.staff-tab').forEach(function (b) {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-selected', 'false');
+                });
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+                applyFilters();
+            });
+        });
+
+        /* Filters */
+        var searchInput = document.getElementById('searchInput');
+        var postFilter = document.getElementById('postFilter');
+        var sortFilter = document.getElementById('sortFilter');
+
+        if (searchInput) searchInput.addEventListener('input', applyFilters);
+        if (postFilter)  postFilter.addEventListener('change', applyFilters);
+        if (sortFilter)  sortFilter.addEventListener('change', applyFilters);
+
+        /* Card clicks — delegated */
+        var container = document.getElementById('employeesContainer');
+        if (container) {
+            container.addEventListener('click', function (e) {
+                var card = e.target.closest('.staff-card');
+                if (!card) return;
+                openQuickView(card.dataset.id);
+            });
+        }
+
+        loadEmployees();
+    });
+})();
+</script>
+
+</body>
+</html>
