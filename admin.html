@@ -810,38 +810,8 @@ img, svg { display: block; max-width: 100%; height: auto; }
 
         </div>
 
-        <div class="content-area" id="contentArea">
+        
 
-            <div id="feature-news">
-                <h2><i class="fas fa-newspaper" style="color:var(--ochre); margin-right:0.4rem;"></i> News &amp; Events</h2>
-
-                <div class="divider" style="margin-top:1.2rem;">
-                    <h3>Create New Post</h3>
-
-                    <form class="post-form" id="postForm" onsubmit="createPost(event)">
-                        <input type="text" id="postTitle" placeholder="Post title" required>
-                        <select id="postCategory">
-                            <option value="Announcement">Announcement</option>
-                            <option value="Event">Event</option>
-                            <option value="Exam Update">Exam Update</option>
-                            <option value="Achievement">Achievement</option>
-                            <option value="Notice">Notice</option>
-                            <option value="General">General</option>
-                        </select>
-                        <textarea id="postContent" placeholder="Write your message here…" required></textarea>
-                        <button type="submit">Publish Post →</button>
-                    </form>
-
-                    <div id="postMessage" style="margin-top:0.75rem; text-align:center; font-size:0.85rem;"></div>
-                </div>
-
-                <div>
-                    <h3>Manage Posts</h3>
-                    <div id="adminPostsList">Loading posts…</div>
-                </div>
-            </div>
-
-        </div>
 
         <div class="quick-stats">
             <div class="stat-item"><div class="stat-number" id="statPosts">0</div><div class="stat-label"><i class="fas fa-pen"></i> Total Posts</div></div>
