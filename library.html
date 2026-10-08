@@ -30,14 +30,27 @@
 <main class="library-page">
 
     <div class="library-tabs" role="tablist">
-        <button class="library-tab active" data-tab="ncert">
-            <span class="tab-emoji">📖</span><span>NCERT Books</span>
+        <button class="library-tab active" data-tab="ncert" role="tab" aria-selected="true">
+            <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+            </svg>
+            <span>NCERT Books</span>
         </button>
-        <button class="library-tab" data-tab="world">
-            <span class="tab-emoji">🌍</span><span>World Libraries</span>
+        <button class="library-tab" data-tab="world" role="tab" aria-selected="false">
+            <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+            </svg>
+            <span>World Libraries</span>
         </button>
-        <button class="library-tab" data-tab="skills">
-            <span class="tab-emoji">🎓</span><span>Free Skills</span>
+        <button class="library-tab" data-tab="skills" role="tab" aria-selected="false">
+            <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+            <span>Free Skills</span>
         </button>
     </div>
 
@@ -97,69 +110,91 @@
         return div.innerHTML;
     }
 
+    /* Subject → badge letter + color class.
+       Used to build the small badge that replaced the emoji. */
+    function getSubjectBadge(name) {
+        var n = (name || '').toLowerCase();
+
+        if (n.indexOf('math') !== -1)                   return { text: 'MA', cls: 'maths' };
+        if (n.indexOf('physics') !== -1)                return { text: 'PH', cls: 'science' };
+        if (n.indexOf('chemistry') !== -1)              return { text: 'CH', cls: 'science' };
+        if (n.indexOf('biology') !== -1)                return { text: 'BI', cls: 'science' };
+        if (n.indexOf('science') !== -1)                return { text: 'SC', cls: 'science' };
+        if (n.indexOf('english') !== -1)                return { text: 'EN', cls: 'language' };
+        if (n.indexOf('hindi') !== -1)                  return { text: 'HI', cls: 'language' };
+        if (n.indexOf('social') !== -1)                 return { text: 'SS', cls: 'social' };
+        if (n.indexOf('history') !== -1)                return { text: 'HI', cls: 'social' };
+        if (n.indexOf('geography') !== -1)              return { text: 'GE', cls: 'social' };
+        if (n.indexOf('civics') !== -1)                 return { text: 'CI', cls: 'social' };
+        if (n.indexOf('politics') !== -1)               return { text: 'PO', cls: 'social' };
+        if (n.indexOf('economics') !== -1)              return { text: 'EC', cls: 'social' };
+
+        return { text: 'BK', cls: 'other' };
+    }
+
     /* ----------------------------------------------------------------------
        NCERT BOOKS
        ---------------------------------------------------------------------- */
     var libraryData = {
         "8": [
-            { icon: "📐", name: "Mathematics", url: "https://drive.google.com/file/d/1_4RRqoCWzF5YBYSgNITEZ54ccWpqwgjP/view" },
-            { icon: "🔬", name: "Science", url: "https://drive.google.com/open?id=1LX0x7mbgcD_oLTJ3MK2rkEvwEJLZMtst" },
-            { icon: "📖", name: "English (Honeydew)", url: "https://drive.google.com/open?id=1pT2fGiFdcM1d0hY_gWs4F9TRb2beyDoM" },
-            { icon: "📖", name: "English (It So Happened)", url: "https://drive.google.com/open?id=1UCdStiW8cJ_rcjEIStdWt29NF7LI5qHZ" },
-            { icon: "📖", name: "Hindi (Vasant)", url: "https://drive.google.com/open?id=1-7AxqfM4IKra40gXjLnAop10FxXOjzEQ" },
-            { icon: "📖", name: "Hindi (Bharat Ki Khoj)", url: "https://drive.google.com/open?id=1-7AxqfM4IKra40gXjLnAop10FxXOjzEQ" },
-            { icon: "📖", name: "Hindi (Durva)", url: "https://drive.google.com/file/d/18YGZuUXuhw99Ke9rPhCgCUpYIk5nz7oI/view" },
-            { icon: "🏛️", name: "Social Science (History)", url: "https://ncert.nic.in/textbook/pdf/hess2dd.zip" },
-            { icon: "🏛️", name: "Social Science (Geography)", url: "https://drive.google.com/open?id=1fvbmE6rtwQvDe48OUGA3musQvlk6PR2u" },
-            { icon: "🏛️", name: "Social Science (Civics)", url: "https://drive.google.com/open?id=1cvfCTChv124tMJikcwGPjAZ4wglDy3fg" }
+            { name: "Mathematics", url: "https://drive.google.com/file/d/1_4RRqoCWzF5YBYSgNITEZ54ccWpqwgjP/view" },
+            { name: "Science", url: "https://drive.google.com/open?id=1LX0x7mbgcD_oLTJ3MK2rkEvwEJLZMtst" },
+            { name: "English (Honeydew)", url: "https://drive.google.com/open?id=1pT2fGiFdcM1d0hY_gWs4F9TRb2beyDoM" },
+            { name: "English (It So Happened)", url: "https://drive.google.com/open?id=1UCdStiW8cJ_rcjEIStdWt29NF7LI5qHZ" },
+            { name: "Hindi (Vasant)", url: "https://drive.google.com/open?id=1-7AxqfM4IKra40gXjLnAop10FxXOjzEQ" },
+            { name: "Hindi (Bharat Ki Khoj)", url: "https://drive.google.com/open?id=1-7AxqfM4IKra40gXjLnAop10FxXOjzEQ" },
+            { name: "Hindi (Durva)", url: "https://drive.google.com/file/d/18YGZuUXuhw99Ke9rPhCgCUpYIk5nz7oI/view" },
+            { name: "Social Science (History)", url: "https://ncert.nic.in/textbook/pdf/hess2dd.zip" },
+            { name: "Social Science (Geography)", url: "https://drive.google.com/open?id=1fvbmE6rtwQvDe48OUGA3musQvlk6PR2u" },
+            { name: "Social Science (Civics)", url: "https://drive.google.com/open?id=1cvfCTChv124tMJikcwGPjAZ4wglDy3fg" }
         ],
         "9": [
-            { icon: "📐", name: "Mathematics", url: "https://drive.google.com/open?id=1EO59ZtEQVJd5x7JCi8iBRk-Ya1CE5Rfh" },
-            { icon: "🔬", name: "Science", url: "https://drive.google.com/open?id=1odObVgkMnnwfhsooweHohhXwSDK3d2uK" },
-            { icon: "📖", name: "English (Beehive)", url: "https://drive.google.com/open?id=1GEpEmDebr5lfP6DCu3joQVaZUZlhRUdu" },
-            { icon: "📖", name: "English (Moments)", url: "https://drive.google.com/open?id=1PsW28xlC1zxqBnOaSGyC0nDa66YINPzp" },
-            { icon: "📖", name: "Hindi (Kshitij)", url: "https://drive.google.com/open?id=1PhsKZ0M7t8Z9AjYt0ygQiHatGINCLhML" },
-            { icon: "📖", name: "Hindi (Sparsh)", url: "https://drive.google.com/open?id=14ri_BKHHKdA_UL7n5rwOkleQC2mDDElv" },
-            { icon: "🏛️", name: "Social Science (History)", url: "https://drive.google.com/open?id=1a0-DcGZTZG8iEPtry9j1O0awCbAIY0YI" },
-            { icon: "🏛️", name: "Social Science (Geography)", url: "https://drive.google.com/open?id=1odObVgkMnnwfhsooweHohhXwSDK3d2uK" },
-            { icon: "🏛️", name: "Social Science (Civics)", url: "https://drive.google.com/open?id=1-CsD_zlhKzyY9E4eUyNmfC0q3I26TSpW" }
+            { name: "Mathematics", url: "https://drive.google.com/open?id=1EO59ZtEQVJd5x7JCi8iBRk-Ya1CE5Rfh" },
+            { name: "Science", url: "https://drive.google.com/open?id=1odObVgkMnnwfhsooweHohhXwSDK3d2uK" },
+            { name: "English (Beehive)", url: "https://drive.google.com/open?id=1GEpEmDebr5lfP6DCu3joQVaZUZlhRUdu" },
+            { name: "English (Moments)", url: "https://drive.google.com/open?id=1PsW28xlC1zxqBnOaSGyC0nDa66YINPzp" },
+            { name: "Hindi (Kshitij)", url: "https://drive.google.com/open?id=1PhsKZ0M7t8Z9AjYt0ygQiHatGINCLhML" },
+            { name: "Hindi (Sparsh)", url: "https://drive.google.com/open?id=14ri_BKHHKdA_UL7n5rwOkleQC2mDDElv" },
+            { name: "Social Science (History)", url: "https://drive.google.com/open?id=1a0-DcGZTZG8iEPtry9j1O0awCbAIY0YI" },
+            { name: "Social Science (Geography)", url: "https://drive.google.com/open?id=1odObVgkMnnwfhsooweHohhXwSDK3d2uK" },
+            { name: "Social Science (Civics)", url: "https://drive.google.com/open?id=1-CsD_zlhKzyY9E4eUyNmfC0q3I26TSpW" }
         ],
         "10": [
-            { icon: "📐", name: "Mathematics", url: "https://drive.google.com/open?id=1RU74az46KhIDkrFi6Vq1dB_w7scfbDoe" },
-            { icon: "🔬", name: "Science", url: "https://drive.google.com/open?id=1xNp55m23jNX_jXb8idPNwAHkS1tI7gj-" },
-            { icon: "📖", name: "English (First Flight)", url: "https://drive.google.com/open?id=1JbO5jBrM7bCuA8o2JFQtBdlK3pZKR43G" },
-            { icon: "📖", name: "English (Footprints)", url: "https://drive.google.com/open?id=1JbO5jBrM7bCuA8o2JFQtBdlK3pZKR43G" },
-            { icon: "📖", name: "Hindi (Kshitij - Part 2)", url: "https://drive.google.com/open?id=1mjc7OGBWbWYxv9Rk3cXFXSanbD9GkMnx" },
-            { icon: "📖", name: "Hindi (Sparsh - Part 2)", url: "https://drive.google.com/open?id=1jzvjW3BcZcx7PbbITYnKciCppjBAbgtb" },
-            { icon: "🏛️", name: "Social Science (History)", url: "https://drive.google.com/open?id=1jX5wAsD7nHyP4iTByKuyuWeaGsg47q9i" },
-            { icon: "🏛️", name: "Social Science (Geography)", url: "https://ncert.nic.in/textbook/pdf/jess1dd.zip" },
-            { icon: "🏛️", name: "Social Science (Politics)", url: "https://drive.google.com/open?id=1BvTkrjDPQ--xKcfuebEwQebuJmDtu7Jd" },
-            { icon: "🏛️", name: "Social Science (Economics)", url: "https://drive.google.com/open?id=1Rp-BV3qjOj5T1kQAaZs91qFYeKIRYFAH" }
+            { name: "Mathematics", url: "https://drive.google.com/open?id=1RU74az46KhIDkrFi6Vq1dB_w7scfbDoe" },
+            { name: "Science", url: "https://drive.google.com/open?id=1xNp55m23jNX_jXb8idPNwAHkS1tI7gj-" },
+            { name: "English (First Flight)", url: "https://drive.google.com/open?id=1JbO5jBrM7bCuA8o2JFQtBdlK3pZKR43G" },
+            { name: "English (Footprints)", url: "https://drive.google.com/open?id=1JbO5jBrM7bCuA8o2JFQtBdlK3pZKR43G" },
+            { name: "Hindi (Kshitij - Part 2)", url: "https://drive.google.com/open?id=1mjc7OGBWbWYxv9Rk3cXFXSanbD9GkMnx" },
+            { name: "Hindi (Sparsh - Part 2)", url: "https://drive.google.com/open?id=1jzvjW3BcZcx7PbbITYnKciCppjBAbgtb" },
+            { name: "Social Science (History)", url: "https://drive.google.com/open?id=1jX5wAsD7nHyP4iTByKuyuWeaGsg47q9i" },
+            { name: "Social Science (Geography)", url: "https://ncert.nic.in/textbook/pdf/jess1dd.zip" },
+            { name: "Social Science (Politics)", url: "https://drive.google.com/open?id=1BvTkrjDPQ--xKcfuebEwQebuJmDtu7Jd" },
+            { name: "Social Science (Economics)", url: "https://drive.google.com/open?id=1Rp-BV3qjOj5T1kQAaZs91qFYeKIRYFAH" }
         ],
         "11": [
-            { icon: "📐", name: "Mathematics", url: "https://drive.google.com/open?id=11NOEGmpuGa55iMGgKMsCWiCH02x2n_4h" },
-            { icon: "🔬", name: "Physics (Part 1)", url: "https://drive.google.com/open?id=14z_05vUqTFzc6hujHp4Uh6ETE2KsY6QL" },
-            { icon: "🔬", name: "Physics (Part 2)", url: "https://drive.google.com/open?id=1vImp8b_C1_rfiMbxf2VFN7mGlRz7T2Nl" },
-            { icon: "🧪", name: "Chemistry (Part 1)", url: "https://drive.google.com/open?id=1f7Vg0NniAJ10aRI2uG37CMOmPGpr52w3" },
-            { icon: "🧪", name: "Chemistry (Part 2)", url: "https://drive.google.com/open?id=18LgHhMMTfbIq0CPR74ErNmLdx9pFnQrp" },
-            { icon: "🧬", name: "Biology", url: "https://drive.google.com/open?id=1U8eAWuWjzrmE4EDBI2n20AqMwqj9dNH_" },
-            { icon: "📖", name: "English (Hornbill)", url: "https://drive.google.com/open?id=1qG51cTKfWpnyk5E7QxHfgL77X33i80CX" },
-            { icon: "📖", name: "English (Snapshot)", url: "https://drive.google.com/open?id=1hHIiqeXQ0glQ2MAlfgReXQJLq2-Mnohx" },
-            { icon: "📖", name: "Hindi (Antra)", url: "https://drive.google.com/open?id=1uhXRvab8Gb44tQCqUEy0qed724g_h8XE" },
-            { icon: "📖", name: "Hindi (Antral)", url: "https://drive.google.com/open?id=1WN17VHOF5Vc4bcxpHokdaq33EL0cwcQU" }
+            { name: "Mathematics", url: "https://drive.google.com/open?id=11NOEGmpuGa55iMGgKMsCWiCH02x2n_4h" },
+            { name: "Physics (Part 1)", url: "https://drive.google.com/open?id=14z_05vUqTFzc6hujHp4Uh6ETE2KsY6QL" },
+            { name: "Physics (Part 2)", url: "https://drive.google.com/open?id=1vImp8b_C1_rfiMbxf2VFN7mGlRz7T2Nl" },
+            { name: "Chemistry (Part 1)", url: "https://drive.google.com/open?id=1f7Vg0NniAJ10aRI2uG37CMOmPGpr52w3" },
+            { name: "Chemistry (Part 2)", url: "https://drive.google.com/open?id=18LgHhMMTfbIq0CPR74ErNmLdx9pFnQrp" },
+            { name: "Biology", url: "https://drive.google.com/open?id=1U8eAWuWjzrmE4EDBI2n20AqMwqj9dNH_" },
+            { name: "English (Hornbill)", url: "https://drive.google.com/open?id=1qG51cTKfWpnyk5E7QxHfgL77X33i80CX" },
+            { name: "English (Snapshot)", url: "https://drive.google.com/open?id=1hHIiqeXQ0glQ2MAlfgReXQJLq2-Mnohx" },
+            { name: "Hindi (Antra)", url: "https://drive.google.com/open?id=1uhXRvab8Gb44tQCqUEy0qed724g_h8XE" },
+            { name: "Hindi (Antral)", url: "https://drive.google.com/open?id=1WN17VHOF5Vc4bcxpHokdaq33EL0cwcQU" }
         ],
         "12": [
-            { icon: "📐", name: "Mathematics (Part 1)", url: "https://drive.google.com/file/d/1YYCF9Qohad4cl7o1bx5CAvYA7m8OwYD-/view" },
-            { icon: "📐", name: "Mathematics (Part 2)", url: "https://drive.google.com/file/d/17iGetFTGnA6LhNruYHnHcZg1sYgeGCAI/view" },
-            { icon: "🔬", name: "Physics (Part 1)", url: "https://drive.google.com/file/d/1sJK_TqatLjp1mfkEdY3QsoZrUpXa7ifx/view" },
-            { icon: "🔬", name: "Physics (Part 2)", url: "https://drive.google.com/file/d/1peL54z2uBzDCeAanNBnDdt7OqG-_tk5Z/view" },
-            { icon: "🧪", name: "Chemistry (Part 1)", url: "https://drive.google.com/file/d/1oeK4299WwVe6Vl9s7Ildi6pqN5fN-YIu/view" },
-            { icon: "🧪", name: "Chemistry (Part 2)", url: "https://drive.google.com/file/d/1BbtT_wOCF43HH6g5q2Q-73PYyWYLFgIS/view" },
-            { icon: "🧬", name: "Biology", url: "https://www.drishtiias.com/images/pdf/NCERT-Class-12-Biology.pdf" },
-            { icon: "📖", name: "English (Flamingo)", url: "https://drive.google.com/file/d/1tR1YayakWV-B2j-CN_qua1Pcv2q585Hw/view" },
-            { icon: "📖", name: "English (Vistas)", url: "https://drive.google.com/file/d/1eMGj79Nga6IT1TjKGmWTqm2RcGLOZMsy/view" },
-            { icon: "📖", name: "Hindi (Antra)", url: "https://drive.google.com/file/d/1EydrlpGACLqcws4RHHrOtgOgh3aiVV16/view" },
-            { icon: "📖", name: "Hindi (Antral)", url: "https://drive.google.com/file/d/1fxFziUZjigF_NuPn9IA2UasctgAkFMaZ/view" }
+            { name: "Mathematics (Part 1)", url: "https://drive.google.com/file/d/1YYCF9Qohad4cl7o1bx5CAvYA7m8OwYD-/view" },
+            { name: "Mathematics (Part 2)", url: "https://drive.google.com/file/d/17iGetFTGnA6LhNruYHnHcZg1sYgeGCAI/view" },
+            { name: "Physics (Part 1)", url: "https://drive.google.com/file/d/1sJK_TqatLjp1mfkEdY3QsoZrUpXa7ifx/view" },
+            { name: "Physics (Part 2)", url: "https://drive.google.com/file/d/1peL54z2uBzDCeAanNBnDdt7OqG-_tk5Z/view" },
+            { name: "Chemistry (Part 1)", url: "https://drive.google.com/file/d/1oeK4299WwVe6Vl9s7Ildi6pqN5fN-YIu/view" },
+            { name: "Chemistry (Part 2)", url: "https://drive.google.com/file/d/1BbtT_wOCF43HH6g5q2Q-73PYyWYLFgIS/view" },
+            { name: "Biology", url: "https://www.drishtiias.com/images/pdf/NCERT-Class-12-Biology.pdf" },
+            { name: "English (Flamingo)", url: "https://drive.google.com/file/d/1tR1YayakWV-B2j-CN_qua1Pcv2q585Hw/view" },
+            { name: "English (Vistas)", url: "https://drive.google.com/file/d/1eMGj79Nga6IT1TjKGmWTqm2RcGLOZMsy/view" },
+            { name: "Hindi (Antra)", url: "https://drive.google.com/file/d/1EydrlpGACLqcws4RHHrOtgOgh3aiVV16/view" },
+            { name: "Hindi (Antral)", url: "https://drive.google.com/file/d/1fxFziUZjigF_NuPn9IA2UasctgAkFMaZ/view" }
         ]
     };
 
@@ -175,9 +210,10 @@
 
         var html = '<div class="books-grid">';
         books.forEach(function (book) {
+            var badge = getSubjectBadge(book.name);
             html += '<div class="book-item">' +
                 '<div class="book-info">' +
-                    '<span class="book-icon">' + book.icon + '</span>' +
+                    '<span class="subject-badge ' + badge.cls + '">' + badge.text + '</span>' +
                     '<span class="book-name">' + escapeHtml(book.name) + '</span>' +
                 '</div>' +
                 '<a href="' + escapeHtml(book.url) + '" target="_blank" rel="noopener" class="btn-pdf">Open PDF</a>' +
@@ -191,24 +227,26 @@
        WORLD LIBRARIES
        ---------------------------------------------------------------------- */
     var worldLibraries = [
-        { icon: "🏛️", name: "Harvard Free Courses", category: "Top Universities", description: "Free online courses from Harvard University across all subjects", url: "https://pll.harvard.edu/catalog/free" },
-        { icon: "🏛️", name: "MIT OpenCourseWare", category: "Top Universities", description: "Free lecture notes, exams, and videos from MIT", url: "https://ocw.mit.edu/" },
-        { icon: "🏛️", name: "Stanford Online", category: "Top Universities", description: "Free courses from Stanford University", url: "https://online.stanford.edu/free-courses" },
-        { icon: "🏛️", name: "Oxford Free Courses", category: "Top Universities", description: "Free online courses from Oxford University", url: "https://www.oxfordhomestudy.com/free-online-courses-with-certificates" },
-        { icon: "🏛️", name: "Swayam", category: "Top Universities", description: "Government of India's free online learning platform", url: "https://swayam.gov.in/" },
-        { icon: "🏛️", name: "Skill India", category: "Top Universities", description: "Government of India's skill development initiative", url: "https://www.skillindiadigital.gov.in/home" },
-        { icon: "📖", name: "FreeCodeCamp", category: "Online Learning", description: "Build your skills for free — includes free certification", url: "https://www.freecodecamp.org/" },
-        { icon: "📖", name: "MOOC.fi", category: "Online Learning", description: "Massive Open Online Courses by University of Helsinki", url: "https://www.mooc.fi/en/" },
-        { icon: "📖", name: "Khan Academy", category: "Online Learning", description: "Free world-class education for anyone, anywhere", url: "https://www.khanacademy.org/" },
-        { icon: "📖", name: "Coursera Free Courses", category: "Online Learning", description: "Thousands of free courses from top universities", url: "https://www.coursera.org/browse/free" },
-        { icon: "📖", name: "NPTEL", category: "Online Learning", description: "Free courses by top IIT educators", url: "https://nptel.ac.in/" },
-        { icon: "📖", name: "Google Digital Garage", category: "Online Learning", description: "Free digital skills training from Google", url: "https://learndigital.withgoogle.com/digitalgarage" },
-        { icon: "📖", name: "Microsoft Learn", category: "Online Learning", description: "Free learning paths and certifications from Microsoft", url: "https://learn.microsoft.com/" },
-        { icon: "📚", name: "UNESCO Digital Library", category: "Digital Libraries", description: "Access to the world's largest collection of books and documents", url: "https://unesdoc.unesco.org/" },
-        { icon: "📚", name: "World Digital Library", category: "Digital Libraries", description: "Cultural treasures from libraries around the world", url: "https://www.wdl.org/" },
-        { icon: "📚", name: "Project Gutenberg", category: "Digital Libraries", description: "Over 60,000 free ebooks", url: "https://www.gutenberg.org/" },
-        { icon: "📚", name: "Internet Archive", category: "Digital Libraries", description: "Free books, movies, music, and websites", url: "https://archive.org/" },
-        { icon: "📚", name: "Google Books", category: "Digital Libraries", description: "Search and preview millions of books", url: "https://books.google.com/" }
+        { name: "Harvard Free Courses", category: "Top Universities", description: "Free online courses from Harvard University across all subjects", url: "https://pll.harvard.edu/catalog/free" },
+        { name: "MIT OpenCourseWare", category: "Top Universities", description: "Free lecture notes, exams, and videos from MIT", url: "https://ocw.mit.edu/" },
+        { name: "Stanford Online", category: "Top Universities", description: "Free courses from Stanford University", url: "https://online.stanford.edu/free-courses" },
+        { name: "Oxford Free Courses", category: "Top Universities", description: "Free online courses from Oxford University", url: "https://www.oxfordhomestudy.com/free-online-courses-with-certificates" },
+        { name: "Swayam", category: "Top Universities", description: "Government of India's free online learning platform", url: "https://swayam.gov.in/" },
+        { name: "Skill India", category: "Top Universities", description: "Government of India's skill development initiative", url: "https://www.skillindiadigital.gov.in/home" },
+
+        { name: "FreeCodeCamp", category: "Online Learning", description: "Build your skills for free — includes free certification", url: "https://www.freecodecamp.org/" },
+        { name: "MOOC.fi", category: "Online Learning", description: "Massive Open Online Courses by University of Helsinki", url: "https://www.mooc.fi/en/" },
+        { name: "Khan Academy", category: "Online Learning", description: "Free world-class education for anyone, anywhere", url: "https://www.khanacademy.org/" },
+        { name: "Coursera Free Courses", category: "Online Learning", description: "Thousands of free courses from top universities", url: "https://www.coursera.org/browse/free" },
+        { name: "NPTEL", category: "Online Learning", description: "Free courses by top IIT educators", url: "https://nptel.ac.in/" },
+        { name: "Google Digital Garage", category: "Online Learning", description: "Free digital skills training from Google", url: "https://learndigital.withgoogle.com/digitalgarage" },
+        { name: "Microsoft Learn", category: "Online Learning", description: "Free learning paths and certifications from Microsoft", url: "https://learn.microsoft.com/" },
+
+        { name: "UNESCO Digital Library", category: "Digital Libraries", description: "Access to the world's largest collection of books and documents", url: "https://unesdoc.unesco.org/" },
+        { name: "World Digital Library", category: "Digital Libraries", description: "Cultural treasures from libraries around the world", url: "https://www.wdl.org/" },
+        { name: "Project Gutenberg", category: "Digital Libraries", description: "Over 60,000 free ebooks", url: "https://www.gutenberg.org/" },
+        { name: "Internet Archive", category: "Digital Libraries", description: "Free books, movies, music, and websites", url: "https://archive.org/" },
+        { name: "Google Books", category: "Digital Libraries", description: "Search and preview millions of books", url: "https://books.google.com/" }
     ];
 
     function loadWorldLibraries() {
@@ -225,10 +263,9 @@
             categories[cat].forEach(function (item) {
                 html +=
                     '<div class="resource-card">' +
-                        '<div class="resource-icon">' + item.icon + '</div>' +
                         '<div class="resource-name">' + escapeHtml(item.name) + '</div>' +
                         '<div class="resource-description">' + escapeHtml(item.description) + '</div>' +
-                        '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="resource-btn">Visit →</a>' +
+                        '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="resource-btn">Visit</a>' +
                     '</div>';
             });
         });
@@ -245,7 +282,10 @@
 
         if (!db) {
             container.innerHTML =
-                '<div class="no-resources"><span class="icon">⚠️</span><p>Skills load when you are online.</p></div>';
+                '<div class="no-resources">' +
+                    '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+                    '<p>Skills load when you are online.</p>' +
+                '</div>';
             return;
         }
 
@@ -255,8 +295,10 @@
             .then(function (snapshot) {
                 if (snapshot.empty) {
                     container.innerHTML =
-                        '<div class="no-resources"><span class="icon">🎓</span>' +
-                        '<p>No skills added yet. The admin can add skills from the dashboard.</p></div>';
+                        '<div class="no-resources">' +
+                            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>' +
+                            '<p>No skills added yet. The admin can add skills from the dashboard.</p>' +
+                        '</div>';
                     return;
                 }
 
@@ -277,12 +319,11 @@
                                 return '<a href="' + escapeHtml(p.url) + '" target="_blank" rel="noopener">' +
                                        escapeHtml(p.name) + '</a>';
                             }).join(' · ');
-                            platformsHtml = '<div class="resource-platforms">📚 ' + links + '</div>';
+                            platformsHtml = '<div class="resource-platforms">' + links + '</div>';
                         }
 
                         html +=
                             '<div class="resource-card">' +
-                                '<div class="resource-icon">' + (item.icon || '🎓') + '</div>' +
                                 '<div class="resource-name">' + escapeHtml(item.name || '') + '</div>' +
                                 '<div class="resource-category">' + escapeHtml(item.category || '') + '</div>' +
                                 '<div class="resource-description">' + escapeHtml(item.description || '') + '</div>' +
@@ -296,7 +337,10 @@
             .catch(function (err) {
                 console.warn('Skills unavailable:', err);
                 container.innerHTML =
-                    '<div class="no-resources"><span class="icon">⚠️</span><p>Could not load skills. Please refresh.</p></div>';
+                    '<div class="no-resources">' +
+                        '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+                        '<p>Could not load skills. Please refresh.</p>' +
+                    '</div>';
             });
     }
 
@@ -312,8 +356,12 @@
 
     tabs.forEach(function (tab) {
         tab.addEventListener('click', function () {
-            tabs.forEach(function (t) { t.classList.remove('active'); });
+            tabs.forEach(function (t) {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
             tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
 
             Object.keys(tabContents).forEach(function (k) {
                 tabContents[k].classList.remove('active');
