@@ -514,23 +514,41 @@ body{padding:20px 14px 40px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 
 /* ================= PRINT ================= */
+/* ================= PRINT ================= */
 @media print {
-  @page { size: A4 portrait; margin: 10mm; }
-  html, body { background: #fff !important; padding: 0 !important; }
+  @page { size: A4 portrait; margin: 8mm; }
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
   body * { visibility: hidden; }
   .print-area, .print-area * { visibility: visible; }
-  .print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+  .print-area { position: absolute; left: 0; top: 0; width: 100%; }
   .no-print { display: none !important; }
   
   .document { box-shadow: none !important; page-break-inside: avoid; }
   .doc-frame { 
     border-color: #1e3a8a !important; 
     background-color: #f8fafc !important;
+    padding: 6px !important; /* Tightened */
     -webkit-print-color-adjust: exact; 
     print-color-adjust: exact; 
   }
+  .doc-inner { 
+    padding: 20px 24px !important; /* Tightened to save vertical space */
+    page-break-inside: avoid; 
+  }
   .doc-inner::before { opacity: 0.05 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .doc-inner { page-break-inside: avoid; }
+  
+  /* Tighten vertical spacing for print */
+  .doc-header { padding-bottom: 8px !important; margin-bottom: 12px !important; }
+  .doc-title { margin-top: 6px !important; }
+  .student-info { margin-bottom: 12px !important; }
+  .info-row { margin-bottom: 6px !important; font-size: 13px !important; }
+  
+  .marks-table th, .marks-table td { padding: 6px 8px !important; font-size: 12px !important; }
+  .summary-strip { margin-top: 14px !important; }
+  .summary-cell { padding: 8px 10px !important; }
+  
+  .footer-area { margin-top: 25px !important; }
+  .signatures { margin-top: 10px !important; }
   
   .marks-table thead th { background: #eef2f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .marks-table tbody tr:nth-child(even) { background: #fcfcfd !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
