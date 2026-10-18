@@ -441,19 +441,19 @@ body{padding:20px 14px 40px}
 
 .signatures{
   display:flex;
-  gap:60px;
+  gap: 30px; /* Reduced gap to fit 3 signatures */
   align-items:flex-end;
 }
 .sig{
   text-align:center;
-  font-size:11.5px;
+  font-size:11px;
   font-weight:800;
   text-transform:uppercase;
   letter-spacing:.6px;
   color:var(--text);
   border-top:1.5px solid var(--text);
   padding-top:6px;
-  min-width:150px;
+  min-width: 110px; /* Reduced width so they don't overflow */
 }
 
 /* The Official Stamp */
@@ -482,6 +482,7 @@ body{padding:20px 14px 40px}
 .verified-stamp::after {
   content:''; position:absolute; inset:5px; border:1px solid currentColor; border-radius:50%; opacity:0.6;
 }
+
 
 /* Actions */
 .actions{
@@ -1093,7 +1094,7 @@ function renderResult(stu, examType, fallbackSection, docId, isVerified) {
             </div>
           ` : ''}
 
-          <div class="footer-area">
+           <div class="footer-area">
             <div class="qr-verify">
               <div class="qr-wrap" id="qrWrap"></div>
               <div class="qr-label">Scan to Verify</div>
@@ -1106,6 +1107,7 @@ function renderResult(stu, examType, fallbackSection, docId, isVerified) {
 
             <div class="signatures">
               <div class="sig">Class Teacher</div>
+              <div class="sig">Principal</div>
               <div class="sig">Controller of Exams</div>
             </div>
           </div>
