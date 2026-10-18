@@ -6,13 +6,12 @@
 <meta name="theme-color" content="#1e3a8a">
 <title>Result Lookup — SVGMS Bhim</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --navy:#1e3a8a;
   --navy-dark:#1e293b;
-  --maroon:#7f1d1d;
   --text:#0f172a;
   --muted:#64748b;
   --line:#cbd5e1;
@@ -54,10 +53,10 @@ body{padding:20px 14px 40px}
 }
 .school-header .info{flex-grow:1;text-align:center}
 .school-header h1{
-  font-family:'Libre Baskerville',serif;
+  font-family:'Cinzel',serif;
   font-size:22px;
   font-weight:700;
-  letter-spacing:.4px;
+  letter-spacing:.5px;
   color:var(--navy);
   line-height:1.25;
 }
@@ -174,118 +173,173 @@ body{padding:20px 14px 40px}
 .result-section{display:none}
 .result-section.show{display:block}
 
+/* --- The New Official Frame --- */
 .document{
-  background:var(--card);
-  border:1px solid var(--line);
-  padding:0;
-  box-shadow:0 1px 3px rgba(15,23,42,.06);
+  background:#fff;
+  box-shadow:0 8px 30px rgba(15,23,42,.15);
   margin-bottom:16px;
+  position:relative;
 }
-.doc-banner{
-  background:var(--navy);
-  color:#fff;
-  text-align:center;
-  padding:14px 20px;
+
+/* Outer Security Pattern Border */
+.doc-frame{
+  padding:12px;
+  border: 3px solid var(--navy);
+  background-color: #f8fafc;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 0 L24 12 L12 24 L0 12 Z' fill='none' stroke='%231e3a8a' stroke-width='0.75' opacity='0.25'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%231e3a8a' opacity='0.25'/%3E%3C/svg%3E");
 }
-.doc-banner .line1{
-  font-size:13px;
+
+/* Inner Double-Line Border */
+.doc-inner{
+  border: 1.5px solid var(--navy);
+  padding: 36px 34px 28px;
+  position: relative;
+  background: #fff;
+  overflow: hidden;
+}
+.doc-inner::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--navy);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Large Watermark */
+.doc-inner::before{
+  content:'SVGMS';
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Cinzel', serif;
+  font-size:160px;
   font-weight:700;
+  color:rgba(30,58,138,0.03);
+  transform:rotate(-30deg);
+  pointer-events:none;
+  z-index:0;
+  letter-spacing: 15px;
+}
+.doc-inner > * { position:relative; z-index:1; }
+
+/* Crest & Header */
+.doc-header{
+  text-align:center;
+  border-bottom:2px solid var(--navy);
+  padding-bottom:16px;
+  margin-bottom:20px;
+}
+.doc-crest{
+  width:70px;height:70px;
+  margin:0 auto 10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.doc-crest img{max-width:100%;max-height:100%}
+.doc-crest .fallback{
+  font-family:'Cinzel',serif;
+  font-size:30px;font-weight:700;color:var(--navy);
+}
+.doc-school-name{
+  font-family:'Cinzel',serif;
+  font-size:25px;font-weight:700;
+  color:var(--navy);
+  letter-spacing:1px;
+  line-height:1.2;
+}
+.doc-school-address{
+  font-size:12.5px;font-weight:600;
+  color:var(--text);
+  margin-top:6px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.doc-title{
+  font-size:14px;font-weight:800;
   letter-spacing:3px;
   text-transform:uppercase;
-}
-.doc-banner .line2{
-  font-family:'Libre Baskerville',serif;
-  font-size:17px;
-  font-weight:700;
-  letter-spacing:1px;
-  margin-top:5px;
-}
-
-.doc-body{padding:26px 28px 28px}
-
-.doc-subhead{
-  display:flex;
-  justify-content:space-between;
-  align-items:baseline;
-  border-bottom:1px solid var(--line-light);
-  padding-bottom:10px;
-  margin-bottom:18px;
-}
-.doc-subhead .left{
-  font-size:12px;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:1px;
-  color:var(--muted);
-}
-.doc-subhead .right{
-  font-size:12px;
-  font-weight:600;
-  color:var(--muted);
+  color:var(--navy);
+  margin-top:12px;
+  background:#eef2f6;
+  display:inline-block;
+  padding:4px 20px;
+  border: 1px solid var(--navy);
+  border-radius: 2px;
 }
 
-/* Student info grid */
+/* Student Info - Dotted Line Style */
 .student-info{
-  display:grid;
-  grid-template-columns:2fr 1fr;
-  gap:0 40px;
-  margin-bottom:22px;
+  margin-bottom:24px;
+  padding: 0 10px;
 }
 .info-row{
   display:flex;
   gap:10px;
-  padding:6px 0;
-  border-bottom:1px dotted var(--line);
-  font-size:13.5px;
+  margin-bottom:10px;
+  font-size:14.5px;
   align-items:baseline;
 }
 .info-row .label{
-  width:120px;
+  width:150px;
   flex-shrink:0;
-  color:var(--muted);
-  font-weight:600;
-  font-size:12px;
+  color:var(--text);
+  font-weight:700;
   text-transform:uppercase;
-  letter-spacing:.4px;
+  letter-spacing:.5px;
+  font-size:12px;
 }
 .info-row .value{
   color:var(--text);
   font-weight:700;
   flex-grow:1;
+  border-bottom:1px dotted var(--muted);
+  padding-left:10px;
+  font-family:'Libre Baskerville', serif;
+  font-style:italic;
 }
 
-/* Marks table */
+/* Official Table */
 .marks-table{
   width:100%;
   border-collapse:collapse;
-  margin-bottom:0;
+  margin-top:10px;
   font-size:13.5px;
+  border:1.5px solid var(--navy);
 }
 .marks-table thead th{
-  background:#f1f5f9;
+  background:#eef2f6;
   color:var(--navy);
-  text-align:left;
-  font-size:11px;
-  font-weight:700;
+  text-align:center;
+  font-size:11.5px;
+  font-weight:800;
   text-transform:uppercase;
   letter-spacing:.8px;
-  padding:10px 12px;
-  border-top:1px solid var(--line);
-  border-bottom:2px solid var(--navy);
+  padding:12px 8px;
+  border-bottom:1.5px solid var(--navy);
+  border-right:1px solid var(--navy);
 }
+.marks-table thead th:last-child { border-right:none; }
 .marks-table thead th.num{text-align:right}
 .marks-table tbody td{
-  padding:11px 12px;
-  border-bottom:1px solid var(--line-light);
+  padding:10px 8px;
+  border-bottom:1px solid var(--line);
+  border-right:1px solid var(--line);
   vertical-align:middle;
+  text-align:center;
 }
-.marks-table tbody td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.marks-table tbody td:last-child { border-right:none; }
+.marks-table tbody td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;font-family:'Inter',sans-serif}
 .marks-table tbody td.subject{
   font-weight:700;
+  text-align:left;
   color:var(--text);
   letter-spacing:.2px;
+  padding-left:14px;
 }
-.marks-table tbody tr:nth-child(even){background:#fafbfc}
+.marks-table tbody tr:nth-child(even){background:#fcfcfd}
 .marks-table .grade{
   font-weight:800;
   text-align:center;
@@ -297,38 +351,43 @@ body{padding:20px 14px 40px}
 .grade.g-E, .grade.g-E1, .grade.g-E2, .grade.g-F{color:var(--red)}
 
 .marks-table tfoot td{
-  padding:12px;
-  border-top:2px solid var(--navy);
-  background:#f8fafc;
+  padding:12px 8px;
+  border-top:1.5px solid var(--navy);
+  background:#eef2f6;
   font-weight:800;
-  font-size:13.5px;
+  font-size:14px;
+  text-align:center;
+  border-right:1px solid var(--navy);
 }
+.marks-table tfoot td:last-child { border-right:none; }
 .marks-table tfoot td.num{text-align:right;font-variant-numeric:tabular-nums}
-.marks-table tfoot td.grade{text-align:center;font-size:15px}
+.marks-table tfoot td.grade{text-align:center;font-size:16px}
 
-/* Summary strip */
+/* Summary Strip */
 .summary-strip{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  border:1px solid var(--line);
-  margin-top:22px;
+  display:flex;
+  justify-content:space-between;
+  margin-top:24px;
+  border:1.5px solid var(--navy);
+  background:#eef2f6;
 }
 .summary-cell{
-  padding:14px 12px;
+  flex:1;
+  padding:12px 10px;
   text-align:center;
-  border-right:1px solid var(--line);
+  border-right:1px solid var(--navy);
 }
 .summary-cell:last-child{border-right:none}
 .summary-cell .k{
-  font-size:10px;
-  font-weight:700;
+  font-size:11px;
+  font-weight:800;
   text-transform:uppercase;
   letter-spacing:1px;
-  color:var(--muted);
-  margin-bottom:6px;
+  color:var(--navy);
+  margin-bottom:4px;
 }
 .summary-cell .v{
-  font-size:18px;
+  font-size:19px;
   font-weight:800;
   color:var(--text);
   font-variant-numeric:tabular-nums;
@@ -338,56 +397,91 @@ body{padding:20px 14px 40px}
 
 /* Remarks */
 .remarks-block{
-  margin-top:20px;
-  padding:12px 14px;
-  border-left:3px solid var(--navy);
-  background:#f8fafc;
+  margin-top:18px;
+  padding:10px 14px;
+  border:1px solid var(--line);
+  background:#fcfcfd;
   font-size:13px;
-  line-height:1.55;
+  line-height:1.5;
 }
 .remarks-block .k{
   font-size:11px;
-  font-weight:700;
+  font-weight:800;
   text-transform:uppercase;
   letter-spacing:.6px;
-  color:var(--muted);
-  margin-bottom:4px;
-}
-.remarks-block .v{
-  color:var(--text);
-  font-style:italic;
+  color:var(--navy);
+  margin-bottom:3px;
 }
 
-/* Signatures */
+/* Signatures & Stamp */
+.footer-area{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-top:45px;
+}
+.qr-verify{
+  text-align:center;
+}
+.qr-verify .qr-wrap{
+  width:76px;height:76px;
+  margin:0 auto 6px;
+  padding:4px;
+  border:1px solid var(--line);
+  background:#fff;
+}
+.qr-verify .qr-wrap img, .qr-verify .qr-wrap canvas{display:block;max-width:100%;height:auto !important;margin:0 auto;}
+.qr-verify .qr-label{
+  font-size:9.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  color:var(--muted);
+  letter-spacing:.5px;
+}
+
 .signatures{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:30px;
-  margin-top:50px;
-  padding-top:12px;
+  display:flex;
+  gap:60px;
+  align-items:flex-end;
 }
 .sig{
   text-align:center;
-  font-size:11px;
-  font-weight:700;
+  font-size:11.5px;
+  font-weight:800;
   text-transform:uppercase;
   letter-spacing:.6px;
-  color:var(--muted);
-  border-top:1px solid var(--text);
+  color:var(--text);
+  border-top:1.5px solid var(--text);
   padding-top:6px;
+  min-width:150px;
 }
 
-/* Doc footer */
-.doc-footer{
-  margin-top:30px;
-  padding-top:12px;
-  border-top:1px solid var(--line-light);
-  font-size:11px;
-  color:var(--muted);
-  text-align:center;
-  line-height:1.6;
+/* The Official Stamp */
+.verified-stamp {
+  position:absolute;
+  bottom:40px;
+  right:50px;
+  width:150px;
+  height:150px;
+  border:4px double currentColor;
+  border-radius:50%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  transform:rotate(-15deg);
+  color:#b91c1c;
+  opacity:0.85;
+  z-index:10;
+  pointer-events:none;
+  font-family:'Cinzel', serif;
 }
-.doc-footer strong{color:var(--text)}
+.verified-stamp .line1 { font-size:10px; font-weight:700; letter-spacing:2px; }
+.verified-stamp .line2 { font-size:24px; font-weight:800; margin:2px 0; }
+.verified-stamp .line3 { font-size:9px; font-weight:700; letter-spacing:1px; }
+.verified-stamp::after {
+  content:''; position:absolute; inset:5px; border:1px solid currentColor; border-radius:50%; opacity:0.6;
+}
 
 /* Actions */
 .actions{
@@ -395,6 +489,7 @@ body{padding:20px 14px 40px}
   gap:10px;
   justify-content:flex-end;
   margin-top:16px;
+  flex-wrap:wrap;
 }
 
 /* Loading */
@@ -415,68 +510,59 @@ body{padding:20px 14px 40px}
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* Screen-reader only */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
 /* ================= PRINT ================= */
 @media print {
-  @page { size: A4 portrait; margin: 12mm; }
+  @page { size: A4 portrait; margin: 10mm; }
   html, body { background: #fff !important; padding: 0 !important; }
   body * { visibility: hidden; }
   .print-area, .print-area * { visibility: visible; }
-  .print-area {
-    position: absolute;
-    left: 0; top: 0;
-    width: 100%;
-    padding: 0;
-  }
+  .print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
   .no-print { display: none !important; }
-  .document {
-    border: 1px solid #000 !important;
-    box-shadow: none !important;
-    page-break-inside: avoid;
+  
+  .document { box-shadow: none !important; page-break-inside: avoid; }
+  .doc-frame { 
+    border-color: #1e3a8a !important; 
+    background-color: #f8fafc !important;
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact; 
   }
-  .doc-banner { background: #1e3a8a !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .marks-table thead th { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .marks-table tbody tr:nth-child(even) { background: #fafbfc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .marks-table tfoot td { background: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .summary-strip { background: #fff !important; }
-  .remarks-block { background: #f8fafc !important; }
-  .actions { display: none !important; }
-  .search-panel { display: none !important; }
-  .school-header { display: none !important; }
-  .print-header { display: block !important; }
+  .doc-inner::before { opacity: 0.05 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .doc-inner { page-break-inside: avoid; }
+  
+  .marks-table thead th { background: #eef2f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .marks-table tbody tr:nth-child(even) { background: #fcfcfd !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .marks-table tfoot td { background: #eef2f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .summary-strip { background: #eef2f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  
+  .verified-stamp, .qr-wrap { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .actions, .search-panel, .school-header { display: none !important; }
 }
-
-/* Print-only duplicate header inside document */
-.print-header{
-  display: none;
-  text-align: center;
-  padding-bottom: 14px;
-  border-bottom: 2px solid #1e3a8a;
-  margin-bottom: 16px;
-}
-.print-header h1{
-  font-family: 'Libre Baskerville', serif;
-  font-size: 20px;
-  color: #1e3a8a;
-  font-weight: 700;
-  letter-spacing: .4px;
-}
-.print-header .sub{ font-size: 12px; font-weight: 600; margin-top: 3px; }
-.print-header .meta{ font-size: 10px; color: #64748b; margin-top: 3px; text-transform: uppercase; letter-spacing: .4px; }
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 720px){
   .school-header{flex-direction:column;text-align:center;gap:14px;padding:18px}
-  .school-header h1{font-size:17px}
   .form-grid{grid-template-columns:1fr}
-  .student-info{grid-template-columns:1fr;gap:0}
-  .summary-strip{grid-template-columns:repeat(2,1fr)}
-  .summary-cell:nth-child(2){border-right:none}
-  .summary-cell:nth-child(1), .summary-cell:nth-child(2){border-bottom:1px solid var(--line)}
-  .signatures{grid-template-columns:1fr;gap:40px;margin-top:36px}
-  .doc-body{padding:18px 16px 22px}
-  .marks-table thead th, .marks-table tbody td{padding:9px 8px;font-size:12.5px}
+  .student-info{grid-template-columns:1fr; padding: 0;}
+  .info-row{flex-direction:column;gap:2px;margin-bottom:12px}
+  .info-row .label{width:auto}
+  .info-row .value{border-bottom:1px solid var(--line);padding-left:0}
+  .summary-strip{flex-wrap:wrap}
+  .summary-cell{flex:1 1 50%;border-bottom:1px solid var(--line)}
+  .summary-cell:nth-child(2n){border-right:none}
+  .footer-area{flex-direction:column;align-items:center;gap:30px}
+  .signatures{flex-direction:column;gap:30px;width:100%}
+  .sig{width:100%}
+  .doc-inner{padding:24px 16px; border-width: 1px;}
+  .doc-inner::after { inset: 4px; }
+  .doc-frame{padding:8px;}
+  .marks-table thead th, .marks-table tbody td{padding:8px 4px;font-size:12px}
   .actions{flex-direction:column}
   .btn{width:100%}
+  .verified-stamp{bottom:auto;top:15%;right:10px;width:110px;height:110px;}
+  .verified-stamp .line2{font-size:18px;}
 }
 </style>
 </head>
@@ -484,26 +570,30 @@ body{padding:20px 14px 40px}
 
 <div class="page">
 
-  <!-- ============== SCHOOL HEADER ============== -->
-  <header class="school-header">
+  <header class="school-header no-print" id="mainHeader">
     <div class="logo">
-      <img src="logomodern.png" alt="School Logo"
-           onerror="this.outerHTML='<div class=&quot;fallback&quot;>S</div>'">
+      <img src="logomodern.png" alt="School Logo" onerror="this.outerHTML='<div class=&quot;fallback&quot;>S</div>'">
     </div>
     <div class="info">
       <h1>SWAMI VIVEKANAND GOVT. MODEL SCHOOL</h1>
       <div class="sub">BHIM, RAJSAMAND — RAJASTHAN</div>
-      <div class="meta">Affiliated to CBSE &nbsp;|&nbsp; Student Result Portal</div>
+      <div class="meta">Affiliated to CBSE &nbsp;|&nbsp; Official Result Portal</div>
     </div>
   </header>
 
-  <!-- ============== SEARCH PANEL ============== -->
-  <div class="search-panel no-print">
+  <div class="search-panel no-print" id="searchPanel">
     <h2>Result Lookup</h2>
-
     <div class="form-grid">
       <div class="field">
-        <label>Class</label>
+        <label for="f-session">Session</label>
+        <select id="f-session">
+          <option value="2026-27" selected>2026-27</option>
+          <option value="2025-26">2025-26</option>
+          <option value="2024-25">2024-25</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-cls">Class</label>
         <select id="f-cls">
           <option value="">Select Class</option>
           <option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option>
@@ -512,14 +602,14 @@ body{padding:20px 14px 40px}
         </select>
       </div>
       <div class="field">
-        <label>Section</label>
+        <label for="f-sec">Section</label>
         <select id="f-sec">
           <option value="">Select Section</option>
           <option>A</option><option>B</option><option>C</option><option>D</option>
         </select>
       </div>
       <div class="field">
-        <label>Exam Type</label>
+        <label for="f-exam">Exam Type</label>
         <select id="f-exam">
           <option value="">Select Exam</option>
           <option value="PT1">Periodic Test 1</option>
@@ -529,30 +619,31 @@ body{padding:20px 14px 40px}
         </select>
       </div>
       <div class="field">
-        <label>Roll Number</label>
+        <label for="f-roll">Roll Number</label>
         <input type="text" id="f-roll" placeholder="e.g. 1" inputmode="numeric" autocomplete="off">
       </div>
-      <div class="field" style="grid-column: span 2;">
-        <label>Date of Birth</label>
+      <div class="field">
+        <label for="f-dob">Date of Birth</label>
         <input type="date" id="f-dob">
       </div>
     </div>
-
     <button class="btn" id="btn-search" type="button">View Result</button>
-    <div class="error" id="err"></div>
+    <div class="error" id="err" role="alert" aria-live="assertive"></div>
   </div>
 
-  <!-- ============== RESULT ============== -->
   <div class="result-section" id="resultSection">
     <div class="print-area" id="printArea"></div>
-    <div class="actions no-print">
+    <div class="actions no-print" id="actionBtns">
       <button class="btn btn-outline" onclick="resetLookup()">New Search</button>
+      <button class="btn btn-outline" onclick="shareResult()">Share</button>
       <button class="btn" onclick="window.print()">Print / Save as PDF</button>
     </div>
   </div>
 
+  <div id="status" class="sr-only" role="status" aria-live="polite"></div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════
 const FIREBASE_PROJECT_ID = "svgms-backend";
@@ -560,6 +651,7 @@ const FIREBASE_API_KEY    = "AIzaSyAHmBCyGlSo1puz1LZ7k-4twg_XAcOqyRA";
 // ══════════════════════════════════════════════════════════
 
 const CURRENT_SESSION = '2026-27';
+const LAST_SEARCH_KEY = 'svgms:lastSearch';
 
 const EXAM_LABELS = {
   'PT1': 'Periodic Test 1',
@@ -574,7 +666,12 @@ const SCHOOL = {
   affiliation: 'Affiliated to CBSE'
 };
 
-// ---- Grade helper (mirrors script.js) ----
+let lastResult = null;
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => (
+  { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]
+));
+
 function calculateGrade(pct, cls){
   const scales = {
     'I':   [[90,'A*'],[75,'A'],[56,'B'],[35,'C'],[0,'D']],
@@ -595,7 +692,6 @@ function calculateGrade(pct, cls){
   return 'E';
 }
 
-// ---- Crypto ----
 async function sha256Hex(str){
   const buf = new TextEncoder().encode(str);
   const hash = await crypto.subtle.digest('SHA-256', buf);
@@ -617,7 +713,6 @@ function formatDob(dob){
   return dob;
 }
 
-// ---- Firestore REST decoder ----
 function decodeValue(v){
   if (!v) return null;
   if ('stringValue'    in v) return v.stringValue;
@@ -642,111 +737,224 @@ function decodeDoc(doc){
   return out;
 }
 
-// ---- Per-subject computation ----
-function computeSubject(raw, cls, meta){
-  raw = raw || {}; meta = meta || {};
-  let obtained = 0, max = 0, theory = 0, practical = 0;
-  let hasTheoryPractical = false;
+function pickNum(obj, keys) {
+  for (const k of keys) {
+    if (obj[k] != null && obj[k] !== '') {
+      const v = parseFloat(obj[k]);
+      if (!isNaN(v)) return v;
+    }
+  }
+  return undefined;
+}
 
-  if (raw.obtained != null && raw.obtained !== ''){
-    obtained  = parseFloat(raw.obtained) || 0;
-    max       = parseFloat(raw.max) || 0;
-    theory    = parseFloat(raw.theory) || 0;
-    practical = parseFloat(raw.practical) || 0;
-    hasTheoryPractical = !!meta.hasPractical && (raw.theory != null || raw.practical != null);
-  } else if (raw.achieved != null && raw.achieved !== ''){
-    obtained = parseFloat(raw.achieved) || 0;
-    max      = parseFloat(raw.maxMarks) || 0;
-  } else if (raw.marks != null && raw.marks !== ''){
-    obtained = parseFloat(raw.marks) || 0;
-    max      = parseFloat(meta.totalMax) || 0;
+function normalizeSubjectData(entry, subjects) {
+  if (!entry || typeof entry !== 'object') return {};
+  const source = (entry.subjects && typeof entry.subjects === 'object' && Object.keys(entry.subjects).length)
+    ? entry.subjects : entry;
+  const out = {};
+  subjects.forEach(name => {
+    const raw = source[name];
+    if (raw == null) return;
+    if (typeof raw !== 'object') {
+      out[name] = { obtained: Number(raw) || 0 };
+      return;
+    }
+    const n = {
+      obtained:  pickNum(raw, ['obtained','marks','total','achieved','score','final']),
+      max:       pickNum(raw, ['max','maxMarks','totalMax','maximum']),
+      theory:    pickNum(raw, ['theory','th','finalTheory','theoryMarks','tMarks','t','thMarks']),
+      practical: pickNum(raw, ['practical','pr','finalPractical','practicalMarks','pMarks','p','prac','prMarks']),
+    };
+    Object.keys(n).forEach(k => { if (n[k] === undefined) delete n[k]; });
+    if (Object.keys(n).length) out[name] = n;
+  });
+  return out;
+}
+
+function computeSubject(raw, cls, meta) {
+  raw = raw || {}; meta = meta || {};
+  const metaTheoryMax    = parseFloat(meta.theoryMax)    || 0;
+  const metaPracticalMax = parseFloat(meta.practicalMax) || 0;
+  const metaTotalMax     = parseFloat(meta.totalMax) || (metaTheoryMax + metaPracticalMax) || 0;
+  const metaHasPr        = !!(meta.hasPractical || metaPracticalMax > 0);
+
+  const val = v => (v === undefined || v === null || v === '') ? undefined : Number(v);
+
+  let theory    = val(raw.theory);
+  let practical = val(raw.practical);
+  let obtained  = val(raw.obtained);
+  let max       = val(raw.max);
+
+  const dataHasRealPractical = practical !== undefined && practical > 0;
+  const hasSplit = metaHasPr || dataHasRealPractical;
+
+  if (obtained === undefined) {
+    if (theory !== undefined || practical !== undefined) {
+      obtained = (theory || 0) + (practical || 0);
+    } else if (val(raw.marks) !== undefined) {
+      obtained = val(raw.marks);
+    } else if (val(raw.achieved) !== undefined) {
+      obtained = val(raw.achieved);
+    } else {
+      obtained = 0;
+    }
+  }
+
+  if (metaTotalMax > 0) max = metaTotalMax;
+  if (max === undefined) max = metaTotalMax || 0;
+
+  if (!hasSplit) {
+    theory    = undefined;
+    practical = undefined;
   }
 
   const pct = max > 0 ? (obtained / max) * 100 : 0;
   return {
-    obtained, max, theory, practical, hasTheoryPractical,
+    obtained, max, theory, practical,
+    theoryMax: metaTheoryMax,
+    practicalMax: metaPracticalMax,
+    hasTheoryPractical: hasSplit,
     pct,
     grade: pct > 0 ? calculateGrade(pct, cls) : '—'
   };
 }
 
-// ---- Lookup ----
+function countUp(el, from, to, dur, fmt) {
+  if (!el) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || dur <= 0) { el.textContent = fmt(to); return; }
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min((now - start) / dur, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = fmt(from + (to - from) * eased);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function burst() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const canvas = document.createElement('canvas');
+  Object.assign(canvas.style, { position: 'fixed', inset: '0', pointerEvents: 'none', zIndex: '9999' });
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = window.innerWidth;
+  const H = canvas.height = window.innerHeight;
+  const colors = ['#1e3a8a', '#15803d', '#b45309', '#b91c1c', '#1d4ed8', '#7f1d1d'];
+  const particles = Array.from({ length: 100 }, () => ({
+    x: W / 2 + (Math.random() - 0.5) * 90, y: H * 0.3,
+    vx: (Math.random() - 0.5) * 14, vy: -Math.random() * 14 - 4,
+    size: Math.random() * 5 + 2, rot: Math.random() * Math.PI,
+    vr: (Math.random() - 0.5) * 0.3, color: colors[(Math.random() * colors.length) | 0], alpha: 1
+  }));
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+    let alive = false;
+    for (const p of particles) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.4; p.rot += p.vr; p.alpha -= 0.008;
+      if (p.alpha > 0 && p.y < H + 20) {
+        alive = true; ctx.save(); ctx.globalAlpha = Math.max(p.alpha, 0);
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6); ctx.restore();
+      }
+    }
+    if (alive) requestAnimationFrame(tick); else canvas.remove();
+  }
+  requestAnimationFrame(tick);
+}
+
+// ---- Fetch Logic ----
+async function fetchResultById(docId, isVerification = false) {
+  const printArea = document.getElementById('printArea');
+  const resultSection = document.getElementById('resultSection');
+  const searchPanel = document.getElementById('searchPanel');
+  
+  resultSection.classList.remove('show');
+  printArea.innerHTML = '<div class="loading"><div class="spinner"></div>Verifying record...</div>';
+  resultSection.classList.add('show');
+  if(isVerification) searchPanel.style.display = 'none'; 
+
+  try {
+    const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/results/${docId}?key=${FIREBASE_API_KEY}`;
+    const res = await fetch(url);
+    
+    if (res.status === 404) {
+      printArea.innerHTML = '';
+      showError('Verification failed. This marksheet does not exist in our records or the URL is invalid.');
+      if(isVerification) {
+          printArea.innerHTML = `<div style="text-align:center; padding:40px; color:#b91c1c; border:2px dashed #b91c1c; background:#fef2f2;">
+             <h2>Invalid QR Code</h2>
+             <p>The document ID <strong>${esc(docId)}</strong> could not be found.</p>
+          </div>`;
+      }
+    } else if (!res.ok) {
+      throw new Error(`Server returned ${res.status}`);
+    } else {
+      const doc = await res.json();
+      const stu = decodeDoc(doc);
+      
+      const idParts = docId.split('_');
+      const examType = idParts.length >= 5 ? idParts[4] : 'Annual';
+      const fallbackSec = idParts.length >= 3 ? idParts[2] : '';
+      
+      renderResult(stu, examType, fallbackSec, docId, isVerification);
+    }
+  } catch (e) {
+    printArea.innerHTML = '';
+    showError('Verification failed: ' + e.message);
+    if(isVerification) printArea.innerHTML = `<div style="text-align:center; padding:40px; color:#b91c1c;">System Error. Please try again later.</div>`;
+  }
+}
+
 async function doLookup(){
+  const session = document.getElementById('f-session').value || CURRENT_SESSION;
   const cls  = document.getElementById('f-cls').value;
   const sec  = document.getElementById('f-sec').value;
   const exam = document.getElementById('f-exam').value;
   const roll = document.getElementById('f-roll').value.trim();
   const dob  = document.getElementById('f-dob').value;
-  const err  = document.getElementById('err');
-  const resultSection = document.getElementById('resultSection');
-  const printArea = document.getElementById('printArea');
   const btn = document.getElementById('btn-search');
 
-  err.classList.remove('show');
-  resultSection.classList.remove('show');
-  printArea.innerHTML = '<div class="loading"><div class="spinner"></div>Fetching result...</div>';
-  resultSection.classList.add('show');
+  clearError();
+  document.getElementById('resultSection').classList.remove('show');
 
   if (!cls || !sec || !exam || !roll || !dob){
-    printArea.innerHTML = '';
-    resultSection.classList.remove('show');
-    err.textContent = 'Please fill all fields including Exam Type.';
-    err.classList.add('show');
+    showError('Please fill all fields including Exam Type and Date of Birth.');
     return;
   }
 
-  btn.disabled = true;
-  btn.textContent = 'Searching...';
+  btn.disabled = true; btn.textContent = 'Searching...';
+  document.getElementById('printArea').innerHTML = '<div class="loading"><div class="spinner"></div>Fetching result...</div>';
+  document.getElementById('resultSection').classList.add('show');
 
   try {
     const dobHash = await sha256Hex(normalizeDob(dob));
-    const docId = `${CURRENT_SESSION}_${cls}_${sec}_${roll}_${exam}_${dobHash.slice(0,10)}`;
-    const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/results/${docId}?key=${FIREBASE_API_KEY}`;
-
-    const res = await fetch(url);
-    if (res.status === 404){
-      printArea.innerHTML = '';
-      resultSection.classList.remove('show');
-      err.textContent = `No result found for ${EXAM_LABELS[exam] || exam}. Please verify Class, Section, Exam Type, Roll Number, and Date of Birth.`;
-      err.classList.add('show');
-    } else if (!res.ok){
-      const text = await res.text();
-      printArea.innerHTML = '';
-      resultSection.classList.remove('show');
-      err.textContent = `Server returned ${res.status}. ${text}`;
-      err.classList.add('show');
-    } else {
-      const doc = await res.json();
-      const stu = decodeDoc(doc);
-      renderResult(stu, exam);
+    const docId = `${session}_${cls}_${sec}_${roll}_${exam}_${dobHash.slice(0,10)}`;
+    
+    await fetchResultById(docId, false);
+    
+    if(document.querySelector('.document')) {
+       try { localStorage.setItem(LAST_SEARCH_KEY, JSON.stringify({ session, cls, sec, exam, roll })); } catch(_){}
     }
-  } catch(e){
+
+  } catch(e) {
     console.error(e);
-    printArea.innerHTML = '';
-    resultSection.classList.remove('show');
-    err.textContent = 'Search failed: ' + e.message;
-    err.classList.add('show');
   }
-  btn.disabled = false;
-  btn.textContent = 'View Result';
+  btn.disabled = false; btn.textContent = 'View Result';
 }
 
-// ---- Render ----
-function renderResult(stu, examType){
+function renderResult(stu, examType, fallbackSection, docId, isVerified) {
   const printArea = document.getElementById('printArea');
   const cls = stu.class;
   const meta = stu.subjectMeta || {};
   const subjects = stu.subjects || [];
-  const sectionKey = stu.section || sec;
-const entry = (stu.entries && stu.entries[sectionKey]) || {};
-  const subjectData = entry.subjects || {};
+  const sectionKey = stu.section || fallbackSection || '';
+  const entry = (stu.entries && stu.entries[sectionKey]) || {};
+  const subjectData = normalizeSubjectData(entry, subjects);
   const remarks = entry.remarks || stu.remarks || '';
 
-  const rows = subjects.map(s => {
-    const r = computeSubject(subjectData[s], cls, meta[s]);
-    return { subject: s, ...r };
-  });
-
+  const rows = subjects.map(s => ({ subject: s, ...computeSubject(subjectData[s], cls, meta[s]) }));
   const valid = rows.filter(r => r.max > 0);
   const totalObtained = valid.reduce((sum, r) => sum + r.obtained, 0);
   const totalMax      = valid.reduce((sum, r) => sum + r.max, 0);
@@ -754,125 +962,204 @@ const entry = (stu.entries && stu.entries[sectionKey]) || {};
   const overallGrade  = overallPct > 0 ? calculateGrade(overallPct, cls) : '—';
   const passed        = overallPct >= 33;
 
-  const session = stu.session || CURRENT_SESSION;
+  const session = stu.session || document.getElementById('f-session').value || CURRENT_SESSION;
   const dobDisplay = formatDob(stu.dob);
   const examLabel = EXAM_LABELS[examType] || examType;
+  
+  const anyPractical = rows.some(r => r.hasTheoryPractical);
+  const totalTheory = rows.reduce((s, r) => s + (r.hasTheoryPractical ? (r.theory || 0) : 0), 0);
+  const totalPractical = rows.reduce((s, r) => s + (r.hasTheoryPractical ? (r.practical || 0) : 0), 0);
 
+  const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  
   const rowsHTML = rows.map((r, i) => {
     const gc = 'g-' + String(r.grade).replace('*', '');
+    const hasSplit = r.hasTheoryPractical && (r.theory !== 0 || r.practical !== 0);
+    const thCell = anyPractical ? `<td class="num">${hasSplit ? r.theory : '—'}</td>` : '';
+    const prCell = anyPractical ? `<td class="num">${hasSplit ? r.practical : '—'}</td>` : '';
     return `
       <tr>
         <td class="num" style="width:40px">${i + 1}</td>
-        <td class="subject">${r.subject}</td>
+        <td class="subject">${esc(r.subject)}</td>
         <td class="num">${r.max || '—'}</td>
-        <td class="num">${r.obtained}</td>
+        ${thCell}${prCell}
+        <td class="num" style="background:#f8fafc; font-weight:800;">${r.obtained}</td>
         <td class="num">${r.max > 0 ? r.pct.toFixed(1) + '%' : '—'}</td>
-        <td class="grade ${gc}">${r.grade}</td>
+        <td class="grade ${gc}">${esc(r.grade)}</td>
       </tr>
     `;
   }).join('');
 
+  const emptyRowColspan = anyPractical ? 8 : 6;
+  const verifyUrl = `https://svgms.vercel.app/result-lookup.html?verify=${docId}`;
+
   printArea.innerHTML = `
     <div class="document" id="resultDoc">
-
-      <div class="doc-banner">
-        <div class="line1">Statement of Marks</div>
-        <div class="line2">${examLabel}</div>
-      </div>
-
-      <div class="doc-body">
-
-        <!-- Print-only school header -->
-        <div class="print-header">
-          <h1>${SCHOOL.name}</h1>
-          <div class="sub">${SCHOOL.address}</div>
-          <div class="meta">${SCHOOL.affiliation}</div>
-        </div>
-
-        <div class="doc-subhead">
-          <div class="left">Session ${session}</div>
-          <div class="right">Issued: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
-        </div>
-
-        <div class="student-info">
-          <div class="info-row"><span class="label">Name</span><span class="value">${stu.name || '—'}</span></div>
-          <div class="info-row"><span class="label">Roll No</span><span class="value">${stu.rollNo || '—'}</span></div>
-          <div class="info-row"><span class="label">Father's Name</span><span class="value">${stu.fatherName || '—'}</span></div>
-          <div class="info-row"><span class="label">Class</span><span class="value">${stu.class || '—'}${stu.section ? '-' + stu.section : ''}</span></div>
-          <div class="info-row"><span class="label">Mother's Name</span><span class="value">${stu.motherName || '—'}</span></div>
-          <div class="info-row"><span class="label">Date of Birth</span><span class="value">${dobDisplay}</span></div>
-          <div class="info-row"><span class="label">Admission No</span><span class="value">${stu.admissionNo || '—'}</span></div>
-          <div class="info-row"><span class="label">Exam</span><span class="value">${examLabel}</span></div>
-        </div>
-
-        <table class="marks-table">
-          <thead>
-            <tr>
-              <th class="num" style="width:40px">#</th>
-              <th>Subject</th>
-              <th class="num" style="width:90px">Max Marks</th>
-              <th class="num" style="width:110px">Marks Obtained</th>
-              <th class="num" style="width:90px">Percentage</th>
-              <th style="width:70px;text-align:center">Grade</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHTML || '<tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">No subject data available.</td></tr>'}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2">TOTAL</td>
-              <td class="num">${totalMax}</td>
-              <td class="num">${totalObtained}</td>
-              <td class="num">${overallPct.toFixed(2)}%</td>
-              <td class="grade g-${String(overallGrade).replace('*','')}">${overallGrade}</td>
-            </tr>
-          </tfoot>
-        </table>
-
-        <div class="summary-strip">
-          <div class="summary-cell">
-            <div class="k">Total Marks</div>
-            <div class="v">${totalObtained} / ${totalMax}</div>
+      <div class="doc-frame">
+        <div class="doc-inner">
+          
+          <div class="doc-header">
+            <div class="doc-crest">
+              <img src="logomodern.png" alt="Crest" onerror="this.outerHTML='<div class=&quot;fallback&quot;>S</div>'">
+            </div>
+            <div class="doc-school-name">${esc(SCHOOL.name)}</div>
+            <div class="doc-school-address">${esc(SCHOOL.address)}</div>
+            <div class="doc-school-address" style="margin-top:2px; font-size:11px;">${esc(SCHOOL.affiliation)}</div>
+            <div class="doc-title">Statement of Marks</div>
+            <div style="font-family:'Libre Baskerville', serif; font-weight:700; font-size:16px; margin-top:12px; color:var(--navy);">
+              ${esc(examLabel)}
+            </div>
+            <div style="font-size:12px; font-weight:700; margin-top:4px;">Session: ${esc(session)}</div>
           </div>
-          <div class="summary-cell">
-            <div class="k">Percentage</div>
-            <div class="v">${overallPct.toFixed(2)}%</div>
+
+          <div class="student-info">
+            <div class="info-row"><span class="label">Name of Student</span><span class="value">${esc(stu.name || '—')}</span></div>
+            <div class="info-row"><span class="label">Roll Number</span><span class="value">${esc(stu.rollNo || '—')}</span></div>
+            <div class="info-row"><span class="label">Father's Name</span><span class="value">${esc(stu.fatherName || '—')}</span></div>
+            <div class="info-row"><span class="label">Mother's Name</span><span class="value">${esc(stu.motherName || '—')}</span></div>
+            <div class="info-row"><span class="label">Class & Section</span><span class="value">${esc(stu.class || '—')} - ${esc(sectionKey)}</span></div>
+            <div class="info-row"><span class="label">Date of Birth</span><span class="value">${esc(dobDisplay)}</span></div>
+            <div class="info-row"><span class="label">Admission No.</span><span class="value">${esc(stu.admissionNo || '—')}</span></div>
           </div>
-          <div class="summary-cell">
-            <div class="k">Overall Grade</div>
-            <div class="v">${overallGrade}</div>
+
+          <table class="marks-table">
+            <thead>
+              <tr>
+                <th class="num" style="width:40px">#</th>
+                <th style="text-align:left; padding-left:14px;">Subjects</th>
+                <th class="num" style="width:80px">Full Marks</th>
+                ${anyPractical ? '<th class="num" style="width:70px">Th. Marks</th><th class="num" style="width:70px">Pr. Marks</th>' : ''}
+                <th class="num" style="width:100px">Marks Obtained</th>
+                <th class="num" style="width:80px">Percent</th>
+                <th style="width:60px">Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHTML || `<tr><td colspan="${emptyRowColspan}" style="text-align:center;padding:30px;color:#64748b">No subject data available.</td></tr>`}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" style="text-align:left; padding-left:14px;">GRAND TOTAL</td>
+                <td class="num">${totalMax}</td>
+                ${anyPractical ? `<td class="num">${totalTheory || '—'}</td><td class="num">${totalPractical || '—'}</td>` : ''}
+                <td class="num" style="background:#e2e8f0;">${totalObtained}</td>
+                <td class="num">${overallPct.toFixed(2)}%</td>
+                <td class="grade g-${String(overallGrade).replace('*','')}">${esc(overallGrade)}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <div class="summary-strip">
+            <div class="summary-cell">
+              <div class="k">Total Marks</div>
+              <div class="v" id="sum-total">0 / ${totalMax}</div>
+            </div>
+            <div class="summary-cell">
+              <div class="k">Percentage</div>
+              <div class="v" id="sum-pct">0.00%</div>
+            </div>
+            <div class="summary-cell">
+              <div class="k">Division / Grade</div>
+              <div class="v">${esc(overallGrade)}</div>
+            </div>
+            <div class="summary-cell">
+              <div class="k">Final Result</div>
+              <div class="v ${passed ? 'pass' : 'fail'}">${passed ? 'PASS' : 'FAIL'}</div>
+            </div>
           </div>
-          <div class="summary-cell">
-            <div class="k">Result</div>
-            <div class="v ${passed ? 'pass' : 'fail'}">${passed ? 'PASS' : 'FAIL'}</div>
+
+          ${remarks ? `
+            <div class="remarks-block">
+              <div class="k">Remarks</div>
+              <div class="v" style="font-style:italic;">${esc(remarks)}</div>
+            </div>
+          ` : ''}
+
+          <div class="footer-area">
+            <div class="qr-verify">
+              <div class="qr-wrap" id="qrWrap"></div>
+              <div class="qr-label">Scan to Verify</div>
+            </div>
+            
+            <div style="text-align:center; font-size:11px; font-weight:600; color:var(--muted); margin-bottom:10px;">
+              <div>Date of Issue: ${esc(today)}</div>
+              <div>Place: Bhim, Rajsamand</div>
+            </div>
+
+            <div class="signatures">
+              <div class="sig">Class Teacher</div>
+              <div class="sig">Controller of Exams</div>
+            </div>
           </div>
+
+          ${isVerified ? `
+            <div class="verified-stamp">
+              <div class="line1">SVGMS BHIM</div>
+              <div class="line2">VERIFIED</div>
+              <div class="line3">${esc(today)}</div>
+            </div>
+          ` : (passed ? `
+            <div class="verified-stamp" style="color:var(--green);">
+              <div class="line1">RESULT</div>
+              <div class="line2">PASSED</div>
+              <div class="line3">${esc(overallGrade)}</div>
+            </div>
+          ` : `
+            <div class="verified-stamp" style="color:var(--red);">
+              <div class="line1">RESULT</div>
+              <div class="line2">FAILED</div>
+              <div class="line3">—</div>
+            </div>
+          `)}
+          
         </div>
-
-        ${remarks ? `
-          <div class="remarks-block">
-            <div class="k">Remarks</div>
-            <div class="v">${remarks}</div>
-          </div>
-        ` : ''}
-
-        <div class="signatures">
-          <div class="sig">Class Teacher</div>
-          <div class="sig">Exam In-charge</div>
-          <div class="sig">Principal</div>
-        </div>
-
-        <div class="doc-footer">
-          This is a computer-generated statement of marks issued by <strong>${SCHOOL.name}</strong>.<br>
-          In case of any discrepancy, contact the school office within 7 days of publication.
-        </div>
-
       </div>
     </div>
   `;
 
+  const qrWrap = printArea.querySelector('#qrWrap');
+  if (qrWrap && window.QRCode) {
+    try {
+      new QRCode(qrWrap, {
+        text: verifyUrl,
+        width: 64, height: 64,
+        correctLevel: QRCode.CorrectLevel.M,
+        colorDark: '#1e3a8a',
+        colorLight: '#ffffff'
+      });
+    } catch(_) { qrWrap.style.display = 'none'; }
+  }
+
+  const docEl = printArea.querySelector('.document');
+  if (docEl) docEl.focus({ preventScroll: true });
+  
+  countUp(printArea.querySelector('#sum-total'), 0, totalObtained, 800, v => `${Math.round(v)} / ${totalMax}`);
+  countUp(printArea.querySelector('#sum-pct'), 0, overallPct, 900, v => `${v.toFixed(2)}%`);
+  
+  if (passed && !isVerified) setTimeout(burst, 250);
+
+  lastResult = { name: stu.name || 'Student', pct: overallPct, grade: overallGrade, examLabel };
+  
   document.getElementById('resultSection').classList.add('show');
+  document.getElementById('status').textContent = `Result loaded. ${overallPct.toFixed(2)} percent. ${passed ? 'Passed.' : 'Failed.'}`;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showError(msg) {
+  const err = document.getElementById('err');
+  err.textContent = msg;
+  err.classList.add('show');
+}
+function clearError() {
+  document.getElementById('err').classList.remove('show');
+  document.getElementById('err').textContent = '';
+}
+
+function shareResult(){
+  if (!lastResult) return;
+  const text = `${lastResult.name} scored ${lastResult.pct.toFixed(1)}% (Grade ${lastResult.grade}) in ${lastResult.examLabel} at SVGMS Bhim.`;
+  if (navigator.share) navigator.share({ title: 'Result — SVGMS Bhim', text }).catch(() => {});
+  else window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
 function resetLookup(){
@@ -880,13 +1167,39 @@ function resetLookup(){
   document.getElementById('printArea').innerHTML = '';
   document.getElementById('f-roll').value = '';
   document.getElementById('f-dob').value = '';
-  document.getElementById('err').classList.remove('show');
+  clearError();
+  document.getElementById('searchPanel').style.display = 'block'; 
+  window.history.replaceState({}, document.title, window.location.pathname);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 document.getElementById('btn-search').addEventListener('click', doLookup);
 document.getElementById('f-dob').addEventListener('keydown', e => { if (e.key === 'Enter') doLookup(); });
 document.getElementById('f-roll').addEventListener('keydown', e => { if (e.key === 'Enter') doLookup(); });
+document.getElementById('f-dob').max = new Date().toISOString().slice(0, 10);
+
+try {
+  const last = JSON.parse(localStorage.getItem(LAST_SEARCH_KEY) || '{}');
+  ['session', 'cls', 'sec', 'exam', 'roll'].forEach(k => {
+    const el = document.getElementById('f-' + k);
+    if (el && last[k] != null && last[k] !== '') el.value = last[k];
+  });
+} catch(_) {}
+
+const urlParams = new URLSearchParams(window.location.search);
+const verifyDocId = urlParams.get('verify');
+
+if (verifyDocId) {
+  document.getElementById('searchPanel').style.display = 'none';
+  document.getElementById('mainHeader').style.display = 'none';
+  
+  document.getElementById('actionBtns').innerHTML = `
+    <button class="btn btn-outline" onclick="resetLookup()">Back to Home</button>
+    <button class="btn" onclick="window.print()">Print Verified Document</button>
+  `;
+  
+  fetchResultById(verifyDocId, true);
+}
 </script>
 </body>
 </html>
